@@ -287,6 +287,7 @@ function go(hash) {
     location.hash = target;
   }
 }
+window.go = go;
 
 function activeNavForRoute(route) {
   if (route === '/intro' || route === '/' || route === '/home') return 'Home';
@@ -4690,13 +4691,7 @@ async function manufacturerIntelligence() {
         if (studioLayoutKey) localStorage.removeItem(studioLayoutKey);
         if (user) localStorage.removeItem('genesis_studio_layout_' + user.id);
         isEditMode = false;
-        if ($('#studioModeLabel')) $('#studioModeLabel').textContent = 'Customize Dashboard';
-        if (studioApi && typeof studioApi.setProperty === 'function' && typeof studioApi.setState === 'function') {
-          studioApi.setProperty('mode', 'view');
-          studioApi.setState(createDefaultReportState());
-        } else {
-          draw();
-        }
+        draw();
         notice('AG Studio reset to default GENESIS Intelligence dashboard.', 'success');
       };
     }

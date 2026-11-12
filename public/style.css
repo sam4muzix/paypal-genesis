@@ -114,6 +114,8 @@ svg.icon,
 
 /* Contextual Topbar */
 .lumina-topbar {
+  position: relative;
+  z-index: 40;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -567,14 +569,82 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 }
 
 /* =====================================================================
-   01. ENTRY HOME PAGE (01-entry-home.png + Hero 3D Journey Visual)
+   01. ENTRY HOME PAGE (01-entry-home.png + Elevated Animated Hero Stage)
    ===================================================================== */
+@keyframes luminaRiseIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.988); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes heroFloatOrb {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-9px) scale(1.014); }
+}
+
+@keyframes heroGlowBreathe {
+  0%, 100% { opacity: 0.72; transform: scale(0.97); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+@keyframes heroSweepShimmer {
+  0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  35% { opacity: 0.45; }
+  70%, 100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes journeyNodePulse {
+  0%, 100% {
+    box-shadow: 0 0 22px rgba(37, 137, 255, 0.22);
+    border-color: rgba(56, 189, 248, 0.38);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(56, 189, 248, 0.52), 0 0 10px rgba(37, 137, 255, 0.35);
+    border-color: rgba(125, 211, 252, 0.72);
+  }
+}
+
+@keyframes journeyArrowFlow {
+  0%, 100% { opacity: 0.4; transform: translateX(0px); }
+  50% { opacity: 0.92; transform: translateX(3px); }
+}
+
 .genesis-home-hero {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 1.08fr);
   align-items: center;
   gap: clamp(20px, 3vw, 56px);
-  padding: clamp(16px, 2vw, 32px) 4px 18px;
+  padding: clamp(22px, 3vw, 44px) clamp(20px, 3.2vw, 48px);
+  border-radius: 28px;
+  background:
+    radial-gradient(ellipse 68% 72% at 76% 48%, rgba(37, 137, 255, 0.16), transparent 64%),
+    radial-gradient(circle at 14% 18%, rgba(56, 189, 248, 0.10), transparent 52%),
+    linear-gradient(135deg, rgba(11, 22, 44, 0.84) 0%, rgba(6, 12, 26, 0.90) 58%, rgba(10, 22, 48, 0.82) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.24);
+  backdrop-filter: blur(26px);
+  -webkit-backdrop-filter: blur(26px);
+  box-shadow:
+    0 32px 84px -18px rgba(0, 0, 0, 0.84),
+    0 0 56px -18px rgba(37, 137, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(56, 189, 248, 0.12);
+  overflow: hidden;
+  animation: luminaRiseIn 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.genesis-home-hero::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(115deg, rgba(125, 211, 252, 0.18) 0%, transparent 28%, transparent 72%, rgba(37, 137, 255, 0.16) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.genesis-home-hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .genesis-home-left {
@@ -583,6 +653,35 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   align-items: flex-start;
   gap: 18px;
   min-width: 0;
+}
+
+.genesis-home-left .stage-kicker { animation: luminaRiseIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both; }
+.genesis-home-left .genesis-hero-title { animation: luminaRiseIn 0.56s cubic-bezier(0.22, 1, 0.36, 1) 0.10s both; }
+.genesis-home-left .genesis-hero-subhead { animation: luminaRiseIn 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+.genesis-home-left .genesis-hero-note { animation: luminaRiseIn 0.60s cubic-bezier(0.22, 1, 0.36, 1) 0.20s both; }
+.genesis-home-left .genesis-cta-row { animation: luminaRiseIn 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both; }
+.genesis-home-left .genesis-entry-meta { animation: luminaRiseIn 0.64s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both; }
+
+.genesis-cta-row .btn-luminous-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.genesis-cta-row .btn-luminous-primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+  pointer-events: none;
+  animation: heroSweepShimmer 5.2s ease-in-out 1.2s infinite;
+}
+
+.genesis-cta-row .btn-luminous-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(14, 165, 233, 0.22);
 }
 
 .genesis-hero-title {
@@ -631,7 +730,19 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   align-items: center;
   justify-content: center;
   min-height: clamp(260px, 28vw, 460px);
-  background: radial-gradient(circle at 50% 50%, rgba(37, 137, 255, 0.24) 0%, rgba(14, 165, 233, 0.08) 44%, transparent 72%);
+  animation: luminaRiseIn 0.68s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+}
+
+.genesis-home-right::before {
+  content: "";
+  position: absolute;
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(37, 137, 255, 0.30) 0%, rgba(14, 165, 233, 0.10) 48%, transparent 72%);
+  filter: blur(18px);
+  pointer-events: none;
+  animation: heroGlowBreathe 6s ease-in-out infinite;
 }
 
 .hero-3d-pedestal {
@@ -643,6 +754,8 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   justify-content: center;
   -webkit-mask-image: radial-gradient(ellipse 62% 60% at 50% 50%, #000 44%, transparent 88%);
   mask-image: radial-gradient(ellipse 62% 60% at 50% 50%, #000 44%, transparent 88%);
+  animation: heroFloatOrb 5.5s ease-in-out infinite;
+  will-change: transform;
 }
 
 .hero-3d-pedestal::after {
@@ -661,31 +774,40 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* 5-Step Journey Connector Strip */
 .genesis-journey-strip {
-  margin-top: 16px;
+  margin-top: 18px;
   padding: 14px 20px;
   border-radius: 22px;
-  background: rgba(9, 17, 34, 0.62);
-  border: 1px solid rgba(96, 165, 250, 0.16);
-  backdrop-filter: blur(20px);
+  background: linear-gradient(180deg, rgba(11, 21, 42, 0.78) 0%, rgba(7, 14, 29, 0.84) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.22);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow:
+    0 22px 54px -14px rgba(0, 0, 0, 0.74),
+    0 0 36px -16px rgba(37, 137, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  animation: luminaRiseIn 0.68s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
 }
 
 .journey-node {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 8px 12px;
+  padding: 9px 12px;
   border-radius: 16px;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.22s ease, transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
   flex: 1;
 }
 
 .journey-node:hover {
-  background: rgba(37, 137, 255, 0.1);
+  background: rgba(37, 137, 255, 0.12);
+  border-color: rgba(96, 165, 250, 0.28);
+  box-shadow: 0 10px 24px -10px rgba(37, 137, 255, 0.35);
   transform: translateY(-2px);
 }
 
@@ -697,11 +819,17 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 30% 25%, rgba(56, 189, 248, 0.22), rgba(10, 20, 42, 0.92));
+  background: radial-gradient(circle at 30% 25%, rgba(56, 189, 248, 0.24), rgba(10, 20, 42, 0.94));
   border: 1px solid rgba(56, 189, 248, 0.42);
   color: #7dd3fc;
-  box-shadow: 0 0 22px rgba(37, 137, 255, 0.22);
+  box-shadow: 0 0 22px rgba(37, 137, 255, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  animation: journeyNodePulse 4.5s ease-in-out infinite;
 }
+
+.genesis-journey-strip .journey-node:nth-of-type(2) .journey-circle { animation-delay: 0.9s; }
+.genesis-journey-strip .journey-node:nth-of-type(3) .journey-circle { animation-delay: 1.8s; }
+.genesis-journey-strip .journey-node:nth-of-type(4) .journey-circle { animation-delay: 2.7s; }
+.genesis-journey-strip .journey-node:nth-of-type(5) .journey-circle { animation-delay: 3.6s; }
 
 .journey-circle svg { width: 22px; height: 22px; }
 
@@ -712,8 +840,20 @@ button:disabled { opacity: 0.55; cursor: not-allowed; }
 .journey-arrow {
   width: 22px;
   height: 22px;
-  color: rgba(96, 165, 250, 0.48);
+  color: rgba(96, 165, 250, 0.54);
   flex-shrink: 0;
+  animation: journeyArrowFlow 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genesis-home-hero,
+  .genesis-home-hero *,
+  .genesis-journey-strip,
+  .genesis-journey-strip *,
+  .btn-luminous-primary::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* =====================================================================
@@ -2193,7 +2333,7 @@ dialog#modal .close {
   .app-workspace-layout,
   .mfg-workspace-layout { grid-template-columns: 1fr; }
   .consumer-hero-grid { grid-template-columns: 1fr 1fr; }
-  .genesis-home-hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 18px; padding: 10px 0 8px; }
+  .genesis-home-hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 18px; padding: 20px; }
   .genesis-hero-title { font-size: clamp(28px, 4.4vw, 38px); line-height: 1.06; }
   .genesis-home-right { min-height: 220px; }
   .genesis-hero-3d-img { max-height: 250px; }
@@ -2206,7 +2346,7 @@ dialog#modal .close {
   .topbar-center { width: 100%; order: 3; justify-content: flex-start; }
   .lumina-role-pill { width: 100%; justify-content: space-between; }
   .role-btn { flex: 1; justify-content: center; padding: 6px 10px; }
-  .genesis-home-hero { grid-template-columns: 1fr; gap: 12px; padding: 4px 0 6px; }
+  .genesis-home-hero { grid-template-columns: 1fr; gap: 12px; padding: 18px 16px; border-radius: 22px; }
   .genesis-home-left { gap: 10px; }
   .genesis-hero-title { font-size: 30px; line-height: 1.06; }
   .genesis-hero-subhead { font-size: 13.5px; line-height: 1.42; }
