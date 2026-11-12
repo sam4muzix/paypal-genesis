@@ -3473,6 +3473,11 @@ async function manufacturerIntelligence() {
   };
 
   const draw = () => {
+    if (studioApi && typeof studioApi.destroy === 'function') {
+      try { studioApi.destroy(); } catch {}
+      studioApi = null;
+    }
+
     const filtered = getFiltered();
     const donut = renderDonut(filtered.length ? filtered : products);
     const vis = getProductVisual(activeProduct);
@@ -3500,6 +3505,40 @@ async function manufacturerIntelligence() {
           </div>
         </div>
 
+        <div class="query-box-wrap" id="queryBoxWrap" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <span style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">${icon('sparkles')} GENESIS Intelligence Assistant</span>
+            <span style="font-size:11px;color:var(--text-muted)">Gemini 3.8 Flash · Live D1 Grounded</span>
+          </div>
+          <div class="query-pills">
+            <button type="button" class="query-pill" data-q="Which product ideas have the most customer interest?">Most customer interest</button>
+            <button type="button" class="query-pill" data-q="Show products that have interest but no eligible manufacturing offer.">Open opportunities</button>
+            <button type="button" class="query-pill" data-q="Show my completed PayPal Sandbox orders.">Completed Sandbox orders</button>
+          </div>
+          <form id="aiQueryForm" class="query-input-row">
+            <input id="aiQueryInput" placeholder="Ask about demand, opportunities, stages, or PayPal Sandbox transactions…" autocomplete="off">
+            <button type="submit" class="btn-luminous-primary sm" id="aiQuerySubmit">Ask Assistant</button>
+          </form>
+          <div id="aiQueryResult" class="query-result-panel" style="display:none"></div>
+        </div>
+
+        <div id="studioSectionWrap" style="display:${showStudio && isMaker ? 'block' : 'none'}">
+          <div class="intel-card" style="padding:18px">
+            <div class="row" style="justify-content:space-between;margin-bottom:14px">
+              <div>
+                <strong style="font-size:16px;color:#fff">AG Studio v3.1 Embedded Intelligence</strong>
+                <p style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">Interactive AG Grid, category charts, cross-filters &amp; PayPal Sandbox ledger</p>
+              </div>
+              <div class="row">
+                <button type="button" class="btn-luminous-secondary sm" id="btnToggleStudioMode"><span id="studioModeLabel">${isEditMode ? 'Lock Dashboard' : 'Customize Dashboard'}</span></button>
+                <button type="button" class="btn-luminous-secondary sm" id="btnResetLayout">Reset Layout</button>
+                <button type="button" class="btn-luminous-primary sm" id="btnGoOrders">PayPal Orders (${orders.length})</button>
+              </div>
+            </div>
+            <div id="genesisStudioMount" class="studio-embed-shell ag-theme-mode" data-ag-theme-mode="dark-blue"></div>
+          </div>
+        </div>
+
         <div class="intel-filter-bar">
           <div class="intel-filter-left">
             <select id="deCatFilter" style="width:auto;min-width:155px">
@@ -3517,23 +3556,6 @@ async function manufacturerIntelligence() {
             </select>
           </div>
           <input id="deSearch" value="${esc(searchQ)}" placeholder="Search product ideas…" style="max-width:260px">
-        </div>
-
-        <div class="query-box-wrap" id="queryBoxWrap" style="display:${isMaker ? 'none' : 'none'}">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <span style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">${icon('sparkles')} GENESIS Intelligence Assistant</span>
-            <span style="font-size:11px;color:var(--text-muted)">Gemini 3.8 Flash · Live D1 Grounded</span>
-          </div>
-          <div class="query-pills">
-            <button type="button" class="query-pill" data-q="Which product ideas have the most customer interest?">Most customer interest</button>
-            <button type="button" class="query-pill" data-q="Show products that have interest but no eligible manufacturing offer.">Open opportunities</button>
-            <button type="button" class="query-pill" data-q="Show my completed PayPal Sandbox orders.">Completed Sandbox orders</button>
-          </div>
-          <form id="aiQueryForm" class="query-input-row">
-            <input id="aiQueryInput" placeholder="Ask about demand, opportunities, stages, or PayPal Sandbox transactions…" autocomplete="off">
-            <button type="submit" class="btn-luminous-primary sm" id="aiQuerySubmit">Ask Assistant</button>
-          </form>
-          <div id="aiQueryResult" class="query-result-panel" style="display:none"></div>
         </div>
 
         <div class="intel-grid-top">
@@ -3620,23 +3642,6 @@ async function manufacturerIntelligence() {
               ${donut.svg}
               <div class="donut-legend">${donut.legend}</div>
             </div>
-          </div>
-        </div>
-
-        <div id="studioSectionWrap" style="display:${showStudio && isMaker ? 'block' : 'none'}">
-          <div class="intel-card">
-            <div class="row" style="justify-content:space-between;margin-bottom:12px">
-              <div>
-                <strong style="font-size:16px;color:#fff">AG Studio v3.1 Embedded Canvas</strong>
-                <p style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">Interactive grid &amp; PayPal Sandbox transaction ledger</p>
-              </div>
-              <div class="row">
-                <button type="button" class="btn-luminous-secondary sm" id="btnToggleStudioMode"><span id="studioModeLabel">${isEditMode ? 'Lock Dashboard' : 'Customize Dashboard'}</span></button>
-                <button type="button" class="btn-luminous-secondary sm" id="btnResetLayout">Reset Layout</button>
-                <button type="button" class="btn-luminous-primary sm" id="btnGoOrders">PayPal Orders (${orders.length})</button>
-              </div>
-            </div>
-            <div id="genesisStudioMount" style="min-height:360px"></div>
           </div>
         </div>
       </div>
@@ -3734,25 +3739,401 @@ async function manufacturerIntelligence() {
       };
     }
 
+    const studioLayoutKey = user ? 'genesis_studio_layout_v4_' + user.id : null;
+
+    const extractSavedSpecSummary = (p) => {
+      if (!p) return 'No product selected.';
+      let raw = p.intelligence || p.spec;
+      if (typeof raw === 'string') {
+        try { raw = JSON.parse(raw); } catch { raw = null; }
+      }
+      if (!raw || typeof raw !== 'object') {
+        return `${p.title} — ${p.description || 'Pending Gemini specification generation.'}`;
+      }
+      const parts = [];
+      if (raw.summary) parts.push(raw.summary);
+      if (Array.isArray(raw.capabilities) && raw.capabilities.length) {
+        parts.push('Key capabilities: ' + raw.capabilities.slice(0, 3).join(' · '));
+      }
+      if (Array.isArray(raw.considerations) && raw.considerations.length) {
+        parts.push('Build notes: ' + raw.considerations.slice(0, 2).join(' · '));
+      }
+      return parts.join('\n') || (p.description || p.title);
+    };
+
+    const isValidSavedReportState = (st) => {
+      if (!st || !Array.isArray(st.pages) || !st.pages.length) return false;
+      const pg = st.pages.find((pgItem) => pgItem.id === st.selectedPageId) || st.pages[0];
+      return Boolean(pg && pg.widgets && Object.keys(pg.widgets).length > 0);
+    };
+
+    const createDefaultReportState = () => ({
+      version: '3.1.0',
+      selectedPageId: 'genesis-intelligence',
+      panels: {
+        filters: { collapsed: false, width: 225 },
+        edit: { collapsed: false, width: 215 },
+        data: { collapsed: true, width: 215 }
+      },
+      pages: [
+        {
+          id: 'genesis-intelligence',
+          layout: {
+            type: 'widget',
+            columns: 24,
+            rowHeight: 18,
+            pagePadding: 12,
+            backgroundColor: '#050b16',
+            widgetPadding: 10,
+            widgetBackgroundColor: '#0b1528',
+            widgetBorderEnabled: true,
+            widgetBorderRadius: 12,
+            widgetBorderColor: '#1e293b',
+            widgetBorderWidth: 1
+          },
+          widgets: {
+            kpi_summary: {
+              type: 'multi-kpi',
+              format: {
+                title: { text: 'Customer Demand Totals', enabled: true },
+                subtitle: { text: 'Authorized Cloudflare D1 records', enabled: true },
+                style: {
+                  columns: 3,
+                  verticalAlign: 'center',
+                  color: '#ffffff',
+                  typography: { fontSize: 24, fontWeight: 'bold' },
+                  label: { enabled: true, position: 'below', color: '#94a3b8', typography: { fontSize: 11 } }
+                }
+              },
+              dataMapping: {
+                values: [
+                  { id: 'demand_explorer.title', aggregation: 'count' },
+                  { id: 'demand_explorer.interest', aggregation: 'sum' },
+                  { id: 'demand_explorer.reports', aggregation: 'sum' }
+                ]
+              }
+            },
+            text_requirements: {
+              type: 'text',
+              format: {
+                title: { text: 'Product Requirements (Saved AI Specs)', enabled: true },
+                subtitle: { text: 'Updates dynamically from filtered selection', enabled: true },
+                style: {
+                  padding: true,
+                  verticalAlign: 'top',
+                  textAlign: 'left',
+                  color: '#cbd5e1',
+                  typography: { fontSize: 12.5 }
+                }
+              },
+              dataMapping: {
+                value: [{ id: 'demand_explorer.spec_summary', aggregation: 'first' }]
+              }
+            },
+            chart_category: {
+              type: 'donut-chart',
+              format: {
+                title: { text: 'Demand by Category', enabled: true },
+                subtitle: { text: 'Click a slice to cross-filter', enabled: true },
+                style: { theme: { common: { legend: { enabled: true, position: 'bottom' } } } }
+              },
+              dataMapping: {
+                categoryKey: [{ id: 'demand_explorer.category' }],
+                valueKey: [{ id: 'demand_explorer.interest', aggregation: 'sum' }]
+              }
+            },
+            chart_opportunities: {
+              type: 'column-chart-grouped',
+              format: {
+                title: { text: 'Product Opportunities', enabled: true },
+                subtitle: { text: 'Consumer interest across D1 concepts', enabled: true },
+                style: { theme: { common: { legend: { enabled: true, position: 'bottom' } } } }
+              },
+              dataMapping: {
+                categoryKey: [{ id: 'demand_explorer.short_title' }],
+                valueKey: [{ id: 'demand_explorer.interest', aggregation: 'sum' }],
+                legendKey: [{ id: 'demand_explorer.offer_status' }]
+              }
+            },
+            chart_sandbox_orders: {
+              type: 'column-chart-grouped',
+              format: {
+                title: { text: 'PayPal Sandbox Orders', enabled: true },
+                subtitle: { text: 'Captured & active order volume by status', enabled: true },
+                style: { theme: { common: { legend: { enabled: false } } } }
+              },
+              dataMapping: {
+                categoryKey: [{ id: 'sandbox_orders.status' }],
+                valueKey: [{ id: 'sandbox_orders.amount', aggregation: 'sum' }]
+              }
+            },
+            grid_customer_demand: {
+              type: 'grid',
+              format: {
+                title: { text: 'Customer Demand', enabled: true },
+                subtitle: { text: 'Select a row to inspect AI specs or click Action to manage offers', enabled: true },
+                style: { columnAutoSize: true, headerRow: { wrapText: false } }
+              },
+              dataMapping: {
+                cols: [
+                  { id: 'demand_explorer.title' },
+                  { id: 'demand_explorer.category' },
+                  { id: 'demand_explorer.interest', aggregation: 'sum' },
+                  { id: 'demand_explorer.stage' },
+                  { id: 'demand_explorer.action' }
+                ]
+              }
+            },
+            grid_sandbox_orders: {
+              type: 'grid',
+              format: {
+                title: { text: 'PayPal Sandbox Ledger', enabled: true },
+                subtitle: { text: 'Verified Sandbox Orders v2 records', enabled: true },
+                style: { columnAutoSize: true, headerRow: { wrapText: false } }
+              },
+              dataMapping: {
+                cols: [
+                  { id: 'sandbox_orders.order_id' },
+                  { id: 'sandbox_orders.amount', aggregation: 'sum' },
+                  { id: 'sandbox_orders.status' }
+                ]
+              }
+            }
+          },
+          widgetLayout: {
+            kpi_summary: { xTrack: 0, yTrack: 0, xSpan: 10, ySpan: 7 },
+            text_requirements: { xTrack: 10, yTrack: 0, xSpan: 14, ySpan: 7 },
+            chart_category: { xTrack: 0, yTrack: 7, xSpan: 7, ySpan: 11 },
+            chart_opportunities: { xTrack: 7, yTrack: 7, xSpan: 10, ySpan: 11 },
+            chart_sandbox_orders: { xTrack: 17, yTrack: 7, xSpan: 7, ySpan: 11 },
+            grid_customer_demand: { xTrack: 0, yTrack: 18, xSpan: 16, ySpan: 13 },
+            grid_sandbox_orders: { xTrack: 16, yTrack: 18, xSpan: 8, ySpan: 13 }
+          },
+          filter: {
+            page: [
+              { field: { id: 'demand_explorer.category' }, view: { expanded: true, viewTypeId: 'selection' } },
+              { field: { id: 'demand_explorer.stage' }, view: { expanded: true, viewTypeId: 'selection' } },
+              { field: { id: 'demand_explorer.offer_status' }, view: { expanded: false, viewTypeId: 'selection' } }
+            ]
+          }
+        }
+      ]
+    });
+
+    const renderStudioError = (mountEl, message) => {
+      mountEl.innerHTML = `
+        <div class="studio-error-panel">
+          <strong style="color:#fda4af;font-size:15px">AG Studio v3.1 Initialization Error</strong>
+          <p style="margin:0;color:var(--text-secondary);max-width:480px;font-size:13px">${esc(message)}</p>
+          <button type="button" class="btn-luminous-primary sm" id="btnRetryStudio">Retry AG Studio</button>
+        </div>
+      `;
+      if ($('#btnRetryStudio')) {
+        $('#btnRetryStudio').onclick = () => {
+          if (studioLayoutKey) localStorage.removeItem(studioLayoutKey);
+          mountStudio();
+        };
+      }
+    };
+
     const mountStudio = () => {
-      if (!(showStudio && isMaker && window.agStudio && typeof window.agStudio.createStudio === 'function')) return;
+      if (!(showStudio && isMaker)) return;
       const mountEl = $('#genesisStudioMount');
       if (!mountEl) return;
+
+      if (!window.agStudio || typeof window.agStudio.createStudio !== 'function') {
+        renderStudioError(mountEl, 'AG Studio bundle (/ag-studio.min.js) failed to load.');
+        return;
+      }
+
+      if (studioApi && typeof studioApi.destroy === 'function') {
+        try { studioApi.destroy(); } catch {}
+        studioApi = null;
+      }
+      mountEl.innerHTML = '';
+
       try {
-        const theme = window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme({
-          backgroundColor: '#090d16', textColor: '#f1f5f9', borderColor: '#1e293b', accentColor: '#0ea5e9'
-        }) : undefined;
+        const baseTheme = window.agStudio.studioTheme || (window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme() : null);
+        const theme = baseTheme && typeof baseTheme.withParams === 'function'
+          ? baseTheme.withParams({
+              browserColorScheme: 'dark',
+              backgroundColor: '#07101f',
+              foregroundColor: '#f1f5f9',
+              textColor: '#f1f5f9',
+              subtleTextColor: '#94a3b8',
+              accentColor: '#2589ff',
+              borderColor: 'rgba(148, 163, 184, 0.18)',
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              studioWrapperBackgroundColor: '#050b16',
+              studioCanvasBackgroundColor: '#050b16',
+              studioWidgetBackgroundColor: '#0b1528',
+              studioWidgetBorder: { width: 1, color: '#1e293b' },
+              studioWidgetBorderRadius: 12,
+              studioWidgetTitleTextColor: '#ffffff',
+              studioWidgetTitleFontSize: 15,
+              studioWidgetTitleFontWeight: '700',
+              studioWidgetSubtitleTextColor: '#94a3b8',
+              studioWidgetSubtitleFontSize: 11,
+              studioPanelContainerBackgroundColor: '#081122',
+              studioPanelDividerColor: '#1e293b',
+              studioPanelWidth: 235,
+              studioMinWidth: 320,
+              studioMinHeight: 780,
+              studioCanvasMinWidth: 640,
+              chartTextColor: '#e2e8f0',
+              chartSubtleTextColor: '#94a3b8',
+              chartAxisLabelColor: '#cbd5e1',
+              chartAxisTitleColor: '#94a3b8',
+              chartAxisLineColor: 'rgba(148, 163, 184, 0.25)',
+              chartGridLineColor: 'rgba(148, 163, 184, 0.10)',
+              chartTooltipBackgroundColor: '#0b1528',
+              chartTooltipTextColor: '#f8fafc',
+              chartPaletteFills1Color: '#22d3ee',
+              chartPaletteFills2Color: '#2589ff',
+              chartPaletteFills3Color: '#38bdf8',
+              chartPaletteFills4Color: '#6366f1',
+              chartPaletteFills5Color: '#0ea5e9',
+              chartPaletteFills6Color: '#94a3b8',
+              chartPaletteStrokes1Color: '#22d3ee',
+              chartPaletteStrokes2Color: '#2589ff',
+              chartPaletteStrokes3Color: '#38bdf8',
+              chartPaletteStrokes4Color: '#6366f1',
+              chartPaletteStrokes5Color: '#0ea5e9',
+              chartPaletteStrokes6Color: '#94a3b8'
+            })
+          : undefined;
+
+        let initialState = createDefaultReportState();
+        if (studioLayoutKey) {
+          const rawSaved = localStorage.getItem(studioLayoutKey);
+          if (rawSaved) {
+            try {
+              const parsed = JSON.parse(rawSaved);
+              if (isValidSavedReportState(parsed)) initialState = parsed;
+              else localStorage.removeItem(studioLayoutKey);
+            } catch {
+              localStorage.removeItem(studioLayoutKey);
+            }
+          }
+        }
+
+        const studioData = {
+          sources: [
+            {
+              id: 'demand_explorer',
+              name: 'Customer Demand',
+              primaryKeyField: 'id',
+              fields: [
+                { id: 'id', name: 'Record ID', format: 'textFormat', hide: true },
+                { id: 'title', name: 'Products', format: 'textFormat' },
+                { id: 'short_title', name: 'Concept', format: 'textFormat' },
+                { id: 'category', name: 'Category', format: 'textFormat' },
+                { id: 'interest', name: 'Signals', format: 'integerFormat' },
+                { id: 'reports', name: 'Quality Reports', format: 'integerFormat' },
+                { id: 'stage', name: 'Stage', format: 'textFormat' },
+                { id: 'offer_status', name: 'Manufacturing Status', format: 'textFormat' },
+                { id: 'spec_summary', name: 'Saved AI Spec', format: 'textFormat' },
+                { id: 'action', name: 'Action', format: 'textFormat', context: { isAction: true } },
+                { id: 'created_at', name: 'Submitted', format: 'textFormat' }
+              ],
+              data: products.map((p) => {
+                const rawTitle = String(p.title || 'Untitled');
+                return {
+                  id: p.id,
+                  title: rawTitle,
+                  short_title: rawTitle.length > 20 ? rawTitle.slice(0, 18) + '…' : rawTitle,
+                  category: p.category || 'Creator tools',
+                  interest: Number(p.interest) || 0,
+                  reports: Number(p.reports) || 0,
+                  stage: stageName[p.status] || p.status,
+                  offer_status: p.has_my_offer ? 'My Offer Active' : (p.has_eligible_offer ? 'Offer Available' : 'Open Opportunity'),
+                  spec_summary: extractSavedSpecSummary(p),
+                  action: p.id,
+                  created_at: (p.created_at || '').slice(0, 10) || '—'
+                };
+              })
+            },
+            {
+              id: 'sandbox_orders',
+              name: 'PayPal Sandbox Orders',
+              primaryKeyField: 'id',
+              fields: [
+                { id: 'id', name: 'Internal ID', format: 'textFormat', hide: true },
+                { id: 'order_id', name: 'PayPal Order ID', format: 'textFormat' },
+                { id: 'product', name: 'Product', format: 'textFormat' },
+                { id: 'amount', name: 'Amount', format: 'currencyFormat', formatOptions: { format: '$#,##0.00' } },
+                { id: 'currency', name: 'Currency', format: 'textFormat' },
+                { id: 'status', name: 'PayPal Status', format: 'textFormat' },
+                { id: 'date', name: 'Recorded', format: 'textFormat' }
+              ],
+              data: orders.map((o) => ({
+                id: o.id,
+                order_id: o.paypal_order_id || o.id,
+                product: o.product_title || 'Hardware Order',
+                amount: Number(o.amount) || 0,
+                currency: o.currency || 'USD',
+                status: o.status || 'CREATED',
+                date: (o.created_at || '').slice(0, 10) || '—'
+              }))
+            }
+          ]
+        };
+
         studioApi = window.agStudio.createStudio(mountEl, {
           theme,
           mode: isEditMode ? 'edit' : 'view',
-          data: {
-            sources: [
-              { id: 'demand_explorer', name: 'Demand Explorer', primaryKeyField: 'id', data: products.map((p) => ({ id: p.id, title: p.title, category: p.category || 'General', interest: p.interest, stage: stageName[p.status] || p.status })) },
-              { id: 'sandbox_orders', name: 'PayPal Sandbox Orders', primaryKeyField: 'id', data: orders.map((o) => ({ id: o.id, order_id: o.paypal_order_id || o.id, product: o.product_title || 'Product', amount: Number(o.amount) || 0, status: o.status })) }
-            ]
+          enableFilterEditingInViewMode: true,
+          data: studioData,
+          initialState,
+          panels: {
+            view: { right: ['filters'] },
+            edit: { right: ['filters', 'edit', 'data'] },
+            options: { filters: { applyOnChange: true } }
+          },
+          widgets: window.agStudio.createWidgets
+            ? window.agStudio.createWidgets({
+                overrides: [
+                  {
+                    id: 'grid',
+                    options: {
+                      createCellRenderer: (field) => {
+                        if (!(field?.fieldId === 'demand_explorer.action' || field?.id === 'demand_explorer.action' || field?.context?.isAction)) return undefined;
+                        return (params) => {
+                          const pid = params.value;
+                          if (!pid) return '';
+                          const btn = document.createElement('button');
+                          btn.type = 'button';
+                          btn.textContent = 'Manage →';
+                          btn.className = 'btn-luminous-secondary sm';
+                          btn.style.cssText = 'padding:3px 10px;font-size:11px;line-height:1.3;cursor:pointer;';
+                          btn.onclick = (ev) => {
+                            ev.stopPropagation();
+                            go('#/manufacturer/product/' + pid);
+                          };
+                          return btn;
+                        };
+                      }
+                    }
+                  }
+                ]
+              })
+            : undefined,
+          onStateUpdated: (ev) => {
+            try {
+              if (ev && ev.state && studioLayoutKey && isValidSavedReportState(ev.state)) {
+                localStorage.setItem(studioLayoutKey, JSON.stringify(ev.state));
+              }
+            } catch {}
+          },
+          onErrorRaised: (ev) => {
+            if (ev && ev.fatal) {
+              renderStudioError(mountEl, (ev.errorDetails || []).join(' ') || 'Studio failed to validate dashboard state.');
+            }
           }
         });
-      } catch {}
+      } catch (err) {
+        renderStudioError(mountEl, err?.message || 'Unexpected error initializing AG Studio.');
+      }
     };
 
     if ($('#btnToggleStudioCanvas')) {
@@ -3769,13 +4150,22 @@ async function manufacturerIntelligence() {
         isEditMode = !isEditMode;
         if ($('#studioModeLabel')) $('#studioModeLabel').textContent = isEditMode ? 'Lock Dashboard' : 'Customize Dashboard';
         if (studioApi && studioApi.setProperty) studioApi.setProperty('mode', isEditMode ? 'edit' : 'view');
+        notice(isEditMode ? 'AG Studio Edit Mode enabled: drag, resize, or configure widgets.' : 'Dashboard locked in View Mode.', 'info');
       };
     }
     if ($('#btnResetLayout')) {
       $('#btnResetLayout').onclick = () => {
+        if (studioLayoutKey) localStorage.removeItem(studioLayoutKey);
         if (user) localStorage.removeItem('genesis_studio_layout_' + user.id);
-        notice('Dashboard layout reset.', 'success');
-        draw();
+        isEditMode = false;
+        if ($('#studioModeLabel')) $('#studioModeLabel').textContent = 'Customize Dashboard';
+        if (studioApi && typeof studioApi.setProperty === 'function' && typeof studioApi.setState === 'function') {
+          studioApi.setProperty('mode', 'view');
+          studioApi.setState(createDefaultReportState());
+        } else {
+          draw();
+        }
+        notice('AG Studio reset to default GENESIS Intelligence dashboard.', 'success');
       };
     }
     if ($('#btnGoOrders')) $('#btnGoOrders').onclick = () => go('#/orders');
