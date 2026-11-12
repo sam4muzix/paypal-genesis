@@ -1,0 +1,35 @@
+1
+00:00:00,167 --> 00:00:06,957
+Every product begins with a need. But what happens to the ideas that manufacturers haven't imagined yet?
+
+2
+00:00:11,334 --> 00:00:16,765
+What if the next great product began with you? Introducing PayPal GENESIS.
+
+3
+00:00:24,134 --> 00:00:32,759
+An idea. A problem. Something you wish existed. Describe it in GENESIS, and give that possibility a starting point.
+
+4
+00:00:41,634 --> 00:00:52,484
+GENESIS Intelligence, powered by Google's Gemini AI, turns an early idea into structured, editable product requirements. A clearer starting point for the people who can build it.
+
+5
+00:00:59,834 --> 00:01:06,555
+One idea becomes part of a community. People discover it, support it, and share what needs to improve.
+
+6
+00:01:13,434 --> 00:01:27,264
+On the other side, manufacturers discover what customers are asking for. With AG Grid and AG Studio, demand becomes interactive intelligence, helping teams explore opportunities and make informed decisions.
+
+7
+00:01:36,634 --> 00:01:43,570
+Manufacturers can review the requirements, propose solutions, set pricing, and manage the journey toward production.
+
+8
+00:01:50,934 --> 00:02:00,643
+And when an eligible offer is ready, PayPal brings the purchase journey together through a tested Sandbox checkout, verified payment capture, and order tracking.
+
+9
+00:02:08,000 --> 00:02:14,120
+From the first idea to the next opportunity. The future of products starts with people.

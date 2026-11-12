@@ -1,51 +1,57 @@
 # Final Narration Script — PayPal GENESIS Explainer
 
-Voice: English AI voice (Leda). No background music.
+Voice: English AI voice (Leda). Voice-only (no background music).
 
-## Chapter 1: THE PROBLEM & GENESIS
+## Chapter 1: THE IDEA
 
-What if the products we need didn't have to wait for corporate committees? Introducing PayPal GENESIS, where consumer demand directly sparks manufactured products.
+Every great product starts with a real need. Yet the people who need products rarely get a voice in what gets built. What if consumers could shape what gets made next?
 
-_Measured narration: 11.18s · chapter: 15.00s (frames 0–450)_
+_Measured narration: 10.85s · chapter: 12.07s (frames 0–362)_
 
-## Chapter 2: CONSUMER PRODUCT IDEA
+## Chapter 2: PAYPAL GENESIS
 
-A creator requests an affordable portable audio interface with eight microphone inputs, onboard DSP, and USB-C connectivity for live field recording.
+Welcome to PayPal GENESIS, connecting consumer ideas, structured intelligence, manufacturing, and verified PayPal checkout. Judges can enter instantly with one click, as a consumer or a manufacturer, no signup required.
 
-_Measured narration: 10.17s · chapter: 17.00s (frames 450–960)_
+_Measured narration: 14.55s · chapter: 15.77s (frames 362–835)_
 
-## Chapter 3: GENESIS INTELLIGENCE SPECIFICATION
+## Chapter 3: CONSUMER CREATION
 
-Google Gemini AI instantly transforms this description into a verifiable engineering specification, with bill of materials, key technical questions, and editable requirements.
+Consumers pitch the products they wish existed in a guided four-step studio. They describe the problem, choose a category, set a target price, and turn everyday frustrations into a clear product brief.
 
-_Measured narration: 11.01s · chapter: 20.00s (frames 960–1560)_
+_Measured narration: 12.53s · chapter: 13.73s (frames 835–1247)_
 
-## Chapter 4: COMMUNITY DEMAND DISCOVERY
+## Chapter 4: GENESIS INTELLIGENCE
 
-The community discovers the idea in the public catalog, pledging nonbinding support to prove real market demand before a single unit is built.
+GENESIS Intelligence transforms each raw concept into structured, editable engineering specifications. Creators review every requirement, adjust assumptions, and publish, so manufacturers can evaluate real needs instead of vague ideas.
 
-_Measured narration: 9.05s · chapter: 13.00s (frames 1560–1950)_
+_Measured narration: 15.93s · chapter: 17.13s (frames 1247–1761)_
 
-## Chapter 5: AG STUDIO COMMAND CENTER
+## Chapter 5: COMMUNITY DEMAND
 
-Approved manufacturers enter the GENESIS Intelligence Command Center, built with AG Grid and AG Studio. They explore live demand velocity, filter by stage, and examine the AI specification in an interactive workspace.
+Community interest validates demand before production begins. People support ideas, signal intent to buy, and report real field problems, giving manufacturers live, trustworthy evidence.
 
-_Measured narration: 15.05s · chapter: 30.00s (frames 1950–2850)_
+_Measured narration: 12.53s · chapter: 13.73s (frames 1761–2173)_
 
-## Chapter 6: FROM INSIGHT TO PRODUCTION
+## Chapter 6: AG GRID & AG STUDIO
 
-Confident in customer demand, the manufacturer publishes a production offer with unit pricing, minimum batch quantity, and transparent lifecycle milestones.
+Inside the Command Center, powered by AG Grid and AG Studio, manufacturers sort, filter, and inspect live demand records. Charts cross-filter instantly, custom Opportunity Spotlight and Intelligence Brief widgets update with every selection, and one click exports the data to CSV.
 
-_Measured narration: 9.80s · chapter: 17.00s (frames 2850–3360)_
+_Measured narration: 19.72s · chapter: 20.93s (frames 2173–2801)_
 
-## Chapter 7: PAYPAL SANDBOX CHECKOUT
+## Chapter 7: MANUFACTURING OFFERS
 
-Consumers complete the purchase through PayPal Sandbox using Orders API v2, with instant escrowed payment verification and confirmed order reconciliation.
+Manufacturers review requirements and demand for a selected opportunity, then submit batch production offers with pricing and milestones, tracking every step from prototype to delivery.
 
-_Measured narration: 9.99s · chapter: 18.00s (frames 3360–3900)_
+_Measured narration: 11.45s · chapter: 12.67s (frames 2801–3181)_
 
-## Chapter 8: CLOSING IDENTITY
+## Chapter 8: PAYPAL SANDBOX & STACK
 
-From the first idea to intelligent planning, manufacturing, and PayPal checkout. PayPal GENESIS. Products should begin with people.
+Finally, PayPal Orders API version two powers server-verified Sandbox checkout, with idempotent capture and signed webhook reconciliation, running on Cloudflare Workers and D1. Every confirmed payment appears in the order ledger.
 
-_Measured narration: 8.74s · chapter: 12.00s (frames 3900–4260)_
+_Measured narration: 15.06s · chapter: 16.27s (frames 3181–3669)_
+
+## Chapter 9: CLOSING
+
+Zero-friction judge demo, open-source MIT code, AG Studio analytics, and PayPal Sandbox. PayPal GENESIS—products should begin with people.
+
+_Measured narration: 10.31s · chapter: 11.53s (frames 3669–4015)_

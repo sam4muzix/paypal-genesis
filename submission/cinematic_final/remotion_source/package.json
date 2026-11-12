@@ -1,0 +1,13 @@
+{
+  "name": "genesis-explainer",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "narration": "node scripts/generate-narration.mjs",
+    "manifest": "node scripts/build-manifest.mjs",
+    "record": "node scripts/record-footage.mjs",
+    "render": "node scripts/render-film.mjs"
+  }
+}
+

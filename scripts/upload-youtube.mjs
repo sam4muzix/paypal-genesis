@@ -49,26 +49,27 @@ async function upload() {
   // 2. Prepare upload metadata
   const metadata = {
     snippet: {
-      title: "PayPal GENESIS | From Product Ideas to Reality | AI + PayPal Hackathon Demo",
-      description: `What if the products we need could begin with the people who imagine them?
+      title: "PayPal GENESIS | From Consumer Ideas to Real Products | PayPal AI Hackathon 2026",
+      description: `PayPal GENESIS is an AI-powered, consumer-led product innovation platform.
 
-PayPal GENESIS connects consumers and manufacturers through a simple product development journey.
+Consumers propose products they wish existed. GENESIS Intelligence transforms those ideas into structured product specifications. Community interest helps manufacturers discover opportunities, while AG Grid and AG Studio provide interactive demand intelligence.
 
-Consumers can share product ideas, use GENESIS Intelligence to organize requirements, support ideas they want, and report problems with existing products.
+Manufacturers can evaluate opportunities, publish offers, and manage product development.
 
-Manufacturers can discover customer demand, propose products, track development, and respond to feedback.
+PayPal Orders API v2 powers a verified Sandbox checkout experience.
 
-PayPal Sandbox enables a verified demonstration checkout experience.
+Built independently by Sam.
 
-Created by Sam.
-
-Built for the PayPal AI Hackathon.
-
-Explore GENESIS:
+Live application:
 https://genesis.greenmixlabs.com
 
-This demonstration uses PayPal Sandbox. No live-money transaction is represented.`,
-      tags: ["PayPal", "AI Hackathon", "PayPal GENESIS", "GENESIS Intelligence", "Consumer Electronics", "Crowd Manufacturing"],
+Technologies:
+PayPal Developer Platform, Google Gemini API, AG Grid, AG Studio, Cloudflare Workers, Cloudflare D1, JavaScript.
+
+Hackathon: PayPal AI Hackathon 2026
+
+Products should begin with people.`,
+      tags: ["PayPal", "AI Hackathon", "PayPal AI Hackathon 2026", "PayPal GENESIS", "GENESIS Intelligence", "AG Grid", "AG Studio", "Google Gemini API"],
       categoryId: "28", // Science & Technology
       defaultLanguage: "en"
     },

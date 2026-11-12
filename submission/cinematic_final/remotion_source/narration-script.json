@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ch1",
+    "title": "THE HOOK",
+    "fixedSec": 9,
+    "beats": [
+      "Every great product begins with a real human need. Yet the people who use them rarely get a voice before manufacturing starts."
+    ]
+  },
+  {
+    "id": "ch2",
+    "title": "GENESIS REVEAL",
+    "fixedSec": 11,
+    "beats": [
+      "Introducing PayPal GENESIS—a consumer-led innovation platform uniting real demand, structured intelligence, and instant Judge Demo access."
+    ]
+  },
+  {
+    "id": "ch3",
+    "title": "CONSUMER IDEA CREATION",
+    "fixedSec": 16,
+    "beats": [
+      "Inside the Consumer Creation Studio, anyone can pitch a product they wish existed—capturing target audience, budget, and real-world pain points in four guided steps."
+    ]
+  },
+  {
+    "id": "ch4",
+    "title": "GENESIS INTELLIGENCE",
+    "fixedSec": 17,
+    "beats": [
+      "GENESIS Intelligence converts raw consumer ideas into structured, editable engineering specifications—persisted in Cloudflare D1 for immediate manufacturer evaluation."
+    ]
+  },
+  {
+    "id": "ch5",
+    "title": "COMMUNITY DEMAND",
+    "fixedSec": 13,
+    "beats": [
+      "Community members signal purchase intent and report real-world product issues, proving genuine customer demand before a single unit enters production."
+    ]
+  },
+  {
+    "id": "ch6",
+    "title": "AG STUDIO INTELLIGENCE",
+    "fixedSec": 22,
+    "beats": [
+      "In the Command Center powered by AG Grid and AG Studio, manufacturers sort, cross-filter, and inspect live demand—combining custom Opportunity Spotlight widgets, Intelligence Briefs, and instant CSV export."
+    ]
+  },
+  {
+    "id": "ch7",
+    "title": "MANUFACTURER ACTION",
+    "fixedSec": 15,
+    "beats": [
+      "Manufacturers review technical requirements, publish batch production offers with transparent pricing, and coordinate milestones from prototype to launch."
+    ]
+  },
+  {
+    "id": "ch8",
+    "title": "PAYPAL SANDBOX CHECKOUT",
+    "fixedSec": 17,
+    "beats": [
+      "When an offer goes live, PayPal Orders API v2 drives server-verified Sandbox checkout, idempotent payment capture, and signed webhook reconciliation."
+    ]
+  },
+  {
+    "id": "ch9",
+    "title": "THE COMPLETE JOURNEY",
+    "fixedSec": 8,
+    "beats": [
+      "From idea to intelligence, demand, manufacturing, and PayPal checkout—one open-source platform."
+    ]
+  },
+  {
+    "id": "ch10",
+    "title": "GENESIS END CARD",
+    "fixedSec": 5,
+    "beats": [
+      "PayPal GENESIS. Products should begin with people."
+    ]
+  }
+]

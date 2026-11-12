@@ -12,4 +12,6 @@ test-results/
 .DS_Store
 video/
 submission/*.mp4
+submission/devpost-mcp-*.json
 *.mov
+submission/cinematic_final/*.mp4

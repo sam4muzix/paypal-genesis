@@ -1,31 +1,35 @@
 1
-00:00:00,167 --> 00:00:11,501
-What if the products we need didn't have to wait for corporate committees? Introducing PayPal GENESIS, where consumer demand directly sparks manufactured products.
+00:00:00,167 --> 00:00:11,162
+Every great product starts with a real need. Yet the people who need products rarely get a voice in what gets built. What if consumers could shape what gets made next?
 
 2
-00:00:15,167 --> 00:00:25,487
-A creator requests an affordable portable audio interface with eight microphone inputs, onboard DSP, and USB-C connectivity for live field recording.
+00:00:12,234 --> 00:00:26,939
+Welcome to PayPal GENESIS, connecting consumer ideas, structured intelligence, manufacturing, and verified PayPal checkout. Judges can enter instantly with one click, as a consumer or a manufacturer, no signup required.
 
 3
-00:00:32,167 --> 00:00:43,325
-Google Gemini AI instantly transforms this description into a verifiable engineering specification, with bill of materials, key technical questions, and editable requirements.
+00:00:28,000 --> 00:00:40,679
+Consumers pitch the products they wish existed in a guided four-step studio. They describe the problem, choose a category, set a target price, and turn everyday frustrations into a clear product brief.
 
 4
-00:00:52,167 --> 00:01:01,370
-The community discovers the idea in the public catalog, pledging nonbinding support to prove real market demand before a single unit is built.
+00:00:41,734 --> 00:00:57,817
+GENESIS Intelligence transforms each raw concept into structured, editable engineering specifications. Creators review every requirement, adjust assumptions, and publish, so manufacturers can evaluate real needs instead of vague ideas.
 
 5
-00:01:05,167 --> 00:01:20,365
-Approved manufacturers enter the GENESIS Intelligence Command Center, built with AG Grid and AG Studio. They explore live demand velocity, filter by stage, and examine the AI specification in an interactive workspace.
+00:00:58,867 --> 00:01:11,549
+Community interest validates demand before production begins. People support ideas, signal intent to buy, and report real field problems, giving manufacturers live, trustworthy evidence.
 
 6
-00:01:35,167 --> 00:01:45,115
-Confident in customer demand, the manufacturer publishes a production offer with unit pricing, minimum batch quantity, and transparent lifecycle milestones.
+00:01:12,600 --> 00:01:32,470
+Inside the Command Center, powered by AG Grid and AG Studio, manufacturers sort, filter, and inspect live demand records. Charts cross-filter instantly, custom Opportunity Spotlight and Intelligence Brief widgets update with every selection, and one click exports the data to CSV.
 
 7
-00:01:52,167 --> 00:02:02,306
-Consumers complete the purchase through PayPal Sandbox using Orders API v2, with instant escrowed payment verification and confirmed order reconciliation.
+00:01:33,534 --> 00:01:45,133
+Manufacturers review requirements and demand for a selected opportunity, then submit batch production offers with pricing and milestones, tracking every step from prototype to delivery.
 
 8
-00:02:10,167 --> 00:02:19,061
-From the first idea to intelligent planning, manufacturing, and PayPal checkout. PayPal GENESIS. Products should begin with people.
+00:01:46,200 --> 00:02:01,415
+Finally, PayPal Orders API version two powers server-verified Sandbox checkout, with idempotent capture and signed webhook reconciliation, running on Cloudflare Workers and D1. Every confirmed payment appears in the order ledger.
+
+9
+00:02:02,467 --> 00:02:12,927
+Zero-friction judge demo, open-source MIT code, AG Studio analytics, and PayPal Sandbox. PayPal GENESIS—products should begin with people.

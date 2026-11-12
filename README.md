@@ -136,6 +136,6 @@ npx wrangler deploy --dry-run --outdir=/tmp/genesis-dry-run && rm -rf /tmp/genes
 ## Official Hackathon Submission
 
 - **Live Application:** [https://genesis.greenmixlabs.com](https://genesis.greenmixlabs.com)
-- **Official YouTube Walkthrough:** [https://www.youtube.com/watch?v=D4zczmATPa8](https://www.youtube.com/watch?v=D4zczmATPa8)
+- **Official YouTube Walkthrough:** [https://www.youtube.com/watch?v=yDLigrtdXCI](https://www.youtube.com/watch?v=yDLigrtdXCI)
 - **Creator Credit:** Sam
 - **Hackathon:** PayPal AI Hackathon

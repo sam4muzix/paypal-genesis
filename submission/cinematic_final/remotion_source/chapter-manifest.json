@@ -1,0 +1,938 @@
+{
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "voice": "Leda",
+  "music": {
+    "enabled": false,
+    "src": null
+  },
+  "totalFrames": 3990,
+  "totalDurationSec": 133,
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "THE HOOK",
+      "narrationText": "Every great product begins with a real human need. Yet the people who use them rarely get a voice before manufacturing starts.",
+      "narrationFile": "audio/ch1.wav",
+      "narrationDurationSec": 8.694,
+      "visualTailSec": 0.139,
+      "audioStartFrame": 5,
+      "startFrame": 0,
+      "endFrame": 270,
+      "frames": 270,
+      "beats": [
+        {
+          "text": "Every great product begins with a real human need. Yet the people who use them rarely get a voice before manufacturing starts.",
+          "startSec": 0.167,
+          "endSec": 8.861
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch1",
+          "clip": "clips/ch1.mp4",
+          "fromSec": 0,
+          "toSec": 9,
+          "fromFrame": 0,
+          "toFrame": 270,
+          "recordSec": 9.6,
+          "fadeInFrames": 0,
+          "note": "THE HOOK · HUMAN-LED INNOVATION"
+        }
+      ],
+      "events": [
+        {
+          "text": "PRODUCTS SHOULD BEGIN WITH PEOPLE.",
+          "atSec": 0.167,
+          "atFrame": 5
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 4.95,
+          "s": 1.32,
+          "x": 72,
+          "y": 42
+        },
+        {
+          "t": 9,
+          "s": 1.12,
+          "x": 50,
+          "y": 50
+        }
+      ],
+      "clicks": [],
+      "focuses": [
+        {
+          "atSec": 1.8,
+          "durSec": 4.5,
+          "x": 56,
+          "y": 16,
+          "w": 34,
+          "h": 46,
+          "label": "3D GENESIS ENGINE"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 8.9,
+          "text": "Every great product begins with a real human need. Yet the people who use them rarely get a voice before manufacturing starts."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch2",
+      "title": "GENESIS REVEAL",
+      "narrationText": "Introducing PayPal GENESIS—a consumer-led innovation platform uniting real demand, structured intelligence, and instant Judge Demo access.",
+      "narrationFile": "audio/ch2.wav",
+      "narrationDurationSec": 9.478,
+      "visualTailSec": 1.355,
+      "audioStartFrame": 5,
+      "startFrame": 270,
+      "endFrame": 600,
+      "frames": 330,
+      "beats": [
+        {
+          "text": "Introducing PayPal GENESIS—a consumer-led innovation platform uniting real demand, structured intelligence, and instant Judge Demo access.",
+          "startSec": 0.167,
+          "endSec": 9.645
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch2",
+          "clip": "clips/ch2.mp4",
+          "fromSec": 0,
+          "toSec": 11,
+          "fromFrame": 0,
+          "toFrame": 330,
+          "recordSec": 11.6,
+          "fadeInFrames": 0,
+          "note": "LIVE AT GENESIS.GREENMIXLABS.COM · NO SIGNUP"
+        }
+      ],
+      "events": [
+        {
+          "text": "PAYPAL GENESIS · TWO-SIDED PLATFORM",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "ONE-CLICK JUDGE DEMO ACCESS",
+          "atSec": 8.409,
+          "atFrame": 252
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1.04,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 4.4,
+          "s": 1.54,
+          "x": 18,
+          "y": 50
+        },
+        {
+          "t": 9.02,
+          "s": 1.48,
+          "x": 24,
+          "y": 50
+        },
+        {
+          "t": 11,
+          "s": 1.1,
+          "x": 30,
+          "y": 50
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 3.4,
+          "x": 11.2,
+          "y": 50.2,
+          "label": "Continue as Consumer"
+        },
+        {
+          "atSec": 7.4,
+          "x": 25.2,
+          "y": 50.2,
+          "label": "Explore as Manufacturer"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 2.2,
+          "durSec": 6.8,
+          "x": 3.2,
+          "y": 45,
+          "w": 30.5,
+          "h": 10.5,
+          "label": "ONE-CLICK JUDGE DEMO"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 9.795,
+          "text": "Introducing PayPal GENESIS—a consumer-led innovation platform uniting real demand, structured intelligence, and instant Judge Demo access."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch3",
+      "title": "CONSUMER IDEA CREATION",
+      "narrationText": "Inside the Consumer Creation Studio, anyone can pitch a product they wish existed—capturing target audience, budget, and real-world pain points in four guided steps.",
+      "narrationFile": "audio/ch3.wav",
+      "narrationDurationSec": 10.853,
+      "visualTailSec": 4.98,
+      "audioStartFrame": 5,
+      "startFrame": 600,
+      "endFrame": 1080,
+      "frames": 480,
+      "beats": [
+        {
+          "text": "Inside the Consumer Creation Studio, anyone can pitch a product they wish existed—capturing target audience, budget, and real-world pain points in four guided steps.",
+          "startSec": 0.167,
+          "endSec": 11.02
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch3",
+          "clip": "clips/ch3.mp4",
+          "fromSec": 0,
+          "toSec": 16,
+          "fromFrame": 0,
+          "toFrame": 480,
+          "recordSec": 16.6,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "CONSUMER IDEA CREATION",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "4-STEP CONCEPT STUDIO",
+          "atSec": 9.836,
+          "atFrame": 295
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 7.2,
+          "s": 1.36,
+          "x": 28,
+          "y": 48
+        },
+        {
+          "t": 13.6,
+          "s": 1.5,
+          "x": 92,
+          "y": 82
+        },
+        {
+          "t": 16,
+          "s": 1.14,
+          "x": 85,
+          "y": 75
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 9.8,
+          "x": 93.4,
+          "y": 82.4,
+          "label": "Continue"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 1.8,
+          "durSec": 6.8,
+          "x": 3,
+          "y": 27,
+          "w": 54,
+          "h": 55,
+          "label": "4-STEP CONCEPT WIZARD"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 11.17,
+          "text": "Inside the Consumer Creation Studio, anyone can pitch a product they wish existed—capturing target audience, budget, and real-world pain points in four guided steps."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch4",
+      "title": "GENESIS INTELLIGENCE",
+      "narrationText": "GENESIS Intelligence converts raw consumer ideas into structured, editable engineering specifications—persisted in Cloudflare D1 for immediate manufacturer evaluation.",
+      "narrationFile": "audio/ch4.wav",
+      "narrationDurationSec": 11.161,
+      "visualTailSec": 5.672,
+      "audioStartFrame": 5,
+      "startFrame": 1080,
+      "endFrame": 1590,
+      "frames": 510,
+      "beats": [
+        {
+          "text": "GENESIS Intelligence converts raw consumer ideas into structured, editable engineering specifications—persisted in Cloudflare D1 for immediate manufacturer evaluation.",
+          "startSec": 0.167,
+          "endSec": 11.328
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch4",
+          "clip": "clips/ch4.mp4",
+          "fromSec": 0,
+          "toSec": 17,
+          "fromFrame": 0,
+          "toFrame": 510,
+          "recordSec": 17.6,
+          "fadeInFrames": 0,
+          "note": "PERSISTED IN CLOUDFLARE D1"
+        }
+      ],
+      "events": [
+        {
+          "text": "GENESIS INTELLIGENCE ENGINE",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "STRUCTURED & EDITABLE SPECS",
+          "atSec": 5.179,
+          "atFrame": 155
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1.04,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 7.65,
+          "s": 1.44,
+          "x": 20,
+          "y": 74
+        },
+        {
+          "t": 13.94,
+          "s": 1.32,
+          "x": 34,
+          "y": 56
+        },
+        {
+          "t": 17,
+          "s": 1.08,
+          "x": 40,
+          "y": 50
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 5.6,
+          "x": 20.4,
+          "y": 75.4,
+          "label": "Review & Publish"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 2,
+          "durSec": 8.5,
+          "x": 3,
+          "y": 35,
+          "w": 54,
+          "h": 45,
+          "label": "STRUCTURED ENGINEERING SPECS"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 11.478,
+          "text": "GENESIS Intelligence converts raw consumer ideas into structured, editable engineering specifications—persisted in Cloudflare D1 for immediate manufacturer evaluation."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch5",
+      "title": "COMMUNITY DEMAND",
+      "narrationText": "Community members signal purchase intent and report real-world product issues, proving genuine customer demand before a single unit enters production.",
+      "narrationFile": "audio/ch5.wav",
+      "narrationDurationSec": 9.473,
+      "visualTailSec": 3.36,
+      "audioStartFrame": 5,
+      "startFrame": 1590,
+      "endFrame": 1980,
+      "frames": 390,
+      "beats": [
+        {
+          "text": "Community members signal purchase intent and report real-world product issues, proving genuine customer demand before a single unit enters production.",
+          "startSec": 0.167,
+          "endSec": 9.64
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch5",
+          "clip": "clips/ch5.mp4",
+          "fromSec": 0,
+          "toSec": 13,
+          "fromFrame": 0,
+          "toFrame": 390,
+          "recordSec": 13.6,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "COMMUNITY DEMAND SIGNALS",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "PURCHASE INTENT & FIELD REPORTS",
+          "atSec": 5.661,
+          "atFrame": 170
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 6.5,
+          "s": 1.52,
+          "x": 76,
+          "y": 34
+        },
+        {
+          "t": 13,
+          "s": 1.15,
+          "x": 68,
+          "y": 38
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 4.5,
+          "x": 72.5,
+          "y": 36.2,
+          "label": "I might buy this"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 1.6,
+          "durSec": 6.4,
+          "x": 60,
+          "y": 19,
+          "w": 38,
+          "h": 22,
+          "label": "LIVE COMMUNITY DEMAND"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 9.79,
+          "text": "Community members signal purchase intent and report real-world product issues, proving genuine customer demand before a single unit enters production."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch6",
+      "title": "AG STUDIO INTELLIGENCE",
+      "narrationText": "In the Command Center powered by AG Grid and AG Studio, manufacturers sort, cross-filter, and inspect live demand—combining custom Opportunity Spotlight widgets, Intelligence Briefs, and instant CSV export.",
+      "narrationFile": "audio/ch6.wav",
+      "narrationDurationSec": 13.778,
+      "visualTailSec": 8.055,
+      "audioStartFrame": 5,
+      "startFrame": 1980,
+      "endFrame": 2640,
+      "frames": 660,
+      "beats": [
+        {
+          "text": "In the Command Center powered by AG Grid and AG Studio, manufacturers sort, cross-filter, and inspect live demand—combining custom Opportunity Spotlight widgets, Intelligence Briefs, and instant CSV export.",
+          "startSec": 0.167,
+          "endSec": 13.945
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch6",
+          "clip": "clips/ch6.mp4",
+          "fromSec": 0,
+          "toSec": 22,
+          "fromFrame": 0,
+          "toFrame": 660,
+          "recordSec": 22.6,
+          "fadeInFrames": 0,
+          "note": "AG GRID v36 · AG STUDIO v3.1 · AG CHARTS v14"
+        }
+      ],
+      "events": [
+        {
+          "text": "AG STUDIO INTELLIGENCE",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "AG GRID · LIVE SORT & CROSS-FILTER",
+          "atSec": 2.374,
+          "atFrame": 71
+        },
+        {
+          "text": "CUSTOM WIDGETS · BRIEF & CSV EXPORT",
+          "atSec": 8.929,
+          "atFrame": 268
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 6.16,
+          "s": 1.44,
+          "x": 30,
+          "y": 66
+        },
+        {
+          "t": 13.64,
+          "s": 1.38,
+          "x": 68,
+          "y": 52
+        },
+        {
+          "t": 18.92,
+          "s": 1.48,
+          "x": 18,
+          "y": 35
+        },
+        {
+          "t": 22,
+          "s": 1.06,
+          "x": 50,
+          "y": 50
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 5.5,
+          "x": 49.4,
+          "y": 58.8,
+          "label": "Manage Opportunity"
+        },
+        {
+          "atSec": 14.5,
+          "x": 21,
+          "y": 34.8,
+          "label": "Export CSV"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 1.6,
+          "durSec": 7,
+          "x": 3,
+          "y": 49,
+          "w": 55,
+          "h": 24,
+          "label": "AG GRID v36 · DEMAND EXPLORER"
+        },
+        {
+          "atSec": 9.2,
+          "durSec": 6.5,
+          "x": 58,
+          "y": 30,
+          "w": 30,
+          "h": 42,
+          "label": "AG STUDIO v3.1 · CHARTS & FILTERS"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 14.095,
+          "text": "In the Command Center powered by AG Grid and AG Studio, manufacturers sort, cross-filter, and inspect live demand—combining custom Opportunity Spotlight widgets, Intelligence Briefs, and instant CSV export."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch7",
+      "title": "MANUFACTURER ACTION",
+      "narrationText": "Manufacturers review technical requirements, publish batch production offers with transparent pricing, and coordinate milestones from prototype to launch.",
+      "narrationFile": "audio/ch7.wav",
+      "narrationDurationSec": 9.222,
+      "visualTailSec": 5.611,
+      "audioStartFrame": 5,
+      "startFrame": 2640,
+      "endFrame": 3090,
+      "frames": 450,
+      "beats": [
+        {
+          "text": "Manufacturers review technical requirements, publish batch production offers with transparent pricing, and coordinate milestones from prototype to launch.",
+          "startSec": 0.167,
+          "endSec": 9.389
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch7",
+          "clip": "clips/ch7.mp4",
+          "fromSec": 0,
+          "toSec": 15,
+          "fromFrame": 0,
+          "toFrame": 450,
+          "recordSec": 15.6,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "MANUFACTURER ACTION",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "BATCH OFFERS & MILESTONE TRACKING",
+          "atSec": 3.341,
+          "atFrame": 100
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1.02,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 7.5,
+          "s": 1.48,
+          "x": 78,
+          "y": 54
+        },
+        {
+          "t": 15,
+          "s": 1.12,
+          "x": 68,
+          "y": 50
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 5,
+          "x": 78.5,
+          "y": 56,
+          "label": "Submit Batch Offer"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 1.5,
+          "durSec": 7.8,
+          "x": 60,
+          "y": 15,
+          "w": 38,
+          "h": 49,
+          "label": "SPECIFICATIONS & BATCH OFFER"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 9.539,
+          "text": "Manufacturers review technical requirements, publish batch production offers with transparent pricing, and coordinate milestones from prototype to launch."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch8",
+      "title": "PAYPAL SANDBOX CHECKOUT",
+      "narrationText": "When an offer goes live, PayPal Orders API v2 drives server-verified Sandbox checkout, idempotent payment capture, and signed webhook reconciliation.",
+      "narrationFile": "audio/ch8.wav",
+      "narrationDurationSec": 10.65,
+      "visualTailSec": 6.183,
+      "audioStartFrame": 5,
+      "startFrame": 3090,
+      "endFrame": 3600,
+      "frames": 510,
+      "beats": [
+        {
+          "text": "When an offer goes live, PayPal Orders API v2 drives server-verified Sandbox checkout, idempotent payment capture, and signed webhook reconciliation.",
+          "startSec": 0.167,
+          "endSec": 10.817
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch8",
+          "clip": "clips/ch8.mp4",
+          "fromSec": 0,
+          "toSec": 17,
+          "fromFrame": 0,
+          "toFrame": 510,
+          "recordSec": 17.6,
+          "fadeInFrames": 0,
+          "note": "VERIFIED SANDBOX CAPTURE · $115.00 USD"
+        }
+      ],
+      "events": [
+        {
+          "text": "PAYPAL SANDBOX CHECKOUT",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "ORDERS API v2 · IDEMPOTENT CAPTURE",
+          "atSec": 6.385,
+          "atFrame": 192
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 5.95,
+          "s": 1.5,
+          "x": 80,
+          "y": 40
+        },
+        {
+          "t": 12.24,
+          "s": 1.42,
+          "x": 38,
+          "y": 42
+        },
+        {
+          "t": 17,
+          "s": 1.1,
+          "x": 50,
+          "y": 50
+        }
+      ],
+      "clicks": [
+        {
+          "atSec": 6.4,
+          "x": 49.8,
+          "y": 65.5,
+          "label": "View Order Details"
+        }
+      ],
+      "focuses": [
+        {
+          "atSec": 1.6,
+          "durSec": 5.5,
+          "x": 68,
+          "y": 31,
+          "w": 28,
+          "h": 16,
+          "label": "PAYPAL ORDERS v2 · SANDBOX VERIFIED"
+        },
+        {
+          "atSec": 7.6,
+          "durSec": 5.5,
+          "x": 25,
+          "y": 30,
+          "w": 28,
+          "h": 18,
+          "label": "CAPTURED · $115.00 USD"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 10.967,
+          "text": "When an offer goes live, PayPal Orders API v2 drives server-verified Sandbox checkout, idempotent payment capture, and signed webhook reconciliation."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch9",
+      "title": "THE COMPLETE JOURNEY",
+      "narrationText": "From idea to intelligence, demand, manufacturing, and PayPal checkout—one open-source platform.",
+      "narrationFile": "audio/ch9.wav",
+      "narrationDurationSec": 6.768,
+      "visualTailSec": 1.065,
+      "audioStartFrame": 5,
+      "startFrame": 3600,
+      "endFrame": 3840,
+      "frames": 240,
+      "beats": [
+        {
+          "text": "From idea to intelligence, demand, manufacturing, and PayPal checkout—one open-source platform.",
+          "startSec": 0.167,
+          "endSec": 6.935
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch1",
+          "clip": "clips/ch1.mp4",
+          "fromSec": 0,
+          "toSec": 8,
+          "fromFrame": 0,
+          "toFrame": 240,
+          "recordSec": 8.6,
+          "fadeInFrames": 0,
+          "note": "MIT OPEN SOURCE · CLOUDFLARE WORKERS & D1"
+        }
+      ],
+      "events": [
+        {
+          "text": "THE COMPLETE JOURNEY",
+          "atSec": 0.167,
+          "atFrame": 5
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1.04,
+          "x": 50,
+          "y": 68
+        },
+        {
+          "t": 5.2,
+          "s": 1.24,
+          "x": 50,
+          "y": 72
+        },
+        {
+          "t": 8,
+          "s": 1.05,
+          "x": 50,
+          "y": 50
+        }
+      ],
+      "clicks": [],
+      "focuses": [
+        {
+          "atSec": 0.8,
+          "durSec": 5.8,
+          "x": 3.5,
+          "y": 65,
+          "w": 93,
+          "h": 13,
+          "label": "IDEA → INTELLIGENCE → DEMAND → MANUFACTURING → PAYPAL"
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 7.085,
+          "text": "From idea to intelligence, demand, manufacturing, and PayPal checkout—one open-source platform."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch10",
+      "title": "GENESIS END CARD",
+      "narrationText": "PayPal GENESIS. Products should begin with people.",
+      "narrationFile": "audio/ch10.wav",
+      "narrationDurationSec": 3.755,
+      "visualTailSec": 1.078,
+      "audioStartFrame": 5,
+      "startFrame": 3840,
+      "endFrame": 3990,
+      "frames": 150,
+      "beats": [
+        {
+          "text": "PayPal GENESIS. Products should begin with people.",
+          "startSec": 0.167,
+          "endSec": 3.922
+        }
+      ],
+      "segments": [],
+      "events": [
+        {
+          "text": "PAYPAL GENESIS",
+          "atSec": 0.167,
+          "atFrame": 5
+        }
+      ],
+      "zooms": [],
+      "clicks": [],
+      "focuses": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 4.072,
+          "text": "PayPal GENESIS. Products should begin with people."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    }
+  ]
+}

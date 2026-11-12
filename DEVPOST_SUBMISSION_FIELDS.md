@@ -19,7 +19,7 @@
   `https://github.com/sam4muzix/paypal-genesis`
 
 - **Demo Video URL (YouTube):**
-  `https://www.youtube.com/watch?v=FzxF9MitPY8`
+  `https://www.youtube.com/watch?v=yDLigrtdXCI`
 
 ---
 
@@ -92,7 +92,7 @@ We have provided zero-friction, one-click demonstration pathways on the landing 
 
 3. Complete Source Code & Verification:
    - GitHub: https://github.com/sam4muzix/paypal-genesis
-   - Walkthrough Video: https://www.youtube.com/watch?v=FzxF9MitPY8
+   - Walkthrough Video: https://www.youtube.com/watch?v=yDLigrtdXCI
 ```
 
 ---
