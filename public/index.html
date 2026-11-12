@@ -3,59 +3,76 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>PayPal GENESIS — Products should begin with people</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%233882f6'/><text x='16' y='23' font-family='system-ui,sans-serif' font-size='20' font-weight='800' fill='white' text-anchor='middle'>G</text></svg>">
-  <link rel="stylesheet" href="/style.css?v=20261112-twilight1">
+  <title>PayPal GENESIS — Manufacturer Workspace</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230070ba'/><text x='16' y='23' font-family='system-ui,sans-serif' font-size='20' font-weight='800' fill='white' text-anchor='middle'>G</text></svg>">
+  <link rel="stylesheet" href="/style.css?v=20261112-mfg1">
   <script src="/ag-studio.min.js"></script>
 </head>
 <body>
   <div id="desktopApp" class="mac-window">
-    <!-- Topbar (Matching Reference UI Proportions) -->
-    <header class="ref-topbar" id="appHeader">
-      <div class="ref-topbar-left">
-        <button type="button" class="ref-icon-btn active" id="btnNavHome" title="Home">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>
-        </button>
-        <button type="button" class="ref-icon-btn" id="btnNavMode" title="Mode Toggle">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-        </button>
-        <button type="button" class="ref-icon-btn" id="btnNavBell" title="System Notifications">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          <span class="ref-badge-dot"></span>
-        </button>
-        <a class="ref-icon-btn" id="btnNavVideo" title="Demonstration Video" href="https://youtu.be/39-2zV2F-eU" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#f43f5e"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="#ffffff"/></svg>
-        </a>
+    <!-- Compact Left Navigation Rail (Matching Approved Reference) -->
+    <aside id="sidebar" aria-label="Primary navigation">
+      <div class="mac-traffic-lights" aria-hidden="true">
+        <span class="mac-dot mac-close" title="Close window"></span>
+        <span class="mac-dot mac-minimize" title="Minimize window"></span>
+        <span class="mac-dot mac-zoom" title="Full screen"></span>
       </div>
 
-      <div class="ref-topbar-center">
-        <button type="button" class="ref-capsule-btn" id="topDemoConsumerBtn">Consumer View</button>
-        <button type="button" class="ref-capsule-btn" id="topDemoMakerBtn">Manufacturer View</button>
-        <div class="ref-wallet-pill" id="topWalletDisplay" title="Real-Time PayPal Sandbox Pipeline GMV">
-          <span class="ref-wallet-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-          </span>
-          <span class="ref-wallet-val">148,500.00</span>
-          <span class="ref-wallet-symbol">$</span>
+      <a class="brand" href="#/home" id="brandHomeLink" aria-label="PayPal GENESIS Home">
+        <div class="brand-squircle">
+          <span class="mark" aria-hidden="true">G</span>
         </div>
-      </div>
-
-      <div class="ref-topbar-right">
-        <div class="ref-profile-pill" id="profilePill" role="button" tabindex="0">
-          <div class="ref-profile-avatar">J</div>
-          <span class="ref-profile-name" id="topUserName">Judge Session</span>
-          <span class="ref-profile-flag">🇺🇸</span>
+        <div class="brand-text">
+          <span class="brand-sub">PayPal</span>
+          <span class="brand-name">GENESIS</span>
         </div>
-        <div id="account" style="display:none"></div>
-        <div id="roleChip" style="display:none"></div>
+      </a>
+
+      <nav id="nav" aria-label="App Navigation"></nav>
+
+      <div class="aside-foot" id="asideFoot">
+        <div class="app-identity-card" id="appIdentityCard">
+          <div class="app-identity-icon">
+            <svg viewBox="0 0 24 24" fill="none" class="identity-wave">
+              <path d="M3 13.5C5.5 13.5 6.5 7 9 7C11.5 7 12.5 17 15 17C17.5 17 18.5 10.5 21 10.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="app-identity-meta">
+            <strong>GENESIS</strong>
+            <small>Product OS v3.2</small>
+          </div>
+        </div>
+        <div id="roleChip" class="role-chip" style="display:none">Manufacturer</div>
       </div>
-    </header>
+    </aside>
 
-    <div id="bannerSlot"></div>
-    <div id="notice" role="status" aria-live="polite" tabindex="-1"></div>
-
+    <!-- Main Workspace Stage -->
     <main id="mainCanvas">
-      <h1 id="heading" class="sr-only">PayPal GENESIS</h1>
+      <header id="appHeader" class="mac-toolbar">
+        <div class="header-left">
+          <a class="mobile-brand" href="#/home" id="mobileBrandLink" aria-label="Home">
+            <span class="mark sm" aria-hidden="true">G</span>
+            <span>GENESIS</span>
+          </a>
+          <div class="window-title-group" id="windowTitleGroup">
+            <span class="window-kicker">MANUFACTURER OS</span>
+            <span class="window-sep">/</span>
+            <h1 id="heading" class="window-title">Manufacturer Workspace</h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="mac-icon-tool" id="headerHelpBtn" title="How GENESIS Works" aria-label="Help">
+            <svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+
+          <div id="account"></div>
+        </div>
+      </header>
+
+      <div id="bannerSlot"></div>
+      <div id="notice" role="status" aria-live="polite" tabindex="-1"></div>
+
       <section id="view" class="view-stage"></section>
     </main>
   </div>
@@ -66,6 +83,6 @@
     <div id="modalBody"></div>
   </dialog>
 
-  <script type="module" src="/app.js?v=20261112-twilight1"></script>
+  <script type="module" src="/app.js?v=20261112-mfg1"></script>
 </body>
 </html>
