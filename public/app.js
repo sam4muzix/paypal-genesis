@@ -881,8 +881,10 @@ async function home() {
       const stIdx = ['idea', 'clarifying', 'demand'].includes(active.status) ? 0
         : ['prototype', 'tooling'].includes(active.status) ? 1
         : active.has_my_offer || active.has_eligible_offer ? 2 : 1;
-      const sigCount = active.interest ?? active.supporters ?? 0;
-      const score = Math.min(96, Math.max(24, Number(sigCount) * 28 + (active.has_eligible_offer ? 22 : 12)));
+      const sigCount = Number(active.interest ?? active.supporters ?? 0);
+      const repCount = Number(active.reports || 0);
+      const offerState = active.has_my_offer ? 'My Offer' : (active.has_eligible_offer ? 'Active Offer' : 'Open');
+      const maxBarSig = Math.max(1, ...showcaseProducts.slice(0, 6).map((x) => Number(x.interest ?? x.supporters ?? 0)));
 
       $('#view').innerHTML = `
         <div class="mfg-stage-layout view-enter">
@@ -934,18 +936,21 @@ async function home() {
               <div class="mfg-metrics-strip">
                 <div class="mfg-metric-cell">
                   <strong>${sigCount}</strong>
-                  <span>Interested consumers</span>
+                  <span>Interested consumers (D1)</span>
                 </div>
                 <div class="mfg-metric-cell">
-                  <strong>${score}%</strong>
-                  <span>Demand score</span>
+                  <strong>${repCount}</strong>
+                  <span>Quality reports (D1)</span>
                 </div>
                 <div class="mfg-metric-cell">
-                  <strong>$${Number(active.target_price || 249)}</strong>
-                  <span>Target retail (USD)</span>
+                  <strong>${esc(offerState)}</strong>
+                  <span>Manufacturing offer</span>
                 </div>
                 <div class="mini-bars" aria-hidden="true">
-                  <i style="height:35%"></i><i style="height:48%"></i><i style="height:62%"></i><i style="height:74%"></i><i style="height:88%"></i><i style="height:100%"></i>
+                  ${showcaseProducts.slice(0, 6).map((x) => {
+                    const h = Math.max(18, Math.round((Number(x.interest ?? x.supporters ?? 0) / maxBarSig) * 100));
+                    return `<i style="height:${h}%"></i>`;
+                  }).join('')}
                 </div>
               </div>
 
@@ -1089,7 +1094,7 @@ async function home() {
 
         <div class="discover-cards-grid">
           ${showcaseProducts.slice(0, 3).map((p) => {
-            const pct = Math.min(95, Math.max(18, Number(p.supporters || 1) * 24));
+            const stLbl = stageName[p.status] || p.status || 'Idea';
             return `
               <div class="idea-glass-card ${p.id === featured.id ? 'is-highlighted' : ''}" data-select-card="${esc(p.id)}">
                 ${renderProductThumb(p)}
@@ -1098,10 +1103,10 @@ async function home() {
                     <h4>${esc(p.title)}</h4>
                     <button type="button" class="heart-btn ${p.supported ? 'supported' : ''}" data-open-pid="${esc(p.id)}" title="Open product">♥</button>
                   </div>
-                  <div class="idea-card-sub">${esc(p.category || 'Hardware')} · ${p.supporters ?? 0} supporters</div>
-                  <div class="progress-row">
-                    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
-                    <span class="progress-pct">${pct}%</span>
+                  <div class="idea-card-sub">${esc(p.category || 'Hardware')} · ${p.supporters ?? 0} ${Number(p.supporters) === 1 ? 'supporter' : 'supporters'}</div>
+                  <div class="row" style="gap:6px;margin-top:6px">
+                    <span class="pill" style="font-size:11px;padding:3px 9px">${esc(stLbl)}</span>
+                    ${p.demo ? '<span class="badge muted-badge" style="font-size:10.5px;padding:3px 8px">Demo</span>' : ''}
                   </div>
                 </div>
               </div>
@@ -1216,7 +1221,7 @@ function help() {
             </div>
           </div>
           <div class="app-hero-graphic-stage">
-            ${renderIdeaToProductSvg()}
+            ${renderProductThumb(featured, 'visual-halo')}
           </div>
         </div>
 
@@ -1322,11 +1327,16 @@ function help() {
 
 function productRowHtml(p, btnLabel = 'Inspect Spec') {
   const isProto = p.status === 'prototype';
+  const shortId = (p.id || '').slice(-6);
+  const datePart = (p.created_at || '').slice(0, 10) || (p.demo ? 'Demo fixture' : 'Live');
   return `<tr>
     <td>
-      <div class="table-product-cell">
-        <strong>${esc(p.title)}</strong>
-        <small>${esc((p.description || '').slice(0, 80))}${(p.description || '').length > 80 ? '…' : ''}</small>
+      <div class="row" style="gap:12px;flex-wrap:nowrap">
+        ${renderProductThumb(p)}
+        <div class="table-product-cell">
+          <strong>${esc(p.title)}</strong>
+          <small>#${esc(shortId)} · ${esc(datePart)}${p.demo ? ' · Demo' : ''} — ${esc((p.description || '').slice(0, 68))}${(p.description || '').length > 68 ? '…' : ''}</small>
+        </div>
       </div>
     </td>
     <td><span class="${isProto ? 'mfg-badge-live' : 'mfg-badge-demo'}">${esc(stageName[p.status] || p.status)}</span></td>
@@ -1427,7 +1437,7 @@ async function explore() {
             </div>
           </div>
           <div class="app-hero-graphic-stage">
-            ${renderIdeaToProductSvg()}
+            ${renderProductThumb(featured, 'visual-halo')}
           </div>
         </div>
 
@@ -1473,10 +1483,14 @@ async function explore() {
             <span class="inspector-stage-pill" id="dossierStage">${esc(stageName[featured.status] || featured.status).toUpperCase()}</span>
           </div>
 
-          <div class="inspector-selected-product">
-            <h4 class="inspector-title" id="dossierTitle">${esc(featured.title)}</h4>
-            <span style="font-size:11.5px;color:var(--text-muted)" id="dossierCategory">${esc(featured.category || 'Hardware')} · ${featured.supporters || 0} Backers</span>
+          <div class="inspector-selected-product" style="display:flex;gap:12px;align-items:center">
+            <div id="dossierThumb">${renderProductThumb(featured)}</div>
+            <div style="min-width:0">
+              <h4 class="inspector-title" id="dossierTitle">${esc(featured.title)}</h4>
+              <span style="font-size:11.5px;color:var(--text-muted)" id="dossierCategory">${esc(featured.category || 'Hardware')} · ${featured.supporters || 0} Backers · #${esc((featured.id || '').slice(-6))}</span>
+            </div>
           </div>
+          <p id="dossierDesc" style="margin:0 0 12px;font-size:12px;color:var(--text-secondary);line-height:1.45">${esc((featured.description || '').slice(0, 140))}</p>
 
           <div class="inspector-spec-block">
             <div class="spec-block-title">
@@ -1516,8 +1530,10 @@ async function explore() {
   if ($('#exploreStudioBtn')) $('#exploreStudioBtn').onclick = () => go('#/manufacturer/intelligence');
 
   const updateDossier = (p) => {
+    $('#dossierThumb').innerHTML = renderProductThumb(p);
     $('#dossierTitle').textContent = p.title;
-    $('#dossierCategory').textContent = (p.category || 'Hardware') + ' · ' + (p.supporters || 0) + ' Backers';
+    $('#dossierCategory').textContent = (p.category || 'Hardware') + ' · ' + (p.supporters || 0) + ' Backers · #' + (p.id || '').slice(-6);
+    if ($('#dossierDesc')) $('#dossierDesc').textContent = (p.description || '').slice(0, 140);
     $('#dossierStage').textContent = (stageName[p.status] || p.status).toUpperCase();
     $('#dossierSignals').textContent = (p.supporters || 0) + ' Intent Signals';
     $('#dossierActionBtn').onclick = () => go('#/product/' + p.id);
@@ -2896,35 +2912,24 @@ async function ordersPage() {
 
   const res = isMaker ? await api('/manufacturer/orders') : await api('/orders');
   const orders = res.orders || [];
-  const featuredOrder = orders[0] || {
-    id: 'ord-demo-sample',
-    product_id: 'demo-a1',
-    title: 'Eight-input portable audio interface',
-    amount: 249.00,
-    currency: 'USD',
-    status: 'COMPLETED',
-    paypal_order_id: 'SAMPLE-SANDBOX-A1',
-    created_at: new Date().toISOString().slice(0, 10),
-    is_sample: true
-  };
-
   let statusFilter = '';
 
   const renderOrders = () => {
     const filtered = statusFilter ? orders.filter((o) => o.status === statusFilter) : orders;
-    const fTitle = featuredOrder.product_title || featuredOrder.title || 'Eight-input portable audio interface';
-    const fVis = getProductVisual({ id: featuredOrder.product_id, title: fTitle, category: featuredOrder.category });
-    const fAmount = Number(featuredOrder.amount || 249).toFixed(2);
-    const fCurr = featuredOrder.currency || 'USD';
-    const isCompleted = featuredOrder.status === 'COMPLETED';
-    const stepIdx = isCompleted ? 2 : (featuredOrder.status === 'APPROVED' ? 1 : 0);
+    const featuredOrder = orders[0] || null;
+    const fTitle = featuredOrder ? (featuredOrder.product_title || featuredOrder.title || 'Hardware Order') : 'Eight-input portable audio interface';
+    const fVis = getProductVisual(featuredOrder ? { id: featuredOrder.product_id, title: fTitle, category: featuredOrder.category } : { id: 'demo-a1', title: fTitle, category: 'Audio Hardware' });
+    const fAmount = featuredOrder ? Number(featuredOrder.amount || 0).toFixed(2) : '—';
+    const fCurr = featuredOrder ? (featuredOrder.currency || 'USD') : 'USD';
+    const isCompleted = featuredOrder ? featuredOrder.status === 'COMPLETED' : false;
+    const stepIdx = featuredOrder ? (isCompleted ? 2 : (featuredOrder.status === 'APPROVED' ? 1 : 0)) : 0;
 
     $('#view').innerHTML = `
       <div class="orders-stage-layout view-enter">
         <div class="section-header-row">
           <div>
             <h2 style="font-size:clamp(28px,3vw,36px);margin-bottom:4px">Orders</h2>
-            <p>Track your product orders, payment status, and manufacturing progress.</p>
+            <p>Track your D1 PayPal Sandbox ledger, payment capture status, and manufacturing progress.</p>
           </div>
           <div class="row">
             ${isMaker ? `
@@ -2935,6 +2940,7 @@ async function ordersPage() {
           </div>
         </div>
 
+        ${featuredOrder ? `
         <div class="orders-featured-card">
           <div class="orders-featured-top">
             <div class="visual-halo ${fVis.isSvg ? 'is-svg' : ''}" style="min-height:175px">
@@ -2942,10 +2948,10 @@ async function ordersPage() {
             </div>
 
             <div>
-              <span class="featured-pill">Order #${esc((featuredOrder.paypal_order_id || featuredOrder.id).startsWith('SAMPLE') ? 'SAMPLE-A1' : (featuredOrder.paypal_order_id || featuredOrder.id).slice(-8))}</span>
+              <span class="featured-pill">Order #${esc((featuredOrder.paypal_order_id || featuredOrder.id).slice(-8))}</span>
               <h3 style="margin:10px 0 6px;font-size:24px;font-weight:800;color:#fff">${esc(fTitle)}</h3>
               <p style="margin:0;font-size:13px;color:var(--text-secondary)">
-                ${featuredOrder.is_sample ? 'Sample Sandbox reservation preview · StudioWorks Batch #1' : 'Server-verified PayPal Sandbox checkout · Milestone escrowed'}
+                Server-verified PayPal Sandbox checkout · Recorded in D1 ledger
               </p>
 
               <div class="orders-meta-grid">
@@ -2970,11 +2976,11 @@ async function ordersPage() {
                   <svg viewBox="0 0 28 32" width="18" height="20"><path d="M4 2h12c5 0 8 2.5 8 6s-3 6-8 6h-6L7 28H3L4 2Z" fill="#e0f2fe"/><path d="M8 5h11c4 0 7 2.5 7 6s-3 6-8 6h-5l-3 13H6L8 5Z" fill="#2589ff"/></svg>
                   PayPal
                 </span>
-                <span class="sandbox-pill">Sandbox</span>
+                <span class="sandbox-pill">Sandbox Verified</span>
               </div>
               <div style="font-size:14px;font-weight:700;color:#67e8f9;margin-top:4px">${esc(paymentLabel[featuredOrder.status] || featuredOrder.status)}</div>
               <div style="font-size:12px;color:var(--text-muted)">
-                ${featuredOrder.is_sample ? 'Sample preview order (demo)' : 'Ref: ' + esc(featuredOrder.paypal_order_id || featuredOrder.id)}
+                Ref: ${esc(featuredOrder.paypal_order_id || featuredOrder.id)}
               </div>
             </div>
           </div>
@@ -2982,7 +2988,7 @@ async function ordersPage() {
           <div class="milestone-steps-row" style="padding:8px 24px">
             ${[
               ['Order placed', (featuredOrder.created_at || 'Recent').slice(0, 10)],
-              ['Payment confirmed', isCompleted ? 'Verified via Orders v2' : 'Awaiting approval'],
+              ['Payment confirmed', isCompleted ? 'Captured via Orders v2' : 'Awaiting approval/capture'],
               ['In production', isCompleted ? 'Batch milestone active' : 'Queued on completion']
             ].map(([lbl, sub], i) => `
               <div class="milestone-step ${i < stepIdx ? 'done' : i === stepIdx ? 'current' : ''}">
@@ -2999,6 +3005,58 @@ async function ordersPage() {
             </button>
           </div>
         </div>
+        ` : `
+        <div class="orders-featured-card">
+          <div class="orders-featured-top">
+            <div class="visual-halo ${fVis.isSvg ? 'is-svg' : ''}" style="min-height:175px">
+              <img src="${fVis.src}" alt="${esc(fVis.alt)}">
+            </div>
+
+            <div>
+              <span class="sandbox-pill">Sample Workflow Preview · Not a Ledger Record</span>
+              <h3 style="margin:10px 0 6px;font-size:24px;font-weight:800;color:#fff">No PayPal Sandbox Orders Recorded Yet</h3>
+              <p style="margin:0;font-size:13px;color:var(--text-secondary)">
+                This account currently has <strong>0</strong> PayPal Sandbox transactions stored in Cloudflare D1. Explore an eligible non-DEMO manufacturing offer to test real PayPal Orders v2 checkout.
+              </p>
+
+              <div class="orders-meta-grid">
+                <div class="orders-meta-item">
+                  <small>D1 Orders</small>
+                  <strong>0</strong>
+                </div>
+                <div class="orders-meta-item">
+                  <small>Checkout Flow</small>
+                  <strong>Orders v2</strong>
+                </div>
+                <div class="orders-meta-item">
+                  <small>Ledger Status</small>
+                  <strong>Empty</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="paypal-sandbox-box">
+              <div class="row" style="justify-content:space-between">
+                <span style="display:inline-flex;align-items:center;gap:8px;font-weight:700;color:#fff">
+                  <svg viewBox="0 0 28 32" width="18" height="20"><path d="M4 2h12c5 0 8 2.5 8 6s-3 6-8 6h-6L7 28H3L4 2Z" fill="#e0f2fe"/><path d="M8 5h11c4 0 7 2.5 7 6s-3 6-8 6h-5l-3 13H6L8 5Z" fill="#2589ff"/></svg>
+                  PayPal
+                </span>
+                <span class="sandbox-pill">Sandbox Idle</span>
+              </div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-secondary);margin-top:4px">Awaiting first checkout</div>
+              <div style="font-size:12px;color:var(--text-muted)">
+                No simulated or unverified captures shown.
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="justify-content:center;padding-top:6px">
+            <button type="button" class="btn-luminous-primary" onclick="go('#/explore')">
+              <span>Browse Manufacturing Offers</span>${icon('arrowRight')}
+            </button>
+          </div>
+        </div>
+        `}
 
         <div class="section-header-row">
           <div>
@@ -3038,14 +3096,14 @@ async function ordersPage() {
           }).join('') || `
             <div class="order-row-card">
               <div class="row" style="gap:14px">
-                ${renderProductThumb(featuredOrder)}
+                ${renderProductThumb({ id: 'demo-a1', title: 'Eight-input portable audio interface' })}
                 <div>
-                  <strong style="display:block;color:#fff;font-size:14.5px">${esc(fTitle)} (Sample Preview)</strong>
-                  <small style="color:var(--text-muted)">Explore any eligible non-DEMO offer to run a real PayPal Sandbox checkout.</small>
+                  <strong style="display:block;color:#fff;font-size:14.5px">Empty PayPal Sandbox Ledger</strong>
+                  <small style="color:var(--text-muted)">Real Orders v2 transactions completed via an eligible product offer will appear here with captured amounts and refs.</small>
                 </div>
               </div>
-              <span class="sandbox-pill">Sandbox Sample</span>
-              <strong style="color:#fff">$${fAmount} ${esc(fCurr)}</strong>
+              <span class="sandbox-pill">0 Recorded</span>
+              <span style="color:var(--text-muted);font-size:13px">—</span>
               <button type="button" class="circle-arrow-btn" onclick="go('#/explore')" aria-label="Explore">${icon('arrowRight')}</button>
             </div>
           `}
@@ -3323,7 +3381,7 @@ async function manufacturerIntelligence() {
   let searchQ = '';
   let isEditMode = false;
   let studioApi = null;
-  let showStudio = false;
+  let showStudio = isMaker;
 
   const categories = [...new Set(products.map((p) => p.category || 'Creator Tools'))];
 
@@ -3368,20 +3426,31 @@ async function manufacturerIntelligence() {
   };
 
   const renderTrendSvg = (list) => {
-    const sorted = list.slice(0, 6);
-    const vals = (sorted.length ? sorted : [{ interest: 1 }]).map((p, i) =>
-      chartMode === 'interest' ? Math.max(1, Number(p.interest) || 1) + i * 0.4 : (i + 1)
-    );
-    const maxV = Math.max(2, ...vals);
-    const pts = vals.map((v, i) => {
-      const x = vals.length === 1 ? 280 : Math.round(24 + (i / (vals.length - 1)) * 552);
-      const y = Math.round(138 - (v / maxV) * 106);
-      return [x, y];
+    const byDate = {};
+    list.forEach((p) => {
+      const dt = (p.created_at || p.updated_at || 'Undated').slice(0, 10);
+      if (!byDate[dt]) byDate[dt] = { date: dt, interest: 0, ideas: 0 };
+      byDate[dt].interest += Number(p.interest) || 0;
+      byDate[dt].ideas += 1;
     });
-    const dLine = pts.map((pt, i) => (i === 0 ? `M${pt[0]},${pt[1]}` : `S${pt[0] - 28},${pt[1]} ${pt[0]},${pt[1]}`)).join(' ');
-    const dArea = `${dLine} L${pts[pts.length - 1][0]},156 L${pts[0][0]},156 Z`;
+    const series = Object.values(byDate).sort((a, b) => a.date.localeCompare(b.date)).slice(-6);
+    if (!series.length) {
+      return '<div style="height:175px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:13px">No dated records in D1.</div>';
+    }
+    const vals = series.map((d) => (chartMode === 'interest' ? d.interest : d.ideas));
+    const maxV = Math.max(1, ...vals);
+    const pts = vals.map((v, i) => {
+      const x = vals.length === 1 ? 300 : Math.round(36 + (i / (vals.length - 1)) * 528);
+      const y = Math.round(138 - (v / maxV) * 102);
+      return [x, y, v, series[i].date];
+    });
+    const dLine = pts.length === 1
+      ? `M60,${pts[0][1]} L540,${pts[0][1]}`
+      : pts.map((pt, i) => (i === 0 ? `M${pt[0]},${pt[1]}` : `L${pt[0]},${pt[1]}`)).join(' ');
+    const dArea = pts.length === 1
+      ? `M60,${pts[0][1]} L540,${pts[0][1]} L540,152 L60,152 Z`
+      : `${dLine} L${pts[pts.length - 1][0]},152 L${pts[0][0]},152 Z`;
     const last = pts[pts.length - 1];
-    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     return `
       <svg viewBox="0 0 600 176" style="width:100%;height:175px;display:block">
         <defs>
@@ -3393,8 +3462,12 @@ async function manufacturerIntelligence() {
         </defs>
         <path d="${dArea}" fill="url(#trendAreaFill)"/>
         <path d="${dLine}" fill="none" stroke="#22d3ee" stroke-width="3" filter="url(#cyanCurveGlow)"/>
+        ${pts.map(([x, y, v]) => `
+          <circle cx="${x}" cy="${y}" r="4.5" fill="#090d16" stroke="#22d3ee" stroke-width="2.5"/>
+          <text x="${x}" y="${Math.max(14, y - 10)}" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="600" font-family="Inter,sans-serif">${v}</text>
+        `).join('')}
         <circle cx="${last[0]}" cy="${last[1]}" r="6" fill="#ffffff" stroke="#22d3ee" stroke-width="3"/>
-        ${labels.map((m, i) => `<text x="${28 + i * 108}" y="170" fill="#64748b" font-size="11" font-family="Inter,sans-serif">${m}</text>`).join('')}
+        ${pts.map(([x, , , dt]) => `<text x="${x}" y="170" text-anchor="middle" fill="#64748b" font-size="11" font-family="Inter,sans-serif">${esc(dt.length === 10 ? dt.slice(5) : dt)}</text>`).join('')}
       </svg>
     `;
   };
@@ -3468,7 +3541,7 @@ async function manufacturerIntelligence() {
             <div class="row" style="justify-content:space-between;margin-bottom:8px">
               <div>
                 <strong style="font-size:15.5px;color:#fff;display:block">Demand trend</strong>
-                <span style="font-size:12px;color:var(--text-muted)">Consumer interest across submitted product concepts</span>
+                <span style="font-size:12px;color:var(--text-muted)">Grouped chronologically by verified D1 record dates</span>
               </div>
               <div class="lumina-role-pill">
                 <button type="button" class="role-btn ${chartMode === 'interest' ? 'active' : ''}" data-cmode="interest">Interest</button>
@@ -3518,7 +3591,10 @@ async function manufacturerIntelligence() {
                       <td>
                         <div class="row" style="gap:10px;flex-wrap:nowrap">
                           ${renderProductThumb(p, 'idea-card-thumb')}
-                          <strong style="color:#fff">${esc(p.title)}</strong>
+                          <div>
+                            <strong style="color:#fff;display:block">${esc(p.title)}</strong>
+                            <small style="color:var(--text-muted);font-size:11px">#${esc((p.id || '').slice(-6))} · ${esc((p.created_at || '').slice(0, 10) || 'D1 record')}</small>
+                          </div>
                         </div>
                       </td>
                       <td><span class="pill">${esc(p.category || 'Creator Tools')}</span></td>
@@ -3658,30 +3734,35 @@ async function manufacturerIntelligence() {
       };
     }
 
+    const mountStudio = () => {
+      if (!(showStudio && isMaker && window.agStudio && typeof window.agStudio.createStudio === 'function')) return;
+      const mountEl = $('#genesisStudioMount');
+      if (!mountEl) return;
+      try {
+        const theme = window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme({
+          backgroundColor: '#090d16', textColor: '#f1f5f9', borderColor: '#1e293b', accentColor: '#0ea5e9'
+        }) : undefined;
+        studioApi = window.agStudio.createStudio(mountEl, {
+          theme,
+          mode: isEditMode ? 'edit' : 'view',
+          data: {
+            sources: [
+              { id: 'demand_explorer', name: 'Demand Explorer', primaryKeyField: 'id', data: products.map((p) => ({ id: p.id, title: p.title, category: p.category || 'General', interest: p.interest, stage: stageName[p.status] || p.status })) },
+              { id: 'sandbox_orders', name: 'PayPal Sandbox Orders', primaryKeyField: 'id', data: orders.map((o) => ({ id: o.id, order_id: o.paypal_order_id || o.id, product: o.product_title || 'Product', amount: Number(o.amount) || 0, status: o.status })) }
+            ]
+          }
+        });
+      } catch {}
+    };
+
     if ($('#btnToggleStudioCanvas')) {
       $('#btnToggleStudioCanvas').onclick = () => {
         showStudio = !showStudio;
         draw();
-        if (showStudio && isMaker && window.agStudio && typeof window.agStudio.createStudio === 'function') {
-          try {
-            const mountEl = $('#genesisStudioMount');
-            const theme = window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme({
-              backgroundColor: '#090d16', textColor: '#f1f5f9', borderColor: '#1e293b', accentColor: '#0ea5e9'
-            }) : undefined;
-            studioApi = window.agStudio.createStudio(mountEl, {
-              theme,
-              mode: isEditMode ? 'edit' : 'view',
-              data: {
-                sources: [
-                  { id: 'demand_explorer', name: 'Demand Explorer', primaryKeyField: 'id', data: products.map((p) => ({ id: p.id, title: p.title, category: p.category || 'General', interest: p.interest, stage: stageName[p.status] || p.status })) },
-                  { id: 'sandbox_orders', name: 'PayPal Sandbox Orders', primaryKeyField: 'id', data: orders.map((o) => ({ id: o.id, order_id: o.paypal_order_id || o.id, product: o.product_title || 'Product', amount: Number(o.amount) || 0, status: o.status })) }
-                ]
-              }
-            });
-          } catch {}
-        }
       };
     }
+
+    mountStudio();
 
     if ($('#btnToggleStudioMode')) {
       $('#btnToggleStudioMode').onclick = () => {
