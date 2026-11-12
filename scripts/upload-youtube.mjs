@@ -116,6 +116,20 @@ This demonstration uses PayPal Sandbox. No live-money transaction is represented
 
   const uploadResult = await putRes.json();
   console.log("Upload result:", JSON.stringify(uploadResult, null, 2));
+  const thumbPath = "/Users/shyamlraj/Downloads/PPGEN/paypal-genesis/submission/PayPal_GENESIS_Official_Thumbnail.png";
+  if (uploadResult.id && fs.existsSync(thumbPath)) {
+    const thumbBuf = fs.readFileSync(thumbPath);
+    const thumbRes = await fetch(`https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId=${uploadResult.id}&uploadType=media`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "image/png",
+        "Content-Length": String(thumbBuf.length)
+      },
+      body: thumbBuf
+    });
+    console.log("Thumbnail set status:", thumbRes.status);
+  }
   console.log(`SUCCESS! Watch URL: https://www.youtube.com/watch?v=${uploadResult.id}`);
 }
 
