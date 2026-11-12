@@ -30,7 +30,7 @@ const ICONS = {
 
 function icon(name, extra = '') {
   const path = ICONS[name] || '';
-  return `<svg class="icon ${extra}" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+  return `<svg class="icon ${extra}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
 }
 
 let user = null;
@@ -103,6 +103,41 @@ const paymentBadgeClass = {
 };
 
 const maker = () => ['manufacturer', 'administrator'].includes(user?.role);
+
+function getProductVisual(prod = {}) {
+  const hay = `${prod.id || ''} ${prod.title || ''} ${prod.category || ''} ${prod.description || ''}`.toLowerCase();
+  const title = prod.title || 'GENESIS Hardware Concept';
+  if (hay.includes('audio interface') || hay.includes('recording interface') || hay.includes('demo-a1') || hay.includes('demo-a2') || (hay.includes('creator') && hay.includes('interface'))) {
+    return { src: '/assets/products/audio-interface-3d.jpg', isSvg: false, alt: title };
+  }
+  if (hay.includes('monitor') || hay.includes('display') || hay.includes('screen') || hay.includes('4k') || hay.includes('video')) {
+    return { src: '/assets/products/field-monitor.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('keyboard') || hay.includes('keycap') || hay.includes('typing')) {
+    return { src: '/assets/products/creator-keyboard.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('earbud') || hay.includes('headphone') || hay.includes('audio')) {
+    return { src: '/assets/products/studio-headphones.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('camera') || hay.includes('lens') || hay.includes('photo')) {
+    return { src: '/assets/products/camera.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('watch') || hay.includes('wearable') || hay.includes('fitness')) {
+    return { src: '/assets/products/smartwatch.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('laptop') || hay.includes('notebook') || hay.includes('workstation')) {
+    return { src: '/assets/products/laptop.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('home') || hay.includes('hub') || hay.includes('matter') || hay.includes('appliance')) {
+    return { src: '/assets/products/appliance.svg', isSvg: true, alt: title };
+  }
+  return { src: '/assets/products/hardware-chassis.svg', isSvg: true, alt: title };
+}
+
+function renderProductThumb(prod, cls = 'idea-card-thumb') {
+  const vis = getProductVisual(prod);
+  return `<div class="${cls} ${vis.isSvg ? 'is-svg' : ''}"><img src="${vis.src}" alt="${esc(vis.alt)}" loading="lazy"></div>`;
+}
 
 function loadStore(key, fallback) {
   try {
@@ -234,6 +269,7 @@ function nav(activePage) {
     { label: 'Home', hash: user ? '#/home' : '#/intro', icon: 'home' },
     { label: 'Discover', hash: '#/explore', icon: 'compass' },
     { label: 'Create', hash: '#/request', icon: 'plusCircle', isAccent: true },
+    ...(isMaker ? [{ label: 'Manufacturing', hash: '#/manufacturer/demand', icon: 'factory' }] : []),
     { label: 'Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
     { label: 'Orders', hash: '#/orders', icon: 'receipt' },
     { label: 'Account', hash: '#/account', icon: 'user' },
@@ -243,10 +279,11 @@ function nav(activePage) {
   const isCurrentActive = (item) => {
     if (activePage === item.label) return true;
     if (item.label === 'Home' && (currentPath === '' || currentPath === '/' || currentPath === '/home' || currentPath === '/intro')) return true;
-    if (item.label === 'Discover' && (currentPath === '/explore' || currentPath.startsWith('/product/') || currentPath === '/manufacturer/demand')) return true;
+    if (item.label === 'Discover' && (currentPath === '/explore' || currentPath.startsWith('/product/'))) return true;
     if (item.label === 'Create' && (currentPath.startsWith('/request') || currentPath.startsWith('/report'))) return true;
-    if (item.label === 'Intelligence' && (currentPath.startsWith('/manufacturer/intelligence') || currentPath.startsWith('/manufacturer/analytics'))) return true;
-    if (item.label === 'Orders' && (currentPath === '/orders' || currentPath === '/my-products' || currentPath.startsWith('/manufacturer/product/'))) return true;
+    if (item.label === 'Manufacturing' && (currentPath.startsWith('/manufacturer/demand') || currentPath.startsWith('/manufacturer/offer') || currentPath.startsWith('/manufacturer/products') || currentPath.startsWith('/manufacturer/product/'))) return true;
+    if (item.label === 'Intelligence' && (currentPath.startsWith('/manufacturer/intelligence') || currentPath.startsWith('/manufacturer/analytics') || currentPath.startsWith('/manufacturer/quality'))) return true;
+    if (item.label === 'Orders' && (currentPath === '/orders' || currentPath === '/my-products')) return true;
     if (item.label === 'Account' && (currentPath === '/account' || currentPath === '/help' || currentPath === '/admin')) return true;
     return false;
   };
@@ -697,151 +734,58 @@ function introPage() {
   $('#heading').textContent = 'PayPal GENESIS';
   if ($('#windowKicker')) $('#windowKicker').textContent = 'LUMINA OS';
 
+  const ji = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const arrow = '<svg class="journey-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h15M14 7l5 5-5 5"/></svg>';
   $('#view').innerHTML = `
-    <div class="lumina-home-stage view-enter">
-      <!-- 1440x900 Centerpiece: Monument Hero -->
-      <div class="lumina-hero-monument">
-        <div class="lumina-monument-left">
-          <div class="lumina-kicker-badge">
-            <span class="mfg-badge-live">LUMINA PRODUCT OS</span>
-            <span style="color:var(--text-muted)">//</span>
-            <span style="color:#ffffff">PayPal AI Hackathon</span>
+    <div class="view-enter">
+      <div class="genesis-home-hero">
+        <div class="genesis-home-left">
+          <span class="stage-kicker">IDEAS &middot; INTELLIGENCE &middot; REAL PRODUCTS</span>
+          <h1 class="genesis-hero-title">Products should<br>begin with <span class="cyan-glow">people.</span></h1>
+          <p class="genesis-hero-subhead">GENESIS turns product ideas into real products — connecting consumer demand, intelligent specifications, manufacturing, and PayPal-powered checkout.</p>
+          <p class="genesis-hero-note">Share what you wish existed. Help improve what already exists. See how manufacturers bring better products to life.</p>
+          <div class="genesis-cta-row">
+            <button type="button" class="btn-luminous-primary" id="introConsumerBtn">${icon('users')}<span>Continue as Consumer</span>${icon('arrowRight')}</button>
+            <button type="button" class="btn-luminous-secondary" id="introManufacturerBtn">${icon('factory')}<span>Explore as Manufacturer</span>${icon('arrowRight')}</button>
+            <button type="button" class="btn-luminous-secondary" id="introGetStartedBtn" style="display:none">Get Started</button>
           </div>
-
-          <h1 class="lumina-hero-headline">Products should begin with people.</h1>
-
-          <p class="lumina-hero-subhead">From the first idea to the final purchase, GENESIS connects consumer demand, AI-powered specifications, manufacturing decisions, and PayPal.</p>
-
-          <p style="font-size:12px;color:var(--text-muted);margin:0">
-            Share what you wish existed. Help improve what already exists. See how manufacturers bring better products to life.
-          </p>
-
-          <div class="lumina-cta-row">
-            <button type="button" class="btn-lumina-primary" id="introConsumerBtn">
-              <span>Continue as Consumer</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-            <button type="button" class="btn-lumina-secondary" id="introManufacturerBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7l6-4 6 4"/></svg>
-              <span>Explore as Manufacturer</span>
-            </button>
-            <button type="button" class="btn-lumina-secondary" id="introGetStartedBtn" style="display:none">Get Started</button>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:14px;margin-top:2px;font-size:11px;color:var(--text-muted);flex-wrap:wrap">
-            <span>⚡ Zero-friction demo</span>
-            <span>•</span>
-            <span>🔒 No signup required</span>
-            <span>•</span>
-            <span>💳 PayPal Sandbox checkout</span>
+          <div class="genesis-entry-meta">
+            <span>Hackathon Demo</span>
+            <span>&middot;</span>
+            <span>No signup required</span>
+            <span>&middot;</span>
+            <span>PayPal Sandbox only</span>
           </div>
         </div>
-
-        <!-- Striking 3D Product Concept Visualization -->
-        <div class="lumina-3d-stage">
-          ${renderIdeaToProductSvg()}
-        </div>
-      </div>
-
-      <!-- Tactile 3D Cards: Matching Reference Image (Blue, Purple, Coral) -->
-      <div class="tactile-cards-row">
-        <div class="tactile-card card-blue" id="journeyIdea" role="button" tabindex="0">
-          <svg class="tactile-3d-glyph" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)"/>
-            <path d="M18 16 C18 12, 30 12, 30 16 C30 20, 26 22, 26 26 L22 26 C22 22, 18 20, 18 16 Z" fill="none" stroke="#ffffff" stroke-width="2.5"/>
-            <line x1="22" y1="30" x2="26" y2="30" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="24" cy="17" r="3" fill="#ffffff"/>
-          </svg>
-          <div>
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:6px">Stage 01 · Inception</div>
-            <h3 class="tactile-card-title">You Imagine.</h3>
-            <p class="tactile-card-desc">Describe hardware ideas that do not exist yet. Mobilize backer demand with $0 upfront capital.</p>
-          </div>
-          <div class="tactile-card-action">
-            <span>Request Idea</span>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-
-        <div class="tactile-card card-purple" id="journeyIntel" role="button" tabindex="0">
-          <svg class="tactile-3d-glyph" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)"/>
-            <path d="M24 10 Q24 24 38 24 Q24 24 24 38 Q24 24 10 24 Q24 24 24 10 Z" fill="#ffffff"/>
-            <circle cx="24" cy="24" r="3" fill="#8c46ff"/>
-          </svg>
-          <div>
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:6px">Stage 02 · Intelligence</div>
-            <h3 class="tactile-card-title">Gemini Synthesizes.</h3>
-            <p class="tactile-card-desc">Instant engineering BOM, manufacturing feasibility analysis, and target price discovery.</p>
-          </div>
-          <div class="tactile-card-action">
-            <span>Explore AG Studio</span>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-
-        <div class="tactile-card card-coral" id="journeyPay" role="button" tabindex="0">
-          <svg class="tactile-3d-glyph" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)"/>
-            <path d="M19 14 L27 14 C31 14, 33 16, 33 19 C33 22, 31 24, 27 24 L22 24 L20 34 L16 34 L19 14 Z" fill="#ffffff"/>
-            <circle cx="34" cy="18" r="5" fill="#ffffff"/>
-            <path d="M32 18 L33.5 19.5 L36 17" stroke="#ff4c5b" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <div>
-            <div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:6px">Stage 03 · Checkout</div>
-            <h3 class="tactile-card-title">PayPal Builds.</h3>
-            <p class="tactile-card-desc">Verified milestone protections. Backers pre-order safely via PayPal Sandbox REST API v2.</p>
-          </div>
-          <div class="tactile-card-action">
-            <span>Verified Escrow</span>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <div class="genesis-home-right">
+          <div class="hero-3d-pedestal">
+            <img class="genesis-hero-3d-img" src="/assets/genesis-hero-3d.jpg" alt="GENESIS 3D Product Creation Platform: Idea, Intelligence, Demand, Manufacturing, PayPal">
           </div>
         </div>
       </div>
-
-      <div style="display:none">
-        <span id="journeyDemand"></span>
-        <span id="journeyBuild"></span>
-      </div>
-
-      <!-- Live Real D1 Telemetry Strip -->
-      <div class="lumina-telemetry-bar">
-        <div class="telemetry-tile">
-          <span class="telemetry-label">Preseeded Catalog</span>
-          <span class="telemetry-value">4 Inventions</span>
-          <span class="telemetry-foot">Hardware concepts ready</span>
-        </div>
-        <div class="telemetry-tile">
-          <span class="telemetry-label">Verified Backing</span>
-          <span class="telemetry-value">7 Signals</span>
-          <span class="telemetry-foot">Stored Cloudflare D1 records</span>
-        </div>
-        <div class="telemetry-tile">
-          <span class="telemetry-label">Production Batch</span>
-          <span class="telemetry-value">Batch #1 Active</span>
-          <span class="telemetry-foot">StudioWorks 200 MOQ offer</span>
-        </div>
-        <div class="telemetry-tile">
-          <span class="telemetry-label">PayPal Sandbox</span>
-          <span class="telemetry-value">$249.00 Captured</span>
-          <span class="telemetry-foot">REST API v2 server verified</span>
+      <div class="genesis-journey-strip">
+        <div class="journey-node" id="journeyIdea">
+          <div class="journey-circle">${ji('<path d="M9 18h6M10 22h4M12 2a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 2Z"/>')}</div>
+          <div class="journey-text"><span class="journey-label">Idea</span><span class="journey-sub">Share what you wish existed</span></div>
+        </div>${arrow}
+        <div class="journey-node" id="journeyIntel">
+          <div class="journey-circle">${ji('<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/>')}</div>
+          <div class="journey-text"><span class="journey-label">Intelligence</span><span class="journey-sub">AI-structured specs</span></div>
+        </div>${arrow}
+        <div class="journey-node" id="journeyDemand">
+          <div class="journey-circle">${ji('<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M15 14c3 0 6 2 6 5"/>')}</div>
+          <div class="journey-text"><span class="journey-label">Demand</span><span class="journey-sub">Validate consumer intent</span></div>
+        </div>${arrow}
+        <div class="journey-node" id="journeyBuild">
+          <div class="journey-circle">${ji('<path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/>')}</div>
+          <div class="journey-text"><span class="journey-label">Build</span><span class="journey-sub">Manufacturing offers</span></div>
+        </div>${arrow}
+        <div class="journey-node" id="journeyPay">
+          <div class="journey-circle"><svg viewBox="0 0 28 32" width="22" height="24"><path d="M4 2h12c5 0 8 2.5 8 6s-3 6-8 6h-6L7 28H3L4 2Z" fill="#e0f2fe"/><path d="M8 5h11c4 0 7 2.5 7 6s-3 6-8 6h-5l-3 13H6L8 5Z" fill="#2589ff"/></svg></div>
+          <div class="journey-text"><span class="journey-label">PayPal</span><span class="journey-sub">Sandbox checkout</span></div>
         </div>
       </div>
-
-      <!-- System Message Floating Toast (Bottom Right) -->
-      <div class="system-message-toast" id="systemToastNotice">
-        <div class="toast-avatar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <div class="toast-content">
-          <span class="toast-title">System Status · Hackathon Demo</span>
-          <span class="toast-text">Gemini 3.8 Flash online · PayPal Sandbox v2 active</span>
-        </div>
-      </div>
-
-      <div class="sr-only" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden">
-        YOU IMAGINE · PEOPLE SUPPORT · MAKERS BUILD
-      </div>
+      <div class="sr-only">YOU IMAGINE · PEOPLE SUPPORT · MAKERS BUILD</div>
     </div>
   `;
 
@@ -884,480 +828,331 @@ function bindHomeActions() {
   });
 }
 
-function home() {
+async function home() {
   $('#heading').textContent = maker() ? 'Manufacturer Workspace' : 'Consumer Workspace';
   const isMaker = maker();
-  if (isMaker) {
-    $('#view').innerHTML = `
-      <div class="mfg-workspace-layout view-enter">
-        <!-- Main Opportunities & Intelligence Column -->
-        <div class="mfg-main-col">
-          <!-- Context Header -->
-          <div class="mfg-context-header">
-            <div class="mfg-title-area">
-              <h2>StudioWorks Manufacturing Workspace</h2>
-              <p>Turn verified consumer demand, Gemini specifications, and PayPal activity into production decisions.</p>
-            </div>
-            <div class="mfg-context-actions">
-              <button type="button" class="btn-pill-primary" id="mfgCreateOfferBtn" data-action="offer">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                <span>+ Commit Build Offer</span>
-              </button>
-              <button type="button" class="btn-pill-secondary" id="mfgStudioCanvasBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                <span>AG Studio Intelligence</span>
-              </button>
-            </div>
-          </div>
 
-          <!-- Visually Dominant Featured Opportunity Canvas -->
-          <div class="mfg-hero-opportunity-card">
-            <div class="mfg-hero-info">
-              <div class="mfg-hero-badge-row">
-                <span class="mfg-badge-live">Prototype Phase</span>
-                <span class="mfg-badge-demo">Demo Scenario</span>
-                <span style="font-size:11px;color:var(--text-muted)">Category: Creator Tools</span>
+  let products = [];
+  let analytics = null;
+  try {
+    if (isMaker) {
+      analytics = await api('/manufacturer/analytics');
+      products = analytics.products || [];
+    }
+    if (!products.length) {
+      const res = await api('/products');
+      products = res.products || [];
+    }
+  } catch {
+    products = [];
+  }
+
+  if (!products.length) {
+    products = [
+      { id: 'demo-a1', title: 'Eight-input portable audio interface', category: 'Creator Tools', status: 'prototype', supporters: 2, interest: 2, description: 'Mobile creators request eight discrete XLR/TRS combo preamps, 24-bit/192 kHz conversion DSP, and dual USB-C bus power.', demo: 1 }
+    ];
+  }
+
+  let selectedId = products[0].id;
+  let activeTab = 'overview';
+
+  const seenTitles = new Set();
+  const distinctProducts = [];
+  for (const p of products) {
+    const key = (p.title || '').trim().toLowerCase();
+    if (!seenTitles.has(key)) {
+      seenTitles.add(key);
+      distinctProducts.push(p);
+    }
+  }
+  const showcaseProducts = distinctProducts.length >= 3 ? distinctProducts : products;
+
+  if (isMaker) {
+    const renderMaker = () => {
+      const active = products.find((p) => p.id === selectedId) || products[0];
+      const vis = getProductVisual(active);
+      const specObj = safeParseJson(active.spec || active.intelligence);
+      const reqs = specObj?.requirements || [
+        '8 × XLR/TRS discrete low-noise combo preamps with tactile gain knobs',
+        '24-bit / 192 kHz high-headroom AD/DA conversion DSP',
+        'Dual USB-C bus power architecture with ultra-low host latency',
+        'CNC-machined matte aluminum chassis ($249 consumer target retail)'
+      ];
+      const stIdx = ['idea', 'clarifying', 'demand'].includes(active.status) ? 0
+        : ['prototype', 'tooling'].includes(active.status) ? 1
+        : active.has_my_offer || active.has_eligible_offer ? 2 : 1;
+      const sigCount = active.interest ?? active.supporters ?? 0;
+      const score = Math.min(96, Math.max(24, Number(sigCount) * 28 + (active.has_eligible_offer ? 22 : 12)));
+
+      $('#view').innerHTML = `
+        <div class="mfg-stage-layout view-enter">
+          <div class="mfg-main-col">
+            <div class="mfg-hero-panel">
+              <div class="mfg-context-header">
+                <div>
+                  <span class="stage-kicker">GENESIS MANUFACTURING</span>
+                  <h2 style="margin:0;font-size:clamp(26px,2.8vw,34px);font-weight:800;color:#fff">Product Opportunity</h2>
+                  <p style="margin:4px 0 0;font-size:13.5px;color:var(--text-secondary)">Turn verified consumer demand into a real product.</p>
+                </div>
+                <div class="mfg-switcher-pills">
+                  ${showcaseProducts.slice(0, 4).map((p) => `
+                    <button type="button" class="mfg-opp-chip ${p.id === active.id ? 'active' : ''}" data-pick-opp="${esc(p.id)}">${esc((p.title || '').slice(0, 24))}${(p.title || '').length > 24 ? '…' : ''}</button>
+                  `).join('')}
+                </div>
               </div>
-              <h3 class="mfg-hero-title">Eight-input portable audio interface</h3>
-              <p class="mfg-hero-desc">Mobile creators request eight discrete XLR/TRS combo preamps, high-headroom onboard DSP conversion, dual USB-C bus power, and physical tactile gain knobs.</p>
-              
-              <!-- Real Stored DB Metrics (Explicitly Labeled) -->
-              <div class="mfg-hero-metrics">
-                <div class="mfg-metric-tile">
-                  <span class="mfg-metric-label">Verified Backers</span>
-                  <span class="mfg-metric-value">2 Signals</span>
-                  <span class="mfg-metric-footnote">Stored D1 records</span>
+
+              <div class="mfg-hero-split">
+                <div>
+                  <h3 class="mfg-product-title">${esc(active.title)}</h3>
+                  <p class="mfg-product-desc">${esc((active.description || 'Verified consumer demand signal ready for engineering specification and production offer.').slice(0, 190))}</p>
+                  <div class="mfg-tag-row">
+                    <span class="mfg-tag-pill">${esc(active.category || 'Creator Tools')}</span>
+                    <span class="mfg-tag-pill">${esc(stageName[active.status] || active.status || 'Prototype')}</span>
+                    <span class="mfg-tag-pill">${active.demo ? 'Demo Record' : 'Live D1 Signal'}</span>
+                  </div>
                 </div>
-                <div class="mfg-metric-tile">
-                  <span class="mfg-metric-label">Target Retail</span>
-                  <span class="mfg-metric-value">$249.00</span>
-                  <span class="mfg-metric-footnote">USD consumer target</span>
+                <div class="visual-halo ${vis.isSvg ? 'is-svg' : ''}" style="min-height:200px">
+                  <img src="${vis.src}" alt="${esc(vis.alt)}">
                 </div>
-                <div class="mfg-metric-tile">
-                  <span class="mfg-metric-label">Batch MOQ Target</span>
-                  <span class="mfg-metric-value">200 Units</span>
-                  <span class="mfg-metric-footnote">Batch #1 threshold</span>
+              </div>
+
+              <div class="milestone-steps-row" style="padding:6px 0">
+                ${[
+                  ['Interest', 'Validated demand'],
+                  ['Requirements', 'AI-structured specs'],
+                  ['Offer', 'Manufacturing offer'],
+                  ['Build', 'Move to production']
+                ].map(([lbl, sub], i) => `
+                  <div class="milestone-step ${i < stIdx ? 'done' : i === stIdx ? 'current' : ''}">
+                    <div class="milestone-dot">${i < stIdx ? '✓' : i + 1}</div>
+                    <span>${lbl}</span>
+                    <small style="font-size:10.5px;color:var(--text-muted)">${sub}</small>
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="mfg-metrics-strip">
+                <div class="mfg-metric-cell">
+                  <strong>${sigCount}</strong>
+                  <span>Interested consumers</span>
+                </div>
+                <div class="mfg-metric-cell">
+                  <strong>${score}%</strong>
+                  <span>Demand score</span>
+                </div>
+                <div class="mfg-metric-cell">
+                  <strong>$${Number(active.target_price || 249)}</strong>
+                  <span>Target retail (USD)</span>
+                </div>
+                <div class="mini-bars" aria-hidden="true">
+                  <i style="height:35%"></i><i style="height:48%"></i><i style="height:62%"></i><i style="height:74%"></i><i style="height:88%"></i><i style="height:100%"></i>
                 </div>
               </div>
 
               <div class="mfg-hero-actions">
-                <button type="button" class="btn-pill-primary" data-action="progress">
-                  <span>Update Production Milestone</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <button type="button" class="btn-luminous-primary" onclick="go('#/manufacturer/product/${esc(active.id)}')">
+                  <span>Create offer</span>${icon('arrowRight')}
                 </button>
-                <button type="button" class="btn-pill-secondary" data-action="orders">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                  <span>PayPal Orders</span>
+                <button type="button" class="btn-luminous-secondary" id="mfgStudioCanvasBtn">
+                  ${icon('chart')}<span>View intelligence</span>
+                </button>
+                <button type="button" class="btn-luminous-secondary" data-action="improve">
+                  <span>Quality reports</span>
                 </button>
               </div>
             </div>
-
-            <!-- Vector Blueprint Schematic Stage -->
-            <div class="mfg-hero-graphic-stage">
-              ${renderIdeaToProductSvg()}
-            </div>
           </div>
 
-          <!-- Secondary Section: Product Opportunity Queue -->
-          <div class="mfg-section-title-row">
-            <h4 class="mfg-section-title">Product Opportunity Queue</h4>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button type="button" class="btn-pill-secondary" data-action="explore" style="padding:4px 12px;font-size:11.5px">Customer Demand</button>
-              <button type="button" class="btn-pill-secondary" data-action="improve" style="padding:4px 12px;font-size:11.5px">Quality Reports</button>
-            </div>
-          </div>
-
-          <div class="mfg-opp-table-card">
-            <table class="mfg-table">
-              <thead>
-                <tr>
-                  <th>Product Opportunity</th>
-                  <th>Status</th>
-                  <th>Category</th>
-                  <th>Verified Signals</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <div class="table-product-cell">
-                      <strong>Eight-input portable audio interface</strong>
-                      <small>8-channel XLR/TRS DSP hardware</small>
-                    </div>
-                  </td>
-                  <td><span class="mfg-badge-live">Prototype</span></td>
-                  <td>Creator Tools</td>
-                  <td style="color:#ffffff;font-weight:600">2 Intents (Stored)</td>
-                  <td><button type="button" class="btn-pill-primary" style="padding:5px 12px;font-size:11.5px" data-action="progress">Batch #1 Active</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="table-product-cell">
-                      <strong>Mobile multichannel recording interface</strong>
-                      <small>Field recording preamps &amp; USB bus</small>
-                    </div>
-                  </td>
-                  <td><span class="mfg-badge-demo" style="background:rgba(56,152,255,0.15);color:#93c5fd;border-color:rgba(56,152,255,0.3)">Idea Stage</span></td>
-                  <td>Creator Tools</td>
-                  <td style="color:#ffffff;font-weight:600">1 Signal (Stored)</td>
-                  <td><button type="button" class="btn-pill-secondary" style="padding:5px 12px;font-size:11.5px" data-action="offer">Commit Offer</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="table-product-cell">
-                      <strong>Wireless earbuds with battery drain</strong>
-                      <small>Customer reported battery degradation</small>
-                    </div>
-                  </td>
-                  <td><span class="mfg-badge-demo" style="background:rgba(239,68,68,0.15);color:#fca5a5;border-color:rgba(239,68,68,0.3)">Quality Feedback</span></td>
-                  <td>Audio</td>
-                  <td style="color:#ffffff;font-weight:600">1 Report (Stored)</td>
-                  <td><button type="button" class="btn-pill-secondary" style="padding:5px 12px;font-size:11.5px" data-action="improve">Inspect Defect</button></td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="table-product-cell">
-                      <strong>Smart-home hub with unreliable connections</strong>
-                      <small>Matter mesh gateway connectivity</small>
-                    </div>
-                  </td>
-                  <td><span class="mfg-badge-demo" style="background:rgba(16,185,129,0.15);color:#6ee7b7;border-color:rgba(16,185,129,0.3)">Launch Ready</span></td>
-                  <td>Home</td>
-                  <td style="color:#ffffff;font-weight:600">1 Signal (Stored)</td>
-                  <td><button type="button" class="btn-pill-secondary" style="padding:5px 12px;font-size:11.5px" data-action="progress">View Progress</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Embedded AG Studio Intelligence Preview -->
-          <div class="mfg-studio-preview-card" id="mfgStudioCard">
-            <div class="studio-preview-head">
-              <div class="studio-badge-group">
-                <span class="ag-brand-badge">AG STUDIO</span>
-                <div class="studio-title-meta">
-                  <h3>AG Studio Manufacturer Intelligence Preview</h3>
-                  <p>Real-time D1 analytics, cross-filtering, and PayPal Sandbox order settlement telemetry</p>
-                </div>
-              </div>
-              <button type="button" class="btn-pill-primary" id="openFullStudioBtn">
-                <span>Open Interactive AG Studio Canvas →</span>
-              </button>
-            </div>
-
-            <div class="studio-mini-kpi-row">
-              <div class="studio-mini-kpi">
-                <span>Stored Database Opportunities</span>
-                <strong>4 Products</strong>
-              </div>
-              <div class="studio-mini-kpi">
-                <span>Genuine Backer Actions</span>
-                <strong>7 Recorded Signals</strong>
-              </div>
-              <div class="studio-mini-kpi">
-                <span>Live Sandbox Settlement Offers</span>
-                <strong>1 Active Batch</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column: Contextual Product Inspector -->
-        <aside class="mfg-inspector-col">
-          <div class="inspector-panel">
+          <aside class="mfg-dossier-panel">
             <div class="inspector-header">
-              <h3>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                <span>Product Dossier</span>
-              </h3>
-              <span class="inspector-stage-pill">Prototype Stage</span>
+              <h3>${icon('document')}<span>Product requirements</span></h3>
+              <span class="inspector-stage-pill">${esc(stageName[active.status] || 'Prototype')}</span>
             </div>
 
-            <div class="inspector-selected-product">
-              <h4 class="inspector-title">Eight-input portable audio interface</h4>
-              <span style="font-size:11.5px;color:var(--text-muted)">Selected Scenario: demo-a1 · Creator Tools</span>
+            <div class="dossier-tabs">
+              ${['overview', 'specifications', 'demand', 'notes'].map((t) => `
+                <button type="button" class="dossier-tab ${activeTab === t ? 'active' : ''}" data-dossier-tab="${t}">${t[0].toUpperCase() + t.slice(1)}</button>
+              `).join('')}
             </div>
 
-            <!-- Gemini RFC Engineering Requirements Checklist -->
-            <div class="inspector-spec-block">
-              <div class="spec-block-title">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>Gemini 3.8 Flash Spec Checklist</span>
+            <div class="dossier-spec-rows">
+              ${activeTab === 'overview' ? `
+                <div class="dossier-spec-row"><span class="spec-key">Category</span><span class="spec-val">${esc(active.category || 'Creator Tools')}</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Architecture</span><span class="spec-val">${esc(reqs[0] || 'Modular low-noise chassis')}</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Performance</span><span class="spec-val">${esc(reqs[1] || 'High-efficiency conversion & thermal control')}</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Connectivity</span><span class="spec-val">${esc(reqs[2] || 'Dual USB-C & wireless control')}</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Target price</span><span class="spec-val">$${Number(active.target_price || 249)} (consumer retail)</span></div>
+              ` : activeTab === 'specifications' ? reqs.slice(0, 5).map((r, idx) => `
+                <div class="dossier-spec-row"><span class="spec-key">Spec #${idx + 1}</span><span class="spec-val">${esc(r)}</span></div>
+              `).join('') : activeTab === 'demand' ? `
+                <div class="dossier-spec-row"><span class="spec-key">Stored Signals</span><span class="spec-val">${sigCount} database-backed consumer intents</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Quality Reports</span><span class="spec-val">${Number(active.reports || 0)} field feedback items</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Offer Status</span><span class="spec-val">${active.has_my_offer ? 'Your offer active' : (active.has_eligible_offer ? 'Eligible offer exists' : 'Open opportunity')}</span></div>
+              ` : `
+                <div class="dossier-spec-row"><span class="spec-key">Scenario</span><span class="spec-val">${active.demo ? 'Preseeded demo fixture (' + esc(active.id) + ')' : 'Live community submission'}</span></div>
+                <div class="dossier-spec-row"><span class="spec-key">Settlement</span><span class="spec-val">PayPal Sandbox REST API v2 escrow milestones</span></div>
+              `}
+            </div>
+
+            <div class="ai-studio-banner-box" id="mfgStudioCard">
+              ${icon('sparkles')}
+              <div>
+                <strong style="display:block;color:#fff;font-size:13.5px">AI Specification Studio</strong>
+                <span style="font-size:12px;color:var(--text-secondary)">Editable, structured product specification &amp; AG Studio demand intelligence.</span>
               </div>
-              <div class="spec-req-list">
-                <div class="spec-req-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>8× XLR/TRS discrete low-noise preamps with analog pads</span>
-                </div>
-                <div class="spec-req-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>24-bit / 192 kHz high-headroom AD/DA conversion DSP</span>
-                </div>
-                <div class="spec-req-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Dual USB-C bus power + low-latency host audio data</span>
-                </div>
-                <div class="spec-req-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>CNC-machined aluminum chassis with physical tactile knobs</span>
-                </div>
-              </div>
             </div>
 
-            <!-- Stored D1 Database Signals Summary -->
-            <div class="inspector-signals-card">
-              <div class="inspector-signals-title">Stored Demand Evidence</div>
-              <div class="inspector-signals-val">2 Intent Signals · $250 Target</div>
-              <div class="inspector-signals-sub">Stored in D1 support table for demo-a1. Non-fabricated verification fixture.</div>
-            </div>
-
-            <!-- Inspector Action Box -->
             <div class="inspector-action-box">
-              <button type="button" class="btn-inspector-action" data-action="offer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              <button type="button" class="btn-inspector-action" onclick="go('#/manufacturer/product/${esc(active.id)}')">
                 <span>+ Submit Batch Production Offer</span>
               </button>
-              <button type="button" class="btn-inspector-sub" onclick="go('#/product/demo-a1')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <button type="button" class="btn-inspector-sub" onclick="go('#/product/${esc(active.id)}')">
                 <span>Inspect Full Specification</span>
               </button>
             </div>
-          </div>
-        </aside>
-      </div>
-    `;
+          </aside>
+        </div>
+      `;
 
-    bindHomeActions();
-    if ($('#mfgStudioCanvasBtn')) $('#mfgStudioCanvasBtn').onclick = () => go('#/manufacturer/intelligence');
-    if ($('#openFullStudioBtn')) $('#openFullStudioBtn').onclick = () => go('#/manufacturer/intelligence');
-    if ($('#mfgStudioCard')) $('#mfgStudioCard').onclick = () => go('#/manufacturer/intelligence');
+      document.querySelectorAll('[data-pick-opp]').forEach((b) => {
+        b.onclick = () => { selectedId = b.dataset.pickOpp; renderMaker(); };
+      });
+      document.querySelectorAll('[data-dossier-tab]').forEach((b) => {
+        b.onclick = () => { activeTab = b.dataset.dossierTab; renderMaker(); };
+      });
+      if ($('#mfgStudioCanvasBtn')) $('#mfgStudioCanvasBtn').onclick = () => go('#/manufacturer/intelligence');
+      if ($('#mfgStudioCard')) $('#mfgStudioCard').onclick = () => go('#/manufacturer/intelligence');
+      bindHomeActions();
+    };
+    renderMaker();
     return;
   }
 
-  // Consumer Home
-  $('#view').innerHTML = `
-    <div class="app-workspace-layout view-enter">
-      <div class="app-main-col">
-        <div class="app-context-header">
-          <div class="app-title-area">
-            <h2>Personal Invention Workspace</h2>
-            <p>Describe product needs, generate structured specifications, and follow manufacturing progress.</p>
-          </div>
-          <div class="app-context-actions">
-            <button type="button" class="btn-pill-primary" data-action="request">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M15 2a6 6 0 0 0-6 6c0 2 1 3.5 2 4.5V14a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.5c1-1 2-2.5 2-4.5a6 6 0 0 0-6-6z"/></svg>
-              <span>+ Request Product Idea</span>
-            </button>
-            <button type="button" class="btn-pill-secondary" data-action="explore">
-              <span>Explore Community</span>
-            </button>
-          </div>
-        </div>
+  // Consumer Home (02-consumer-home.png)
+  const renderConsumer = () => {
+    const featured = products.find((p) => p.id === selectedId) || products[0];
+    const vis = getProductVisual(featured);
+    const stepMap = { idea: 0, clarifying: 1, demand: 2, tooling: 2, prototype: 3, active: 3, funded: 4 };
+    const jStep = stepMap[featured.status] ?? 2;
+    const ji = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+    const arrow = '<svg class="journey-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h15M14 7l5 5-5 5"/></svg>';
 
-        <div class="app-hero-command-card">
-          <div class="app-hero-info">
-            <div class="app-hero-badge-row">
-              <span class="mfg-badge-live">Invention Track</span>
-              <span class="mfg-badge-demo">Demo Scenario</span>
-              <span style="font-size:11px;color:var(--text-muted)">Creator Hardware</span>
-            </div>
-            <h3 class="app-hero-title">Eight-input portable audio interface</h3>
-            <p class="app-hero-desc">Your invention has mobilized 2 verified backer signals and an active manufacturing offer from StudioWorks.</p>
-            <div class="app-hero-metrics">
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Backers</span>
-                <span class="mfg-metric-value">2 Signals</span>
-                <span class="mfg-metric-footnote">Stored D1 Intent</span>
-              </div>
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Target Retail</span>
-                <span class="mfg-metric-value">$249.00</span>
-                <span class="mfg-metric-footnote">Consumer Goal</span>
-              </div>
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Manufacturer</span>
-                <span class="mfg-metric-value">StudioWorks</span>
-                <span class="mfg-metric-footnote">Batch #1 Active</span>
-              </div>
-            </div>
-            <div class="app-hero-actions">
-              <button type="button" class="btn-pill-primary" data-action="request">
-                <span>+ Request New Idea</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    $('#view').innerHTML = `
+      <div class="consumer-stage view-enter">
+        <div class="consumer-hero-grid">
+          <div>
+            <span class="stage-kicker">GENESIS INVENTION STUDIO</span>
+            <h2 class="consumer-hero-title">Turn <span class="cyan-glow">your ideas</span><br>into real products.</h2>
+            <p class="consumer-hero-sub">A consumer-led innovation platform that turns real needs into manufacturable products, with AI specifications, community demand, and PayPal checkout.</p>
+            <div class="genesis-cta-row">
+              <button type="button" class="btn-luminous-primary" data-action="request">
+                ${icon('lightbulb')}<span>Create an idea</span>${icon('arrowRight')}
               </button>
-              <button type="button" class="btn-pill-secondary" data-action="orders">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                <span>My PayPal Orders</span>
+              <button type="button" class="btn-luminous-secondary" data-action="help">
+                <span>How it works</span>
               </button>
             </div>
           </div>
-          <div class="app-hero-graphic-stage">
-            ${renderIdeaToProductSvg()}
+
+          <div class="consumer-hero-visual">
+            <div class="visual-halo ${vis.isSvg ? 'is-svg' : ''}">
+              <img src="${vis.src}" alt="${esc(vis.alt)}">
+            </div>
+          </div>
+
+          <div class="featured-idea-card">
+            <span class="featured-pill">Featured Idea</span>
+            <h3>${esc(featured.title)}</h3>
+            <p>${esc((featured.description || 'Compact community-requested product concept backed by structured engineering requirements.').slice(0, 145))}</p>
+            <div class="featured-card-foot">
+              <span class="supporter-chip">${icon('users')}<span>${featured.supporters ?? 0} ${Number(featured.supporters) === 1 ? 'supporter' : 'supporters'}</span></span>
+              <button type="button" class="circle-arrow-btn" onclick="go('#/product/${esc(featured.id)}')" aria-label="View featured product">${icon('arrowRight')}</button>
+            </div>
           </div>
         </div>
 
-        <!-- Product Opportunity Queue Table -->
-        <div class="mfg-section-title-row">
-          <h4 class="mfg-section-title">Community Inventions &amp; Backer Demands</h4>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button type="button" class="btn-pill-secondary" data-action="explore" style="padding:4px 12px;font-size:11.5px">Explore All</button>
-            <button type="button" class="btn-pill-secondary" data-action="mine" style="padding:4px 12px;font-size:11.5px">My Inventions</button>
+        <div class="genesis-journey-strip" style="margin-top:0">
+          <div class="journey-node" data-action="request"><div class="journey-circle">${ji('<path d="M9 18h6M10 22h4M12 2a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 2Z"/>')}</div><div class="journey-text"><span class="journey-label">Idea</span><span class="journey-sub">Your need or idea</span></div></div>${arrow}
+          <div class="journey-node" onclick="go('#/product/${esc(featured.id)}')"><div class="journey-circle">${ji('<path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/>')}</div><div class="journey-text"><span class="journey-label">Intelligence</span><span class="journey-sub">Structured specifications</span></div></div>${arrow}
+          <div class="journey-node" data-action="explore"><div class="journey-circle">${ji('<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.5 3-6 6-6s6 2.5 6 6M15 14c3 0 6 2 6 5"/>')}</div><div class="journey-text"><span class="journey-label">Demand</span><span class="journey-sub">Community interest</span></div></div>${arrow}
+          <div class="journey-node" onclick="go('#/product/${esc(featured.id)}')"><div class="journey-circle">${ji('<path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/>')}</div><div class="journey-text"><span class="journey-label">Build</span><span class="journey-sub">Manufacturing &amp; offers</span></div></div>${arrow}
+          <div class="journey-node" data-action="orders"><div class="journey-circle"><svg viewBox="0 0 28 32" width="22" height="24"><path d="M4 2h12c5 0 8 2.5 8 6s-3 6-8 6h-6L7 28H3L4 2Z" fill="#e0f2fe"/><path d="M8 5h11c4 0 7 2.5 7 6s-3 6-8 6h-5l-3 13H6L8 5Z" fill="#2589ff"/></svg></div><div class="journey-text"><span class="journey-label">PayPal</span><span class="journey-sub">Purchase with confidence</span></div></div>
+        </div>
+
+        <div class="section-header-row">
+          <div>
+            <h2>Discover Product Ideas</h2>
+            <p>Explore what the community is creating and supporting.</p>
           </div>
+          <button type="button" class="btn-luminous-secondary sm" data-action="explore">View all ideas ${icon('arrowRight')}</button>
         </div>
 
-        <div class="app-opp-table-card">
-          <table class="app-table">
-            <thead>
-              <tr>
-                <th>Product Invention</th>
-                <th>Status</th>
-                <th>Category</th>
-                <th>Supporters</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>Eight-input portable audio interface</strong>
-                    <small>8-channel XLR/TRS DSP hardware</small>
+        <div class="discover-cards-grid">
+          ${showcaseProducts.slice(0, 3).map((p) => {
+            const pct = Math.min(95, Math.max(18, Number(p.supporters || 1) * 24));
+            return `
+              <div class="idea-glass-card ${p.id === featured.id ? 'is-highlighted' : ''}" data-select-card="${esc(p.id)}">
+                ${renderProductThumb(p)}
+                <div class="idea-card-body">
+                  <div class="idea-card-top">
+                    <h4>${esc(p.title)}</h4>
+                    <button type="button" class="heart-btn ${p.supported ? 'supported' : ''}" data-open-pid="${esc(p.id)}" title="Open product">♥</button>
                   </div>
-                </td>
-                <td><span class="mfg-badge-live">Prototype</span></td>
-                <td>Creator Tools</td>
-                <td><strong style="color:#ffffff">2 Backers</strong></td>
-                <td><button type="button" class="btn-pill-primary" onclick="go('#/product/demo-a1')" style="padding:4px 12px;font-size:11.5px">View Progress</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>Open-hardware motorized fader wing</strong>
-                    <small>Motorized DAW mixing controller</small>
+                  <div class="idea-card-sub">${esc(p.category || 'Hardware')} · ${p.supporters ?? 0} supporters</div>
+                  <div class="progress-row">
+                    <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                    <span class="progress-pct">${pct}%</span>
                   </div>
-                </td>
-                <td><span class="mfg-badge-demo" style="background:rgba(56,152,255,0.15);color:#93c5fd;border-color:rgba(56,152,255,0.3)">Idea Stage</span></td>
-                <td>Audio &amp; Music</td>
-                <td><strong style="color:#ffffff">2 Backers</strong></td>
-                <td><button type="button" class="btn-pill-secondary" onclick="go('#/product/demo-c1')" style="padding:4px 12px;font-size:11.5px">Support Idea</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>CNC-milled macro stream controller</strong>
-                    <small>Tactile broadcast keypad with OLEDs</small>
-                  </div>
-                </td>
-                <td><span class="mfg-badge-demo" style="background:rgba(239,68,68,0.15);color:#fca5a5;border-color:rgba(239,68,68,0.3)">Quality Feedback</span></td>
-                <td>Creator Tools</td>
-                <td><strong style="color:#ffffff">2 Backers</strong></td>
-                <td><button type="button" class="btn-pill-secondary" onclick="go('#/product/demo-d1')" style="padding:4px 12px;font-size:11.5px">Inspect Spec</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>Analog summing bus mixer</strong>
-                    <small>Discrete 8-channel analog summing unit</small>
-                  </div>
-                </td>
-                <td><span class="mfg-badge-demo" style="background:rgba(16,185,129,0.15);color:#6ee7b7;border-color:rgba(16,185,129,0.3)">Launch Ready</span></td>
-                <td>Audio &amp; Music</td>
-                <td><strong style="color:#ffffff">1 Backer</strong></td>
-                <td><button type="button" class="btn-pill-secondary" onclick="go('#/product/demo-b1')" style="padding:4px 12px;font-size:11.5px">Review Offer</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- AG Studio Quick Card -->
-        <div class="app-studio-preview-card" style="cursor:pointer" onclick="go('#/orders')">
-          <div class="studio-preview-head">
-            <div class="studio-badge-group">
-              <span class="ag-brand-badge" style="background:rgba(0,112,186,0.25);color:#93c5fd">PAYPAL SANDBOX</span>
-              <div class="studio-title-meta">
-                <h3>Pre-Order &amp; Batch Escrow Ledger</h3>
-                <p>Transactions captured via PayPal Sandbox REST API v2 with automatic reconciliation.</p>
+                </div>
               </div>
-            </div>
-            <button type="button" class="btn-pill-secondary" style="padding:6px 14px;font-size:12px">
-              <span>View Orders</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="section-header-row">
+          <div>
+            <h2>Your Idea Journey</h2>
+            <p>Track the progress of product ideas from concept to purchase.</p>
           </div>
-          <div class="studio-mini-kpi-row">
-            <div class="studio-mini-kpi">
-              <span>Pre-Orders</span>
-              <strong>1 Completed</strong>
-            </div>
-            <div class="studio-mini-kpi">
-              <span>Backed Ideas</span>
-              <strong>2 Inventions</strong>
-            </div>
-            <div class="studio-mini-kpi">
-              <span>Protection</span>
-              <strong>Escrow Verified</strong>
+          <button type="button" class="btn-luminous-secondary sm" data-action="mine">My Products</button>
+        </div>
+
+        <div class="journey-tracker-card">
+          <div class="tracker-product-mini">
+            ${renderProductThumb(featured)}
+            <div>
+              <strong>${esc(featured.title)}</strong>
+              <small>${esc(stageName[featured.status] || featured.status || 'Prototype')} · ${featured.demo ? 'Demo Record' : 'Live Database'}</small>
             </div>
           </div>
+
+          <div class="milestone-steps-row">
+            ${['Idea Submitted', 'Specifications', 'Community', 'Manufacturing', 'Purchase'].map((lbl, i) => `
+              <div class="milestone-step ${i < jStep ? 'done' : i === jStep ? 'current' : ''}">
+                <div class="milestone-dot">${i < jStep ? '✓' : (i === jStep ? '●' : '')}</div>
+                <span>${lbl}</span>
+              </div>
+            `).join('')}
+          </div>
+
+          <button type="button" class="btn-luminous-secondary sm" onclick="go('#/product/${esc(featured.id)}')">View Details ${icon('arrowRight')}</button>
         </div>
       </div>
+    `;
 
-      <!-- Right Column Contextual Inspector -->
-      <aside class="app-inspector-col">
-        <div class="inspector-panel">
-          <div class="inspector-header">
-            <h3>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span>Invention Dossier</span>
-            </h3>
-            <span class="inspector-stage-pill">ACTIVE BATCH</span>
-          </div>
-
-          <div class="inspector-selected-product">
-            <h4 class="inspector-title">Eight-input portable audio interface</h4>
-            <span style="font-size:11.5px;color:var(--text-muted)">Creator Tools · StudioWorks Batch #1</span>
-          </div>
-
-          <div class="inspector-spec-block">
-            <div class="spec-block-title">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <span>GEMINI SPEC HIGHLIGHTS</span>
-            </div>
-            <div class="spec-req-list">
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>8x discrete XLR/TRS preamps with physical tactile knobs</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>24-bit / 192 kHz high-headroom AD/DA conversion DSP</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Bus-powered dual USB-C architecture for field recording</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="inspector-signals-card">
-            <span class="inspector-signals-title">VERIFIED BACKING STATUS</span>
-            <span class="inspector-signals-val">2 Intent Signals · $249 Target</span>
-            <span class="inspector-signals-sub">Batch #1 threshold: 200 units. Manufacturer offer committed by StudioWorks.</span>
-          </div>
-
-          <div class="inspector-action-box">
-            <button type="button" class="btn-inspector-action" onclick="go('#/product/demo-a1')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-              <span>Back with PayPal Sandbox</span>
-            </button>
-            <button type="button" class="btn-inspector-sub" onclick="go('#/product/demo-a1')">
-              <span>View Full Specification</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-    </div>
-  `;  bindHomeActions();
+    document.querySelectorAll('[data-select-card]').forEach((card) => {
+      card.onclick = (e) => {
+        if (e.target.closest('[data-open-pid]')) {
+          go('#/product/' + e.target.closest('[data-open-pid]').dataset.openPid);
+          return;
+        }
+        selectedId = card.dataset.selectCard;
+        renderConsumer();
+      };
+    });
+    bindHomeActions();
+  };
+  renderConsumer();
 }
 
 function help() {
@@ -1931,56 +1726,164 @@ function requestWizard(step = 1, publishedId = null) {
     return;
   }
 
-  const steps = ['Your idea', 'Your priorities', 'Review details', 'Publish'];
+  const steps = ['Idea', 'Requirements', 'Review', 'Publish'];
+  const previewIdea = draft.title || draft.idea || 'Describe a portable hardware tool, smart home device, or creator product';
+  const initVis = getProductVisual({ title: draft.title || draft.idea || '', category: draft.category || '' });
+
   $('#view').innerHTML = `
-    <div class="wizard">
-      <div class="steps">
-        ${steps
-          .map(
-            (s, i) =>
-              `<span class="${i + 1 < step ? 'done' : i + 1 === step ? 'current' : ''}">${i + 1}. ${s}</span>`
-          )
-          .join('')}
+    <div class="create-stage-wrap view-enter">
+      <div class="create-header">
+        <span class="stage-kicker">CREATE PRODUCT</span>
+        <h2>Bring your product idea to life.</h2>
+        <p>Describe what you need. GENESIS turns your idea into a structured, manufacturable product with community demand and PayPal.</p>
       </div>
-      <div class="panel" id="wizardBody"></div>
+
+      <div class="create-stepper">
+        ${steps.map((s, i) => `
+          <div class="step-node ${i + 1 < step ? 'done' : i + 1 === step ? 'current' : ''}">
+            <div class="step-bubble">${i + 1 < step ? '✓' : i + 1}</div>
+            <span>${s}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="create-stage-layout">
+        <div class="create-form-card" id="wizardBody"></div>
+
+        <div class="create-preview-col">
+          <div class="create-preview-stage" id="createPreviewStage">
+            <img id="createPreviewImg" src="${initVis.src}" alt="${esc(initVis.alt)}">
+          </div>
+
+          <div class="concept-preview-bar">
+            <div class="concept-bar-left">
+              <div class="concept-icon-box">${icon('sparkles')}</div>
+              <div style="min-width:0">
+                <strong>Product Concept Preview</strong>
+                <span id="createPreviewCaption">${esc(previewIdea.slice(0, 56))}</span>
+              </div>
+            </div>
+            <span class="concept-pill" id="createPreviewCat">${esc(draft.category || 'Concept')}</span>
+          </div>
+
+          ${step === 1 ? `
+            <div class="create-actions-row">
+              <button type="button" class="btn-luminous-secondary" id="saveDraftBtn">${icon('document')}<span>Save draft</span></button>
+              <button type="button" class="btn-cyan-continue" id="continueFromPreviewBtn"><span>Continue</span>${icon('arrowRight')}</button>
+            </div>
+          ` : ''}
+        </div>
+      </div>
     </div>`;
 
   const box = $('#wizardBody');
 
   if (step === 1) {
+    const audienceChoices = ['Content Creators', 'Musicians', 'Podcasters', 'Small Studios', 'Everyday Users'];
+    const selectedAudience = draft.audience || 'Content Creators';
+    const catList = ['Creator Tools', 'Audio & Music', 'Video & Imaging', 'Home & Smart IoT', 'Wearables', 'Computing', 'Other'];
+
     box.innerHTML = `
-      <h2>What product do you wish existed?</h2>
-      <p>Start with the problem or need in plain words. You can refine it before publishing.</p>
       <form class="stack" id="stepForm" novalidate>
-        <label>Describe your idea <span class="req">(Required)</span>
-          <textarea name="idea" maxlength="3000" placeholder="Example: I wish there was a compact 8-input audio recorder I could run on USB-C power without bringing a laptop.">${esc(draft.idea || '')}</textarea>
-          <span class="field-hint">Tip: Mention who it is for and what frustrates you about current options.</span>
+        <div class="form-field-block">
+          <div class="form-field-head">
+            <span class="head-left">${icon('lightbulb')}<span>Your Product Idea <span class="req">*</span></span></span>
+            <span class="char-counter" id="ideaCounter">${(draft.idea || '').length} / 3000</span>
+          </div>
+          <textarea name="idea" id="ideaTextarea" maxlength="3000" placeholder="Example: A portable hardware audio interface, 4K field monitor, or modular travel charger...">${esc(draft.idea || '')}</textarea>
           <span class="field-error" data-err="idea"></span>
-        </label>
-        <label>Category <span class="opt">(Optional)</span>
-          <input name="category" maxlength="60" value="${esc(draft.category || '')}" placeholder="Example: Audio, Home, Travel, Creator tools">
-        </label>
-        <div class="row">
+        </div>
+
+        <div class="form-two-col">
+          <div class="form-field-block" style="margin-bottom:0">
+            <div class="form-field-head"><span class="head-left">${icon('compass')}<span>Category</span></span></div>
+            <select name="category" id="catSelect">
+              <option value="">Select category…</option>
+              ${catList.map((c) => `<option value="${esc(c)}" ${draft.category === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-field-block" style="margin-bottom:0">
+            <div class="form-field-head"><span class="head-left"><span>Target Price (USD)</span></span></div>
+            <input name="budget" id="budgetInput" maxlength="100" value="${esc(draft.budget || '')}" placeholder="$249">
+          </div>
+        </div>
+
+        <div class="form-field-block" style="margin-top:6px">
+          <div class="form-field-head"><span class="head-left">${icon('users')}<span>Who is it for?</span></span></div>
+          <div class="audience-pills" id="audiencePills">
+            ${audienceChoices.map((a) => `<button type="button" class="audience-pill ${selectedAudience === a ? 'active' : ''}" data-aud="${esc(a)}">${esc(a)}</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="form-field-block" style="margin-bottom:6px">
+          <div class="form-field-head">
+            <span class="head-left"><span>What problem does it solve?</span></span>
+            <span class="char-counter" id="useCounter">${(draft.use || '').length} / 1000</span>
+          </div>
+          <textarea name="use" id="useTextarea" style="min-height:86px" maxlength="1000" placeholder="Explain what frustrates users today and how this product solves it.">${esc(draft.use || '')}</textarea>
+        </div>
+
+        <div class="row" style="justify-content:space-between;margin-top:4px">
           <button type="button" class="secondary" id="cancelWizard">Cancel</button>
-          <button type="submit" class="primary">Continue</button>
+          <button type="submit" class="sr-only" id="step1SubmitBtn">Continue</button>
         </div>
       </form>`;
-    $('#cancelWizard').onclick = () => go('#/home');
-    $('#stepForm').onsubmit = (e) => {
-      e.preventDefault();
-      const form = e.target;
+
+    const updatePreview = () => {
+      const ideaVal = ($('#ideaTextarea')?.value || '').trim();
+      const catVal = $('#catSelect')?.value || '';
+      const useVal = ($('#useTextarea')?.value || '').trim();
+      if ($('#ideaCounter')) $('#ideaCounter').textContent = `${($('#ideaTextarea')?.value || '').length} / 3000`;
+      if ($('#useCounter')) $('#useCounter').textContent = `${($('#useTextarea')?.value || '').length} / 1000`;
+      const vis = getProductVisual({ title: ideaVal || draft.title || '', category: catVal });
+      if ($('#createPreviewImg')) {
+        $('#createPreviewImg').src = vis.src;
+        $('#createPreviewImg').alt = vis.alt;
+      }
+      if ($('#createPreviewCaption')) $('#createPreviewCaption').textContent = (ideaVal || useVal || 'Describe your hardware concept').slice(0, 56);
+      if ($('#createPreviewCat')) $('#createPreviewCat').textContent = catVal || 'Concept';
+    };
+
+    $('#ideaTextarea').oninput = updatePreview;
+    $('#catSelect').onchange = updatePreview;
+    $('#useTextarea').oninput = updatePreview;
+    $('#audiencePills').querySelectorAll('[data-aud]').forEach((b) => {
+      b.onclick = () => {
+        draft.audience = b.dataset.aud;
+        $('#audiencePills').querySelectorAll('[data-aud]').forEach((x) => x.classList.toggle('active', x === b));
+      };
+    });
+
+    const persistStep1 = () => {
+      const form = $('#stepForm');
       const idea = form.idea.value.trim();
-      form.querySelector('[data-err="idea"]').textContent = '';
-      if (!idea) {
-        form.querySelector('[data-err="idea"]').textContent = 'Please describe the product idea you want to share.';
-        return;
-      }
-      if (draft.idea !== idea) {
-        draft.customDescription = false;
-      }
+      if (draft.idea !== idea) draft.customDescription = false;
       draft.idea = idea;
       draft.category = form.category.value.trim();
+      draft.budget = form.budget.value.trim();
+      draft.use = form.use.value.trim();
       saveStore('genesis_req_draft', draft);
+      return idea;
+    };
+
+    $('#cancelWizard').onclick = () => go('#/home');
+    if ($('#saveDraftBtn')) {
+      $('#saveDraftBtn').onclick = () => {
+        persistStep1();
+        notice('Product idea draft saved locally.', 'success');
+      };
+    }
+    if ($('#continueFromPreviewBtn')) {
+      $('#continueFromPreviewBtn').onclick = () => $('#stepForm').requestSubmit();
+    }
+    $('#stepForm').onsubmit = (e) => {
+      e.preventDefault();
+      const idea = persistStep1();
+      e.target.querySelector('[data-err="idea"]').textContent = '';
+      if (!idea) {
+        e.target.querySelector('[data-err="idea"]').textContent = 'Please describe the product idea you want to share.';
+        return;
+      }
       requestWizard(2);
     };
     return;
@@ -2982,7 +2885,7 @@ async function ordersPage() {
       <div class="empty">
         <h2>Sign in to view your orders</h2>
         <p>Access your PayPal Sandbox orders and active batch reservations.</p>
-        <button type="button" class="btn-pill-primary" id="ordSignIn">Sign in</button>
+        <button type="button" class="btn-luminous-primary" id="ordSignIn">Sign in</button>
       </div>`;
     $('#ordSignIn').onclick = () => {
       pendingAfterAuth = () => go('#/orders');
@@ -2993,204 +2896,181 @@ async function ordersPage() {
 
   const res = isMaker ? await api('/manufacturer/orders') : await api('/orders');
   const orders = res.orders || [];
-  const totalVolume = orders.reduce((acc, o) => acc + Number(o.amount || 0), 0);
   const featuredOrder = orders[0] || {
     id: 'ord-demo-sample',
+    product_id: 'demo-a1',
     title: 'Eight-input portable audio interface',
     amount: 249.00,
     currency: 'USD',
     status: 'COMPLETED',
-    paypal_order_id: 'SAMPLE-SANDBOX-CAPTURE-A1',
+    paypal_order_id: 'SAMPLE-SANDBOX-A1',
     created_at: new Date().toISOString().slice(0, 10),
     is_sample: true
   };
 
-  $('#view').innerHTML = `
-    <div class="app-workspace-layout view-enter">
-      <!-- Main Orders Column -->
-      <div class="app-main-col">
-        <div class="app-context-header">
-          <div class="app-title-area">
-            <h2>${isMaker ? 'Orders for Your Offers' : 'PayPal Sandbox Purchase History'}</h2>
-            <p>Only server-verified PayPal captures appear as confirmed. Transactions escrow-reconciled against manufacturing milestones.</p>
+  let statusFilter = '';
+
+  const renderOrders = () => {
+    const filtered = statusFilter ? orders.filter((o) => o.status === statusFilter) : orders;
+    const fTitle = featuredOrder.product_title || featuredOrder.title || 'Eight-input portable audio interface';
+    const fVis = getProductVisual({ id: featuredOrder.product_id, title: fTitle, category: featuredOrder.category });
+    const fAmount = Number(featuredOrder.amount || 249).toFixed(2);
+    const fCurr = featuredOrder.currency || 'USD';
+    const isCompleted = featuredOrder.status === 'COMPLETED';
+    const stepIdx = isCompleted ? 2 : (featuredOrder.status === 'APPROVED' ? 1 : 0);
+
+    $('#view').innerHTML = `
+      <div class="orders-stage-layout view-enter">
+        <div class="section-header-row">
+          <div>
+            <h2 style="font-size:clamp(28px,3vw,36px);margin-bottom:4px">Orders</h2>
+            <p>Track your product orders, payment status, and manufacturing progress.</p>
           </div>
-          <div class="app-context-actions">
+          <div class="row">
             ${isMaker ? `
-              <button type="button" class="btn-pill-primary" id="ordProductsBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                <span>My Offered Products</span>
-              </button>
+              <button type="button" class="btn-luminous-primary sm" id="ordProductsBtn">My Offered Products</button>
             ` : `
-              <button type="button" class="btn-pill-primary" id="backMyProductsBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-                <span>Explore Products</span>
-              </button>
+              <button type="button" class="btn-luminous-primary sm" id="backMyProductsBtn">Explore Products</button>
             `}
           </div>
         </div>
 
-        <div class="app-hero-command-card">
-          <div class="app-hero-info">
-            <div class="app-hero-badge-row">
-              <span class="mfg-badge-live">PayPal Sandbox v2</span>
-              <span class="mfg-badge-demo">Server-Side Verified</span>
-              <span style="font-size:11px;color:var(--text-muted)">Escrow Reconciled</span>
+        <div class="orders-featured-card">
+          <div class="orders-featured-top">
+            <div class="visual-halo ${fVis.isSvg ? 'is-svg' : ''}" style="min-height:175px">
+              <img src="${fVis.src}" alt="${esc(fVis.alt)}">
             </div>
-            <h3 class="app-hero-title">Verified Pre-orders and Production Backing</h3>
-            <p class="app-hero-desc">All customer pre-orders are authorized and captured via PayPal Sandbox Orders v2 API with automated milestone reconciliation.</p>
-            <div class="app-hero-metrics">
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Total Orders</span>
-                <span class="mfg-metric-value">${orders.length} Records</span>
-                <span class="mfg-metric-footnote">Sandbox Transactions</span>
-              </div>
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Captured Volume</span>
-                <span class="mfg-metric-value">$${totalVolume.toFixed(2)}</span>
-                <span class="mfg-metric-footnote">USD Sandbox Gross</span>
-              </div>
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Batch Escrow</span>
-                <span class="mfg-metric-value">Active</span>
-                <span class="mfg-metric-footnote">Milestone Reconciled</span>
+
+            <div>
+              <span class="featured-pill">Order #${esc((featuredOrder.paypal_order_id || featuredOrder.id).startsWith('SAMPLE') ? 'SAMPLE-A1' : (featuredOrder.paypal_order_id || featuredOrder.id).slice(-8))}</span>
+              <h3 style="margin:10px 0 6px;font-size:24px;font-weight:800;color:#fff">${esc(fTitle)}</h3>
+              <p style="margin:0;font-size:13px;color:var(--text-secondary)">
+                ${featuredOrder.is_sample ? 'Sample Sandbox reservation preview · StudioWorks Batch #1' : 'Server-verified PayPal Sandbox checkout · Milestone escrowed'}
+              </p>
+
+              <div class="orders-meta-grid">
+                <div class="orders-meta-item">
+                  <small>Qty</small>
+                  <strong>1</strong>
+                </div>
+                <div class="orders-meta-item">
+                  <small>Unit Price</small>
+                  <strong>$${fAmount} ${esc(fCurr)}</strong>
+                </div>
+                <div class="orders-meta-item">
+                  <small>Total Paid</small>
+                  <strong>$${fAmount}</strong>
+                </div>
               </div>
             </div>
-            <div class="app-hero-actions">
-              <button type="button" class="btn-pill-primary" onclick="go('#/home')">
-                <span>Back to Workspace</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-              <button type="button" class="btn-pill-secondary" onclick="go('#/help')">
-                <span>PayPal Escrow Guide</span>
-              </button>
+
+            <div class="paypal-sandbox-box">
+              <div class="row" style="justify-content:space-between">
+                <span style="display:inline-flex;align-items:center;gap:8px;font-weight:700;color:#fff">
+                  <svg viewBox="0 0 28 32" width="18" height="20"><path d="M4 2h12c5 0 8 2.5 8 6s-3 6-8 6h-6L7 28H3L4 2Z" fill="#e0f2fe"/><path d="M8 5h11c4 0 7 2.5 7 6s-3 6-8 6h-5l-3 13H6L8 5Z" fill="#2589ff"/></svg>
+                  PayPal
+                </span>
+                <span class="sandbox-pill">Sandbox</span>
+              </div>
+              <div style="font-size:14px;font-weight:700;color:#67e8f9;margin-top:4px">${esc(paymentLabel[featuredOrder.status] || featuredOrder.status)}</div>
+              <div style="font-size:12px;color:var(--text-muted)">
+                ${featuredOrder.is_sample ? 'Sample preview order (demo)' : 'Ref: ' + esc(featuredOrder.paypal_order_id || featuredOrder.id)}
+              </div>
             </div>
           </div>
-          <div class="app-hero-graphic-stage">
-            ${renderIdeaToProductSvg()}
+
+          <div class="milestone-steps-row" style="padding:8px 24px">
+            ${[
+              ['Order placed', (featuredOrder.created_at || 'Recent').slice(0, 10)],
+              ['Payment confirmed', isCompleted ? 'Verified via Orders v2' : 'Awaiting approval'],
+              ['In production', isCompleted ? 'Batch milestone active' : 'Queued on completion']
+            ].map(([lbl, sub], i) => `
+              <div class="milestone-step ${i < stepIdx ? 'done' : i === stepIdx ? 'current' : ''}">
+                <div class="milestone-dot">${i <= stepIdx ? '✓' : i + 1}</div>
+                <span>${lbl}</span>
+                <small style="font-size:11px;color:var(--text-muted)">${esc(sub)}</small>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="row" style="justify-content:center">
+            <button type="button" class="btn-luminous-primary" onclick="go('#/product/${esc(featuredOrder.product_id || 'demo-a1')}')">
+              <span>View details</span>${icon('arrowRight')}
+            </button>
           </div>
         </div>
 
-        <div class="mfg-section-title-row">
-          <h4 class="mfg-section-title">PayPal Sandbox Transaction Ledger</h4>
-          <span style="font-size:11.5px;color:var(--text-muted)">REST API v2 Reconciliation</span>
+        <div class="section-header-row">
+          <div>
+            <h2>Your Orders</h2>
+            <p>${orders.length} ${orders.length === 1 ? 'record' : 'records'} stored in D1 PayPal Sandbox ledger</p>
+          </div>
+          <select id="ordersStatusFilter" style="width:auto;min-width:170px">
+            <option value="">All Orders</option>
+            <option value="COMPLETED" ${statusFilter === 'COMPLETED' ? 'selected' : ''}>Completed</option>
+            <option value="APPROVED" ${statusFilter === 'APPROVED' ? 'selected' : ''}>Approved</option>
+            <option value="CREATED" ${statusFilter === 'CREATED' ? 'selected' : ''}>Created</option>
+          </select>
         </div>
 
-        <div class="app-opp-table-card">
-          <table class="app-table">
-            <thead>
-              <tr>
-                <th>Product &amp; Reference</th>
-                <th>Status</th>
-                <th>Amount</th>
-                <th>Gateway Reference</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${
-                orders.map((o) => `
-                  <tr>
-                    <td>
-                      <div class="table-product-cell">
-                        <strong>${esc(o.title)}</strong>
-                        <small>${o.is_sample ? 'Demonstration sample capture' : 'Pre-order reservation'} · ${esc(o.created_at || 'Recent')}</small>
-                      </div>
-                    </td>
-                    <td><span class="${paymentBadgeClass[o.status] || 'badge'}">${esc(paymentLabel[o.status] || o.status)}</span></td>
-                    <td><strong style="color:#ffffff">${esc(o.currency || 'USD')} ${Number(o.amount || 0).toFixed(2)}</strong></td>
-                    <td><code style="font-size:11px;color:#93c5fd">${esc(o.paypal_order_id || 'N/A')}</code></td>
-                    <td>
-                      ${
-                        !['COMPLETED', 'CANCELLED', 'FAILED'].includes(o.status)
-                          ? `
-                            ${o.status === 'APPROVED' ? `<button type="button" class="btn-pill-primary" data-capture="${esc(o.id)}" style="padding:4px 10px;font-size:11px">Capture</button>` : ''}
-                            <button type="button" class="btn-pill-secondary" data-reconcile="${esc(o.id)}" style="padding:4px 10px;font-size:11px">Check</button>
-                          `
-                          : `<button type="button" class="btn-pill-secondary" onclick="go('#/product/' + '${esc(o.product_id || 'demo-a1')}')" style="padding:4px 10px;font-size:11px">Inspect</button>`
-                      }
-                    </td>
-                  </tr>
-                `).join('') ||
-                '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted)">No orders yet. Explore an eligible non-DEMO offer to test PayPal Sandbox checkout.</td></tr>'
-              }
-            </tbody>
-          </table>
+        <div class="list">
+          ${filtered.map((o) => {
+            const title = o.product_title || o.title || 'Hardware Order';
+            return `
+              <div class="order-row-card">
+                <div class="row" style="gap:14px">
+                  ${renderProductThumb({ id: o.product_id, title })}
+                  <div>
+                    <strong style="display:block;color:#fff;font-size:14.5px">${esc(title)}</strong>
+                    <small style="color:var(--text-muted)">Ref: ${esc(o.paypal_order_id || o.id)} · ${esc((o.created_at || '').slice(0, 10))}</small>
+                  </div>
+                </div>
+                <span class="${paymentBadgeClass[o.status] || 'badge'}">${esc(paymentLabel[o.status] || o.status)}</span>
+                <strong style="color:#fff;font-size:15px">$${Number(o.amount || 0).toFixed(2)} ${esc(o.currency || 'USD')}</strong>
+                <div class="row">
+                  ${!['COMPLETED', 'CANCELLED', 'FAILED'].includes(o.status) ? `
+                    ${o.status === 'APPROVED' ? `<button type="button" class="btn-luminous-primary sm" data-capture="${esc(o.id)}">Capture</button>` : ''}
+                    <button type="button" class="btn-luminous-secondary sm" data-reconcile="${esc(o.id)}">Check</button>
+                  ` : `<button type="button" class="circle-arrow-btn" onclick="go('#/product/${esc(o.product_id || 'demo-a1')}')" aria-label="View order">${icon('arrowRight')}</button>`}
+                </div>
+              </div>
+            `;
+          }).join('') || `
+            <div class="order-row-card">
+              <div class="row" style="gap:14px">
+                ${renderProductThumb(featuredOrder)}
+                <div>
+                  <strong style="display:block;color:#fff;font-size:14.5px">${esc(fTitle)} (Sample Preview)</strong>
+                  <small style="color:var(--text-muted)">Explore any eligible non-DEMO offer to run a real PayPal Sandbox checkout.</small>
+                </div>
+              </div>
+              <span class="sandbox-pill">Sandbox Sample</span>
+              <strong style="color:#fff">$${fAmount} ${esc(fCurr)}</strong>
+              <button type="button" class="circle-arrow-btn" onclick="go('#/explore')" aria-label="Explore">${icon('arrowRight')}</button>
+            </div>
+          `}
         </div>
       </div>
+    `;
 
-      <!-- Right Column Contextual Inspector -->
-      <aside class="app-inspector-col">
-        <div class="inspector-panel">
-          <div class="inspector-header">
-            <h3>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span>Transaction Dossier</span>
-            </h3>
-            <span class="inspector-stage-pill">${esc(featuredOrder.status)}</span>
-          </div>
+    if ($('#ordProductsBtn')) $('#ordProductsBtn').onclick = () => go('#/manufacturer/products');
+    if ($('#backMyProductsBtn')) $('#backMyProductsBtn').onclick = () => go('#/explore');
+    if ($('#ordersStatusFilter')) {
+      $('#ordersStatusFilter').onchange = (e) => {
+        statusFilter = e.target.value;
+        renderOrders();
+      };
+    }
 
-          <div class="inspector-selected-product">
-            <h4 class="inspector-title">${esc(featuredOrder.title)}</h4>
-            <span style="font-size:11.5px;color:var(--text-muted)">Order ID: ${esc(featuredOrder.paypal_order_id)}</span>
-          </div>
-
-          <div class="inspector-spec-block">
-            <div class="spec-block-title">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <span>PAYPAL ESCROW ASSURANCE</span>
-            </div>
-            <div class="spec-req-list">
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Funds held in sandbox escrow until batch MOQ threshold reached</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Server-verified webhook reconciliation against Cloudflare D1</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Zero-risk testing for hackathon evaluation</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="inspector-signals-card">
-            <span class="inspector-signals-title">PAYMENT RECONCILIATION</span>
-            <span class="inspector-signals-val">${esc(featuredOrder.currency || 'USD')} ${Number(featuredOrder.amount || 0).toFixed(2)}</span>
-            <span class="inspector-signals-sub">Server-side capture verified. Buyer personal information protected.</span>
-          </div>
-
-          <div class="inspector-action-box">
-            <button type="button" class="btn-inspector-action" onclick="go('#/product/' + '${esc(featuredOrder.product_id || 'demo-a1')}')">
-              <span>Inspect Product Progress</span>
-            </button>
-            <button type="button" class="btn-inspector-sub" onclick="go('#/home')">
-              <span>Back to Home</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-    </div>
-  `;
-
-  if ($('#ordProductsBtn')) $('#ordProductsBtn').onclick = () => go('#/manufacturer/products');
-  if ($('#backMyProductsBtn')) $('#backMyProductsBtn').onclick = () => go('#/explore');
-
-  for (const op of ['capture', 'reconcile', 'cancel']) {
-    $('#view')
-      .querySelectorAll(`[data-${op}]`)
-      .forEach((b) => {
+    for (const op of ['capture', 'reconcile', 'cancel']) {
+      $('#view').querySelectorAll(`[data-${op}]`).forEach((b) => {
         b.onclick = (e) =>
           loading(
             e.currentTarget,
             async () => {
               try {
                 const r = await api('/orders/' + b.dataset[op] + '/' + op, 'POST');
-                notice(
-                  paymentLabel[r.status] || r.notice || 'Order updated.',
-                  r.status === 'COMPLETED' ? 'success' : 'info'
-                );
+                notice(paymentLabel[r.status] || r.notice || 'Order updated.', r.status === 'COMPLETED' ? 'success' : 'info');
                 await ordersPage();
               } catch (err) {
                 notice(err.message, 'error');
@@ -3199,7 +3079,9 @@ async function ordersPage() {
             op === 'capture' ? 'Capturing…' : 'Checking…'
           );
       });
-  }
+    }
+  };
+  renderOrders();
 }
 
 async function accountPage() {
@@ -3414,656 +3296,411 @@ async function adminPage() {
 }
 
 async function manufacturerIntelligence() {
-  if (!maker()) return go('#/home');
-  $('#heading').textContent = 'GENESIS Intelligence';
+  const isMaker = maker();
+  $('#heading').textContent = 'Market intelligence';
 
-  const analytics = await api('/manufacturer/analytics');
-  const products = analytics.products || [];
-  const orders = analytics.orders || [];
-  const feedback = analytics.feedback || [];
-  const kpis = analytics.kpis || {};
+  let products = [];
+  let orders = [];
+  let feedback = [];
+  let kpis = {};
 
-  let activeProduct = products[0] || null;
+  if (isMaker) {
+    const analytics = await api('/manufacturer/analytics');
+    products = (analytics.products || []).map((p) => ({ ...p, interest: Number(p.interest ?? p.supporters ?? 0) }));
+    orders = analytics.orders || [];
+    feedback = analytics.feedback || [];
+    kpis = analytics.kpis || {};
+  } else {
+    const pub = await api('/products');
+    products = (pub.products || []).map((p) => ({ ...p, interest: Number(p.supporters || 0) }));
+  }
+
+  let activeProduct = products[0] || { id: 'demo-a1', title: 'Eight-input portable audio interface', category: 'Creator Tools', interest: 2, status: 'prototype' };
+  let chartMode = 'interest';
+  let catFilter = '';
+  let stageFilter = '';
+  let demandFilter = '';
+  let searchQ = '';
   let isEditMode = false;
   let studioApi = null;
+  let showStudio = false;
 
-  $('#view').innerHTML = `
-    <div class="intelligence-hero">
-      <div class="intelligence-hero-top">
-        <div class="intelligence-title-group">
-          <h2>
-            ${icon('sparkles')}
-            GENESIS Intelligence
-            <span class="intelligence-badge">AG Studio Embedded</span>
-          </h2>
-          <p class="intelligence-subtitle">Turn customer demand, product feedback, and PayPal activity into clearer manufacturing decisions.</p>
-        </div>
-        <div class="intelligence-actions">
-          <button type="button" class="secondary" id="btnAskAiToggle">
-            ${icon('sparkles')} Ask GENESIS Intelligence
-          </button>
-          <button type="button" class="secondary" id="btnToggleStudioMode">
-            ${icon('wrench')} <span id="studioModeLabel">Customize Dashboard</span>
-          </button>
-          <button type="button" class="secondary" id="btnResetLayout">
-            Reset Layout
-          </button>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11.5px;color:#94a3b8;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:6px">
-        <span>Powered by <strong>AG Studio v3.1</strong> &amp; <strong>AG Grid v36</strong></span>
-        <span>•</span>
-        <span>Real-time D1 Analytics</span>
-        <span>•</span>
-        <span>PayPal Sandbox Intelligence</span>
-        <span>•</span>
-        <span>Role: <strong>${esc(user.name)}</strong> (${user.role})</span>
-      </div>
-    </div>
+  const categories = [...new Set(products.map((p) => p.category || 'Creator Tools'))];
 
-    <!-- Ask GENESIS Intelligence Drawer -->
-    <div class="query-box-wrap" id="queryBoxWrap">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:13px;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:6px">
-          ${icon('sparkles')} Natural Language Analytical Assistant
-        </span>
-        <span style="font-size:11px;color:#64748b">Connected to private Gemini 3.8 &amp; live D1 data</span>
-      </div>
-      <div class="query-pills">
-        <button type="button" class="query-pill" data-q="Which product ideas have the most customer interest?">Most customer interest</button>
-        <button type="button" class="query-pill" data-q="Show products that have interest but no eligible manufacturing offer.">Open opportunities</button>
-        <button type="button" class="query-pill" data-q="Which development stage contains the most products?">Products by stage</button>
-        <button type="button" class="query-pill" data-q="Show my completed PayPal Sandbox orders.">Completed Sandbox orders</button>
-        <button type="button" class="query-pill" data-q="Compare product interest across categories.">Interest across categories</button>
-      </div>
-      <form id="aiQueryForm" class="query-input-row">
-        <input id="aiQueryInput" placeholder="Ask a question about demand, opportunities, stages, or PayPal Sandbox transactions…" autocomplete="off">
-        <button type="submit" class="primary" id="aiQuerySubmit">Ask Assistant</button>
-      </form>
-      <div id="aiQueryResult" class="query-result-panel" style="display:none"></div>
-    </div>
-
-    <!-- Section A: Demand Overview KPIs -->
-    <div class="kpi-row">
-      <div class="kpi-card">
-        <div class="kpi-card-header">
-          <span class="kpi-label">Product Requests</span>
-          ${icon('lightbulb', 'kpi-icon')}
-        </div>
-        <div class="kpi-value">${kpis.productRequests ?? products.filter(p => !p.demo).length}</div>
-        <p class="kpi-desc">Actual consumer-submitted product ideas</p>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header">
-          <span class="kpi-label">Customer Interest</span>
-          ${icon('users', 'kpi-icon')}
-        </div>
-        <div class="kpi-value">${kpis.customerInterest ?? products.reduce((s,p) => s + (Number(p.interest)||0), 0)}</div>
-        <p class="kpi-desc">Total genuine recorded support actions</p>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header">
-          <span class="kpi-label">Open Opportunities</span>
-          ${icon('compass', 'kpi-icon')}
-        </div>
-        <div class="kpi-value">${kpis.openOpportunities ?? products.filter(p => !p.has_eligible_offer).length}</div>
-        <p class="kpi-desc">Ideas without an eligible manufacturer offer</p>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header">
-          <span class="kpi-label">Active Offers</span>
-          ${icon('factory', 'kpi-icon')}
-        </div>
-        <div class="kpi-value">${kpis.activeOffers ?? products.filter(p => p.has_my_offer && !p.demo).length}</div>
-        <p class="kpi-desc">Current eligible non-DEMO manufacturer offers</p>
-      </div>
-    </div>
-
-    <!-- Main Workspace: AG Studio Canvas & Custom Widgets -->
-    <div class="studio-layout-grid">
-      <!-- Left Column: AG Studio Container & Demand Explorer -->
-      <div class="studio-main-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-          <div>
-            <h3 style="margin:0 0 4px 0;font-size:16px;color:#f8fafc">Demand Explorer</h3>
-            <p style="margin:0;font-size:12.5px;color:#94a3b8">Interactive grid with live cross-filtering, sorting, search, and CSV export.</p>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button type="button" class="secondary sm" id="btnExportCsv">Export CSV</button>
-          </div>
-        </div>
-
-        <!-- Grid Toolbar -->
-        <div class="toolbar" style="margin-top:4px;margin-bottom:12px">
-          <input id="deSearch" placeholder="Search products or categories…" style="max-width:280px">
-          <select id="deStageFilter">
-            <option value="">All stages</option>
-            ${stages.map(s => `<option value="${s}">${esc(stageName[s] || s)}</option>`).join('')}
-          </select>
-          <select id="deOfferFilter">
-            <option value="">All offer statuses</option>
-            <option value="mine">My offers active</option>
-            <option value="open">Open opportunities (no offer)</option>
-          </select>
-          <span style="font-size:12px;color:#64748b;margin-left:auto" id="deCount">${products.length} products</span>
-        </div>
-
-        <!-- Demand Explorer Interactive Table -->
-        <div style="overflow-x:auto;border:1px solid #1e293b;border-radius:8px;background:#090d16">
-          <table class="sandbox-table" id="deTable">
-            <thead>
-              <tr>
-                <th style="cursor:pointer" data-sort="title">Product ↕</th>
-                <th style="cursor:pointer" data-sort="category">Category ↕</th>
-                <th style="cursor:pointer" data-sort="interest">Interested Consumers ↕</th>
-                <th>Stage</th>
-                <th>Manufacturer Offer Status</th>
-                <th style="cursor:pointer" data-sort="updated">Last Activity ↕</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="deTableBody"></tbody>
-          </table>
-        </div>
-
-        <!-- Interactive Demand & Stage Distribution Charts -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px">
-          <div style="background:#090d16;border:1px solid #1e293b;border-radius:8px;padding:16px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <strong style="font-size:13px;color:#f8fafc">Demand Distribution by Category</strong>
-              <span style="font-size:10.5px;color:#00d2b4;font-family:var(--font-mono)">CROSS-FILTER</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              ${(() => {
-                const byCat = {};
-                products.forEach(p => {
-                  const c = p.category || 'Creator Tools';
-                  byCat[c] = (byCat[c] || 0) + Math.max(1, Number(p.interest) || 0);
-                });
-                const entries = Object.entries(byCat).sort((a,b) => b[1] - a[1]).slice(0, 4);
-                const maxV = Math.max(1, ...entries.map(e => e[1]));
-                return entries.map(([cat, val]) => `
-                  <div style="cursor:pointer" data-cat-filter="${esc(cat)}">
-                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-                      <span style="color:#cbd5e1">${esc(cat)}</span>
-                      <strong style="color:#3898ff">${val} interest signals</strong>
-                    </div>
-                    <div style="height:7px;background:#162035;border-radius:4px;overflow:hidden">
-                      <div style="height:100%;width:${Math.round((val / maxV) * 100)}%;background:linear-gradient(90deg,#0070ba,#00d2b4);border-radius:4px"></div>
-                    </div>
-                  </div>
-                `).join('');
-              })()}
-            </div>
-          </div>
-
-          <div style="background:#090d16;border:1px solid #1e293b;border-radius:8px;padding:16px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <strong style="font-size:13px;color:#f8fafc">Product Lifecycle Stage Pipeline</strong>
-              <span style="font-size:10.5px;color:#3898ff;font-family:var(--font-mono)">LIVE STAGES</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-              ${(() => {
-                const byStage = {};
-                products.forEach(p => {
-                  const s = p.status || 'idea';
-                  byStage[s] = (byStage[s] || 0) + 1;
-                });
-                const entries = stages.filter(s => byStage[s]).map(s => [s, byStage[s]]);
-                const maxS = Math.max(1, ...entries.map(e => e[1]));
-                return entries.map(([st, cnt]) => `
-                  <div style="cursor:pointer" data-stage-bar="${esc(st)}">
-                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-                      <span style="color:#cbd5e1">${esc(stageName[st] || st)}</span>
-                      <strong style="color:#00d2b4">${cnt} ${cnt === 1 ? 'product' : 'products'}</strong>
-                    </div>
-                    <div style="height:7px;background:#162035;border-radius:4px;overflow:hidden">
-                      <div style="height:100%;width:${Math.round((cnt / maxS) * 100)}%;background:linear-gradient(90deg,#3898ff,#0070ba);border-radius:4px"></div>
-                    </div>
-                  </div>
-                `).join('');
-              })()}
-            </div>
-          </div>
-        </div>
-
-        <!-- Embedded Studio Mount (Expanded in Customize Mode) -->
-        <div id="genesisStudioMount" style="display:none;margin-top:16px"></div>
-      </div>
-
-      <!-- Right Column: Custom AG Studio Widgets -->
-      <div class="studio-side-card">
-        <!-- Custom Widget 1: Opportunity Spotlight -->
-        <div class="custom-widget" id="customWidgetSpotlight">
-          <div class="custom-widget-header">
-            <div class="custom-widget-title">
-              ${icon('lightbulb')}
-              Opportunity Spotlight
-            </div>
-            <span class="custom-widget-tag">Custom Studio Widget</span>
-          </div>
-          <div class="spotlight-content" id="spotlightContent"></div>
-        </div>
-
-        <!-- Custom Widget 2: GENESIS Intelligence Brief -->
-        <div class="custom-widget" id="customWidgetBrief">
-          <div class="custom-widget-header">
-            <div class="custom-widget-title">
-              ${icon('sparkles')}
-              GENESIS Intelligence Brief
-            </div>
-            <span class="custom-widget-tag">AI Specifications</span>
-          </div>
-          <div id="briefContent"></div>
-        </div>
-
-        <!-- Custom Widget 3: Product Health Summary -->
-        <div class="custom-widget" id="customWidgetHealth">
-          <div class="custom-widget-header">
-            <div class="custom-widget-title">
-              ${icon('alert')}
-              Product Health &amp; Field Reports
-            </div>
-            <span class="custom-widget-tag">Field Signals</span>
-          </div>
-          <div style="font-size:12.5px;color:#cbd5e1" id="healthContent">
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-              <span class="muted">Total Customer Reports</span>
-              <strong style="color:#f8fafc">${feedback.length}</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-              <span class="muted">Frequent Categories</span>
-              <span style="color:#94a3b8">${[...new Set(feedback.map(f => f.category))].slice(0, 3).join(', ') || 'Hardware, Usability'}</span>
-            </div>
-            <p style="font-size:12px;color:#64748b;margin:10px 0 0 0;line-height:1.4">Field reports represent non-verified signals submitted by consumers for human engineering triage.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section E: PayPal Sandbox Activity -->
-    <div class="sandbox-card">
-      <div class="sandbox-header">
-        <div>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <h3 style="margin:0;font-size:17px;color:#f8fafc">PayPal Sandbox Activity</h3>
-            <span class="sandbox-tag">Sandbox Transactions</span>
-          </div>
-          <p style="margin:0;font-size:12.5px;color:#94a3b8">Authorized PayPal Sandbox order records for current manufacturer. Simulated transactions only; no live revenue.</p>
-        </div>
-        <button type="button" class="secondary sm" id="btnGoOrders">Open Full Orders</button>
-      </div>
-
-      <div class="sandbox-kpis">
-        <div class="sandbox-kpi-box">
-          <div class="sandbox-kpi-label">Sandbox Orders Created</div>
-          <div class="sandbox-kpi-val">${kpis.sandboxOrders?.total ?? orders.length}</div>
-        </div>
-        <div class="sandbox-kpi-box">
-          <div class="sandbox-kpi-label">Completed Payments</div>
-          <div class="sandbox-kpi-val" style="color:#4ade80">${kpis.sandboxOrders?.completed ?? orders.filter(o => o.status === 'COMPLETED').length}</div>
-        </div>
-        <div class="sandbox-kpi-box">
-          <div class="sandbox-kpi-label">Pending / In-Flight</div>
-          <div class="sandbox-kpi-val" style="color:#fbbf24">${kpis.sandboxOrders?.pending ?? orders.filter(o => o.status !== 'COMPLETED').length}</div>
-        </div>
-        <div class="sandbox-kpi-box">
-          <div class="sandbox-kpi-label">Captured Volume (USD)</div>
-          <div class="sandbox-kpi-val" style="color:#3898ff">
-            ${(kpis.sandboxOrders?.capturedVolumeByCurrency?.USD ?? orders.filter(o => o.status === 'COMPLETED').reduce((s,o) => s + (Number(o.amount)||0), 0)).toFixed(2)}
-          </div>
-        </div>
-      </div>
-
-      <div style="overflow-x:auto;border:1px solid #1e293b;border-radius:8px">
-        <table class="sandbox-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Product</th>
-              <th>PayPal Order ID</th>
-              <th>Capture ID</th>
-              <th>Amount</th>
-              <th>Currency</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${orders.map(o => `
-              <tr>
-                <td>${esc((o.created_at || '').slice(0, 10))}</td>
-                <td><strong>${esc(o.product_title || o.title || 'Demo Hardware')}</strong></td>
-                <td><code style="font-size:11px;color:#94a3b8">${esc(o.paypal_order_id || o.id)}</code></td>
-                <td><code style="font-size:11px;color:#3898ff">${esc(o.paypal_capture_id || '—')}</code></td>
-                <td><strong>${Number(o.amount).toFixed(2)}</strong></td>
-                <td>${esc(o.currency || 'USD')}</td>
-                <td><span class="badge-completed">${esc(o.status)}</span></td>
-              </tr>
-            `).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:16px">No Sandbox transactions recorded for this manufacturer yet.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-
-  function renderSpotlight(prod) {
-    if (!prod) {
-      $('#spotlightContent').innerHTML = '<p class="muted">Select a product from Demand Explorer to inspect.</p>';
-      return;
-    }
-    $('#spotlightContent').innerHTML = `
-      <div class="spotlight-prod-title">${esc(prod.title)}</div>
-      <div class="spotlight-meta">
-        <span class="pill" style="background:#162035;border:1px solid #24324d;color:#f1f5f9">${esc(stageName[prod.status] || prod.status)}</span>
-        <span class="pill" style="background:rgba(0,112,186,0.2);color:#3898ff;border:1px solid #0070ba">★ ${prod.interest} interested</span>
-        <span class="pill" style="background:#162035;color:#94a3b8">${esc(prod.category || 'General')}</span>
-      </div>
-      <p class="spotlight-desc">${esc(prod.description || 'No description recorded.')}</p>
-      <div style="margin-top:12px">
-        <button type="button" class="primary sm" id="spotlightActionBtn">
-          ${prod.has_my_offer ? 'Review My Offer &amp; Stages' : 'Propose Build Offer'}
-        </button>
-      </div>
-    `;
-    $('#spotlightActionBtn').onclick = () => go('#/manufacturer/product/' + prod.id);
-  }
-
-  function renderBrief(prod) {
-    let spec = null;
-    const rawSpec = prod?.spec || prod?.intelligence;
-    try { spec = typeof rawSpec === 'string' ? JSON.parse(rawSpec) : rawSpec; } catch {}
-    if (!spec || !spec.requirements || spec.requirements.length === 0) {
-      $('#briefContent').innerHTML = `
-        <div style="padding:14px;background:#0d1524;border-radius:6px;border:1px dashed #24324d">
-          <p style="font-size:12.5px;color:#94a3b8;margin:0 0 10px 0">No saved AI specification recorded yet for this idea.</p>
-          <button type="button" class="secondary sm" id="briefOpenSpecBtn">Open Product to Generate Spec</button>
-        </div>
-      `;
-      $('#briefOpenSpecBtn').onclick = () => go('#/product/' + prod.id + '?analyze=1');
-      return;
-    }
-    $('#briefContent').innerHTML = `
-      <div class="brief-specs">
-        <div class="brief-item">
-          <h4>Key Engineering Requirements (${spec.requirements.length})</h4>
-          <ul>
-            ${spec.requirements.slice(0, 3).map(r => `<li>${esc(r)}</li>`).join('')}
-          </ul>
-        </div>
-        ${spec.questions?.length ? `
-          <div class="brief-item">
-            <h4>Open Questions for Manufacturer</h4>
-            <ul>
-              ${spec.questions.slice(0, 2).map(q => `<li>${esc(q)}</li>`).join('')}
-            </ul>
-          </div>
-        ` : ''}
-        ${spec.complexity ? `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0d1524;border-radius:6px;font-size:12px;margin-top:6px">
-            <span class="muted">Complexity</span>
-            <strong style="color:#f8fafc">${esc(spec.complexity)}</strong>
-          </div>
-        ` : ''}
-        <div style="margin-top:10px">
-          <button type="button" class="secondary sm" id="briefFullSpecBtn">Open Full Specification</button>
-        </div>
-      </div>
-    `;
-    $('#briefFullSpecBtn').onclick = () => go('#/product/' + prod.id);
-  }
-
-  renderSpotlight(activeProduct);
-  renderBrief(activeProduct);
-
-  let currentSort = { field: 'interest', dir: 'desc' };
-
-  function renderTable() {
-    const q = ($('#deSearch')?.value || '').toLowerCase().trim();
-    const stage = $('#deStageFilter')?.value || '';
-    const offer = $('#deOfferFilter')?.value || '';
-
-    let list = products.slice();
-    if (q) {
-      list = list.filter(p => (p.title || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
-    }
-    if (stage) {
-      list = list.filter(p => p.status === stage);
-    }
-    if (offer === 'mine') {
-      list = list.filter(p => p.has_my_offer);
-    } else if (offer === 'open') {
-      list = list.filter(p => !p.has_eligible_offer);
-    }
-
-    list.sort((a, b) => {
-      let va = a[currentSort.field];
-      let vb = b[currentSort.field];
-      if (currentSort.field === 'interest') {
-        va = Number(va) || 0;
-        vb = Number(vb) || 0;
-      } else {
-        va = String(va || '').toLowerCase();
-        vb = String(vb || '').toLowerCase();
-      }
-      return currentSort.dir === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  const getFiltered = () =>
+    products.filter((p) => {
+      if (catFilter && (p.category || 'Creator Tools') !== catFilter) return false;
+      if (stageFilter && p.status !== stageFilter) return false;
+      if (demandFilter === 'high' && p.interest < 2) return false;
+      if (demandFilter === 'open' && p.has_eligible_offer) return false;
+      if (searchQ && !(`${p.title || ''} ${p.category || ''}`).toLowerCase().includes(searchQ)) return false;
+      return true;
     });
 
-    $('#deCount').textContent = `${list.length} products`;
-    $('#deTableBody').innerHTML = list.map(p => `
-      <tr style="cursor:pointer;${p.id === activeProduct?.id ? 'background:rgba(56,152,255,0.08);' : ''}" data-row-id="${esc(p.id)}">
-        <td><strong>${esc(p.title)}</strong></td>
-        <td><span class="pill" style="font-size:11px">${esc(p.category || 'General')}</span></td>
-        <td><span style="font-weight:700;color:#3898ff">★ ${p.interest}</span></td>
-        <td><span class="pill" style="font-size:11px">${esc(stageName[p.status] || p.status)}</span></td>
-        <td>
-          ${p.has_my_offer
-            ? '<span style="color:#4ade80;font-weight:600;font-size:12px">My Offer Active</span>'
-            : (p.has_eligible_offer ? '<span style="color:#94a3b8;font-size:12px">Offer Available</span>' : '<span style="color:#fbbf24;font-size:12px">Open Opportunity</span>')}
-        </td>
-        <td class="muted" style="font-size:12px">${esc((p.updated_at || p.created_at || '').slice(0, 10))}</td>
-        <td>
-          <button type="button" class="secondary sm" data-action-pid="${esc(p.id)}">
-            ${p.has_my_offer ? 'Manage' : 'Propose'}
-          </button>
-        </td>
-      </tr>
-    `).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">No matching products found.</td></tr>';
-
-    $('#deTableBody').querySelectorAll('[data-row-id]').forEach(row => {
-      row.onclick = (e) => {
-        if (e.target.closest('[data-action-pid]')) return;
-        const id = row.dataset.rowId;
-        const found = products.find(x => x.id === id);
-        if (found) {
-          activeProduct = found;
-          renderSpotlight(activeProduct);
-          renderBrief(activeProduct);
-          renderTable();
-        }
-      };
+  const renderDonut = (list) => {
+    const byCat = {};
+    list.forEach((p) => {
+      const c = p.category || 'Creator Tools';
+      byCat[c] = (byCat[c] || 0) + Math.max(1, Number(p.interest) || 0);
     });
-
-    $('#deTableBody').querySelectorAll('[data-action-pid]').forEach(btn => {
-      btn.onclick = () => go('#/manufacturer/product/' + btn.dataset.actionPid);
+    const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 4);
+    const total = Math.max(1, entries.reduce((s, e) => s + e[1], 0));
+    const colors = ['#22d3ee', '#2589ff', '#6366f1', '#94a3b8'];
+    let acc = 0;
+    const r = 46;
+    const circ = 2 * Math.PI * r;
+    const segs = entries.map(([cat, val], idx) => {
+      const frac = val / total;
+      const dash = frac * circ;
+      const offset = -acc * circ;
+      acc += frac;
+      return `<circle cx="64" cy="64" r="${r}" fill="none" stroke="${colors[idx % colors.length]}" stroke-width="18" stroke-dasharray="${dash.toFixed(1)} ${(circ - dash).toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"/>`;
     });
-  }
-
-  renderTable();
-
-  $('#deTable').querySelectorAll('[data-sort]').forEach(th => {
-    th.onclick = () => {
-      const field = th.dataset.sort;
-      if (currentSort.field === field) {
-        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentSort.field = field;
-        currentSort.dir = 'desc';
-      }
-      renderTable();
+    return {
+      svg: `<svg viewBox="0 0 128 128" width="132" height="132" style="transform:rotate(-90deg);flex-shrink:0">${segs.join('')}</svg>`,
+      legend: entries.map(([cat, val], idx) => `
+        <div class="donut-legend-row" style="cursor:pointer" data-cat-filter="${esc(cat)}">
+          <span><i class="donut-dot" style="background:${colors[idx % colors.length]}"></i>${esc(cat)}</span>
+          <strong style="color:#fff">${Math.round((val / total) * 100)}%</strong>
+        </div>
+      `).join('')
     };
-  });
-
-  $('#deSearch').oninput = renderTable;
-  $('#deStageFilter').onchange = renderTable;
-  $('#deOfferFilter').onchange = renderTable;
-
-  document.querySelectorAll('[data-cat-filter]').forEach(el => {
-    el.onclick = () => {
-      const cat = el.dataset.catFilter;
-      $('#deSearch').value = $('#deSearch').value === cat ? '' : cat;
-      renderTable();
-    };
-  });
-  document.querySelectorAll('[data-stage-bar]').forEach(el => {
-    el.onclick = () => {
-      const st = el.dataset.stageBar;
-      $('#deStageFilter').value = $('#deStageFilter').value === st ? '' : st;
-      renderTable();
-    };
-  });
-
-  $('#btnExportCsv').onclick = () => {
-    const headers = ['Product', 'Category', 'Interested Consumers', 'Development Stage', 'Offer Status', 'Last Activity'];
-    const rows = products.map(p => [
-      `"${(p.title || '').replace(/"/g, '""')}"`,
-      `"${(p.category || 'General').replace(/"/g, '""')}"`,
-      p.interest || 0,
-      `"${stageName[p.status] || p.status}"`,
-      `"${p.has_my_offer ? 'My Offer Active' : (p.has_eligible_offer ? 'Offer Available' : 'Open Opportunity')}"`,
-      `"${(p.updated_at || p.created_at || '').slice(0, 10)}"`
-    ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const link = document.createElement('a');
-    link.setAttribute('href', encodeURI(csvContent));
-    link.setAttribute('download', 'genesis_demand_export.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    notice('Demand Explorer dataset exported to CSV.', 'success');
   };
 
-  const mountEl = $('#genesisStudioMount');
-  if (window.agStudio && typeof window.agStudio.createStudio === 'function') {
-    try {
-      const theme = window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme({
-        backgroundColor: '#090d16',
-        textColor: '#f1f5f9',
-        borderColor: '#1e293b',
-        accentColor: '#0070ba'
-      }) : undefined;
+  const renderTrendSvg = (list) => {
+    const sorted = list.slice(0, 6);
+    const vals = (sorted.length ? sorted : [{ interest: 1 }]).map((p, i) =>
+      chartMode === 'interest' ? Math.max(1, Number(p.interest) || 1) + i * 0.4 : (i + 1)
+    );
+    const maxV = Math.max(2, ...vals);
+    const pts = vals.map((v, i) => {
+      const x = vals.length === 1 ? 280 : Math.round(24 + (i / (vals.length - 1)) * 552);
+      const y = Math.round(138 - (v / maxV) * 106);
+      return [x, y];
+    });
+    const dLine = pts.map((pt, i) => (i === 0 ? `M${pt[0]},${pt[1]}` : `S${pt[0] - 28},${pt[1]} ${pt[0]},${pt[1]}`)).join(' ');
+    const dArea = `${dLine} L${pts[pts.length - 1][0]},156 L${pts[0][0]},156 Z`;
+    const last = pts[pts.length - 1];
+    const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return `
+      <svg viewBox="0 0 600 176" style="width:100%;height:175px;display:block">
+        <defs>
+          <linearGradient id="trendAreaFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.34"/>
+            <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.0"/>
+          </linearGradient>
+          <filter id="cyanCurveGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="${dArea}" fill="url(#trendAreaFill)"/>
+        <path d="${dLine}" fill="none" stroke="#22d3ee" stroke-width="3" filter="url(#cyanCurveGlow)"/>
+        <circle cx="${last[0]}" cy="${last[1]}" r="6" fill="#ffffff" stroke="#22d3ee" stroke-width="3"/>
+        ${labels.map((m, i) => `<text x="${28 + i * 108}" y="170" fill="#64748b" font-size="11" font-family="Inter,sans-serif">${m}</text>`).join('')}
+      </svg>
+    `;
+  };
 
-      const studioData = {
-        sources: [
-          {
-            id: 'demand_explorer',
-            name: 'Demand Explorer',
-            primaryKeyField: 'id',
-            data: products.map(p => ({
-              id: p.id,
-              title: p.title,
-              category: p.category || 'General',
-              interest: Number(p.interest) || 0,
-              stage: stageName[p.status] || p.status,
-              offer_status: p.has_my_offer ? 'My Offer Active' : (p.has_eligible_offer ? 'Offer Available' : 'Open Opportunity'),
-              reports: Number(p.reports) || 0,
-              updated: (p.updated_at || p.created_at || '').slice(0, 10)
-            }))
-          },
-          {
-            id: 'sandbox_orders',
-            name: 'PayPal Sandbox Transactions',
-            primaryKeyField: 'id',
-            data: orders.map(o => ({
-              id: o.id,
-              order_id: o.paypal_order_id || o.id,
-              product: o.product_title || 'Product',
-              amount: Number(o.amount) || 0,
-              currency: o.currency || 'USD',
-              status: o.status,
-              date: (o.created_at || '').slice(0, 10)
-            }))
-          }
-        ]
+  const draw = () => {
+    const filtered = getFiltered();
+    const donut = renderDonut(filtered.length ? filtered : products);
+    const vis = getProductVisual(activeProduct);
+    const maxSig = Math.max(1, ...products.map((p) => Number(p.interest) || 0));
+
+    $('#view').innerHTML = `
+      <div class="intel-stage-layout view-enter">
+        <div class="intel-hero-bar">
+          <div class="intel-hero-left">
+            <span class="stage-kicker">GENESIS ANALYTICS</span>
+            <h2>Market intelligence</h2>
+            <p>Turn real consumer demand into clearer manufacturing decisions. Powered by live D1 signals &amp; AG Studio.</p>
+            <div class="row" style="margin-top:14px">
+              ${isMaker ? `
+                <button type="button" class="btn-luminous-primary sm" id="btnAskAiToggle">${icon('sparkles')}<span>Ask GENESIS</span></button>
+                <button type="button" class="btn-luminous-secondary sm" id="btnToggleStudioCanvas">${icon('wrench')}<span>${showStudio ? 'Hide AG Studio' : 'Open AG Studio v3.1'}</span></button>
+                <button type="button" class="btn-luminous-secondary sm" id="btnExportCsv">Export CSV</button>
+              ` : `
+                <button type="button" class="btn-luminous-primary sm" id="btnSwitchMakerDemo">${icon('factory')}<span>Switch to Manufacturer Demo for AG Studio</span></button>
+              `}
+            </div>
+          </div>
+          <div class="visual-halo ${vis.isSvg ? 'is-svg' : ''}" style="max-width:250px;min-height:150px">
+            <img src="${vis.src}" alt="${esc(vis.alt)}">
+          </div>
+        </div>
+
+        <div class="intel-filter-bar">
+          <div class="intel-filter-left">
+            <select id="deCatFilter" style="width:auto;min-width:155px">
+              <option value="">All Categories</option>
+              ${categories.map((c) => `<option value="${esc(c)}" ${catFilter === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}
+            </select>
+            <select id="deDemandFilter" style="width:auto;min-width:140px">
+              <option value="">Demand: All</option>
+              <option value="high" ${demandFilter === 'high' ? 'selected' : ''}>High Intent (2+)</option>
+              <option value="open" ${demandFilter === 'open' ? 'selected' : ''}>Open Opportunities</option>
+            </select>
+            <select id="deStageFilter" style="width:auto;min-width:140px">
+              <option value="">Stage: All</option>
+              ${stages.map((s) => `<option value="${s}" ${stageFilter === s ? 'selected' : ''}>${esc(stageName[s] || s)}</option>`).join('')}
+            </select>
+          </div>
+          <input id="deSearch" value="${esc(searchQ)}" placeholder="Search product ideas…" style="max-width:260px">
+        </div>
+
+        <div class="query-box-wrap" id="queryBoxWrap" style="display:${isMaker ? 'none' : 'none'}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <span style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">${icon('sparkles')} GENESIS Intelligence Assistant</span>
+            <span style="font-size:11px;color:var(--text-muted)">Gemini 3.8 Flash · Live D1 Grounded</span>
+          </div>
+          <div class="query-pills">
+            <button type="button" class="query-pill" data-q="Which product ideas have the most customer interest?">Most customer interest</button>
+            <button type="button" class="query-pill" data-q="Show products that have interest but no eligible manufacturing offer.">Open opportunities</button>
+            <button type="button" class="query-pill" data-q="Show my completed PayPal Sandbox orders.">Completed Sandbox orders</button>
+          </div>
+          <form id="aiQueryForm" class="query-input-row">
+            <input id="aiQueryInput" placeholder="Ask about demand, opportunities, stages, or PayPal Sandbox transactions…" autocomplete="off">
+            <button type="submit" class="btn-luminous-primary sm" id="aiQuerySubmit">Ask Assistant</button>
+          </form>
+          <div id="aiQueryResult" class="query-result-panel" style="display:none"></div>
+        </div>
+
+        <div class="intel-grid-top">
+          <div class="intel-card">
+            <div class="row" style="justify-content:space-between;margin-bottom:8px">
+              <div>
+                <strong style="font-size:15.5px;color:#fff;display:block">Demand trend</strong>
+                <span style="font-size:12px;color:var(--text-muted)">Consumer interest across submitted product concepts</span>
+              </div>
+              <div class="lumina-role-pill">
+                <button type="button" class="role-btn ${chartMode === 'interest' ? 'active' : ''}" data-cmode="interest">Interest</button>
+                <button type="button" class="role-btn ${chartMode === 'ideas' ? 'active' : ''}" data-cmode="ideas">Ideas</button>
+              </div>
+            </div>
+            ${renderTrendSvg(filtered.length ? filtered : products)}
+          </div>
+
+          <div class="key-insight-card">
+            <div class="row" style="justify-content:space-between">
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#67e8f9">${icon('sparkles')} Key insight</span>
+              <button type="button" class="circle-arrow-btn" onclick="go('#/product/${esc(activeProduct.id)}')" aria-label="Open product">${icon('arrowRight')}</button>
+            </div>
+            <div>
+              <h3 style="margin:0 0 8px;font-size:20px;font-weight:800;color:#fff;line-height:1.25">Strongest demand: ${esc(activeProduct.title)}</h3>
+              <p style="margin:0;font-size:13px;color:#cbd5e1;line-height:1.5">
+                Recorded ${activeProduct.interest ?? activeProduct.supporters ?? 0} verified consumer signals in ${esc(activeProduct.category || 'Creator Tools')} (${esc(stageName[activeProduct.status] || activeProduct.status)}).
+              </p>
+            </div>
+            <div style="font-size:11.5px;color:#99f6e4">Database KPIs · ${kpis.customerInterest ?? products.reduce((s, p) => s + (Number(p.interest) || 0), 0)} total signals across ${products.length} products</div>
+          </div>
+        </div>
+
+        <div class="intel-grid-bottom">
+          <div class="intel-card">
+            <div class="row" style="justify-content:space-between;margin-bottom:12px">
+              <strong style="font-size:15.5px;color:#fff">Product opportunities</strong>
+              <span style="font-size:12px;color:var(--text-muted)">${filtered.length} matching records</span>
+            </div>
+            <table class="lumina-table">
+              <thead>
+                <tr>
+                  <th>Product idea</th>
+                  <th>Category</th>
+                  <th>Interest</th>
+                  <th>Stage</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.map((p) => {
+                  const pct = Math.min(100, Math.max(14, Math.round(((Number(p.interest) || 1) / maxSig) * 100)));
+                  const levelCls = p.interest >= 2 ? 'badge success' : 'badge muted-badge';
+                  return `
+                    <tr style="cursor:pointer;${p.id === activeProduct.id ? 'background:rgba(37,137,255,0.08)' : ''}" data-row-id="${esc(p.id)}">
+                      <td>
+                        <div class="row" style="gap:10px;flex-wrap:nowrap">
+                          ${renderProductThumb(p, 'idea-card-thumb')}
+                          <strong style="color:#fff">${esc(p.title)}</strong>
+                        </div>
+                      </td>
+                      <td><span class="pill">${esc(p.category || 'Creator Tools')}</span></td>
+                      <td style="min-width:125px">
+                        <div class="progress-row">
+                          <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+                          <span class="progress-pct">${p.interest}</span>
+                        </div>
+                      </td>
+                      <td><span class="${levelCls}">${esc(stageName[p.status] || p.status)}</span></td>
+                      <td><button type="button" class="circle-arrow-btn" data-open-id="${esc(p.id)}" aria-label="Open">${icon('arrowRight')}</button></td>
+                    </tr>
+                  `;
+                }).join('') || '<tr><td colspan="5" style="text-align:center;padding:18px">No matching opportunities.</td></tr>'}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="intel-card">
+            <strong style="font-size:15.5px;color:#fff;display:block;margin-bottom:4px">Demand by category</strong>
+            <span style="font-size:12px;color:var(--text-muted)">Click a slice to cross-filter</span>
+            <div class="donut-wrap">
+              ${donut.svg}
+              <div class="donut-legend">${donut.legend}</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="studioSectionWrap" style="display:${showStudio && isMaker ? 'block' : 'none'}">
+          <div class="intel-card">
+            <div class="row" style="justify-content:space-between;margin-bottom:12px">
+              <div>
+                <strong style="font-size:16px;color:#fff">AG Studio v3.1 Embedded Canvas</strong>
+                <p style="margin:2px 0 0;font-size:12px;color:var(--text-muted)">Interactive grid &amp; PayPal Sandbox transaction ledger</p>
+              </div>
+              <div class="row">
+                <button type="button" class="btn-luminous-secondary sm" id="btnToggleStudioMode"><span id="studioModeLabel">${isEditMode ? 'Lock Dashboard' : 'Customize Dashboard'}</span></button>
+                <button type="button" class="btn-luminous-secondary sm" id="btnResetLayout">Reset Layout</button>
+                <button type="button" class="btn-luminous-primary sm" id="btnGoOrders">PayPal Orders (${orders.length})</button>
+              </div>
+            </div>
+            <div id="genesisStudioMount" style="min-height:360px"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Event bindings
+    if ($('#btnSwitchMakerDemo')) {
+      $('#btnSwitchMakerDemo').onclick = async () => {
+        try {
+          await api('/demo/session', 'POST', { role: 'manufacturer' });
+          await refreshMe();
+          notice('Switched to Demo Manufacturer perspective.', 'success');
+          manufacturerIntelligence();
+        } catch (err) { notice(err.message, 'error'); }
       };
+    }
+    $('#deCatFilter').onchange = (e) => { catFilter = e.target.value; draw(); };
+    $('#deDemandFilter').onchange = (e) => { demandFilter = e.target.value; draw(); };
+    $('#deStageFilter').onchange = (e) => { stageFilter = e.target.value; draw(); };
+    $('#deSearch').oninput = (e) => { searchQ = e.target.value.toLowerCase().trim(); draw(); };
 
-      const savedLayout = localStorage.getItem('genesis_studio_layout_' + user.id);
-      let initialReportState = undefined;
-      if (savedLayout) {
-        try { initialReportState = JSON.parse(savedLayout); } catch {}
-      }
+    document.querySelectorAll('[data-cmode]').forEach((b) => {
+      b.onclick = () => { chartMode = b.dataset.cmode; draw(); };
+    });
+    document.querySelectorAll('[data-cat-filter]').forEach((el) => {
+      el.onclick = () => { catFilter = catFilter === el.dataset.catFilter ? '' : el.dataset.catFilter; draw(); };
+    });
+    document.querySelectorAll('[data-row-id]').forEach((row) => {
+      row.onclick = (e) => {
+        if (e.target.closest('[data-open-id]')) {
+          const pid = e.target.closest('[data-open-id]').dataset.openId;
+          go(isMaker ? '#/manufacturer/product/' + pid : '#/product/' + pid);
+          return;
+        }
+        const found = products.find((p) => p.id === row.dataset.rowId);
+        if (found) { activeProduct = found; draw(); }
+      };
+    });
 
-      studioApi = window.agStudio.createStudio(mountEl, {
-        theme,
-        mode: 'view',
-        data: studioData,
-        initialState: initialReportState,
-        onStateUpdated: () => {
+    if ($('#btnAskAiToggle')) {
+      $('#btnAskAiToggle').onclick = () => {
+        const w = $('#queryBoxWrap');
+        w.style.display = w.style.display === 'none' ? 'block' : 'none';
+        if (w.style.display === 'block') $('#aiQueryInput').focus();
+      };
+    }
+
+    document.querySelectorAll('.query-pill').forEach((btn) => {
+      btn.onclick = () => {
+        $('#aiQueryInput').value = btn.dataset.q;
+        $('#aiQueryForm').dispatchEvent(new Event('submit', { cancelable: true }));
+      };
+    });
+
+    if ($('#aiQueryForm')) {
+      $('#aiQueryForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const q = ($('#aiQueryInput')?.value || '').trim();
+        if (!q) return;
+        const submitBtn = $('#aiQuerySubmit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Analyzing…';
+        const resPanel = $('#aiQueryResult');
+        resPanel.style.display = 'block';
+        resPanel.innerHTML = '<span class="muted">GENESIS Intelligence is reading authorized data…</span>';
+        try {
+          const res = await api('/intelligence/query', 'POST', { query: q });
+          resPanel.innerHTML = `<strong style="color:#67e8f9">Grounded Analysis:</strong><div style="margin-top:4px">${esc(res.answer)}</div>`;
+        } catch (err) {
+          resPanel.innerHTML = `<span style="color:#fda4af">Analysis notice: ${esc(err.message)}</span>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Ask Assistant';
+        }
+      };
+    }
+
+    if ($('#btnExportCsv')) {
+      $('#btnExportCsv').onclick = () => {
+        const headers = ['Product', 'Category', 'Interested Consumers', 'Development Stage'];
+        const rows = products.map((p) => [
+          `"${(p.title || '').replace(/"/g, '""')}"`,
+          `"${(p.category || 'General').replace(/"/g, '""')}"`,
+          p.interest || 0,
+          `"${stageName[p.status] || p.status}"`
+        ]);
+        const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+        const link = document.createElement('a');
+        link.setAttribute('href', encodeURI(csvContent));
+        link.setAttribute('download', 'genesis_demand_export.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        notice('Demand Explorer dataset exported to CSV.', 'success');
+      };
+    }
+
+    if ($('#btnToggleStudioCanvas')) {
+      $('#btnToggleStudioCanvas').onclick = () => {
+        showStudio = !showStudio;
+        draw();
+        if (showStudio && isMaker && window.agStudio && typeof window.agStudio.createStudio === 'function') {
           try {
-            if (studioApi && studioApi.getState) {
-              const state = studioApi.getState();
-              localStorage.setItem('genesis_studio_layout_' + user.id, JSON.stringify(state));
-            }
+            const mountEl = $('#genesisStudioMount');
+            const theme = window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme({
+              backgroundColor: '#090d16', textColor: '#f1f5f9', borderColor: '#1e293b', accentColor: '#0ea5e9'
+            }) : undefined;
+            studioApi = window.agStudio.createStudio(mountEl, {
+              theme,
+              mode: isEditMode ? 'edit' : 'view',
+              data: {
+                sources: [
+                  { id: 'demand_explorer', name: 'Demand Explorer', primaryKeyField: 'id', data: products.map((p) => ({ id: p.id, title: p.title, category: p.category || 'General', interest: p.interest, stage: stageName[p.status] || p.status })) },
+                  { id: 'sandbox_orders', name: 'PayPal Sandbox Orders', primaryKeyField: 'id', data: orders.map((o) => ({ id: o.id, order_id: o.paypal_order_id || o.id, product: o.product_title || 'Product', amount: Number(o.amount) || 0, status: o.status })) }
+                ]
+              }
+            });
           } catch {}
         }
-      });
-    } catch (err) {
-      console.warn('AG Studio mount notice:', err);
+      };
     }
-  }
 
-  $('#btnToggleStudioMode').onclick = () => {
-    isEditMode = !isEditMode;
-    $('#studioModeLabel').textContent = isEditMode ? 'Lock Dashboard' : 'Customize Dashboard';
-    if (studioApi && studioApi.setProperty) {
-      studioApi.setProperty('mode', isEditMode ? 'edit' : 'view');
+    if ($('#btnToggleStudioMode')) {
+      $('#btnToggleStudioMode').onclick = () => {
+        isEditMode = !isEditMode;
+        if ($('#studioModeLabel')) $('#studioModeLabel').textContent = isEditMode ? 'Lock Dashboard' : 'Customize Dashboard';
+        if (studioApi && studioApi.setProperty) studioApi.setProperty('mode', isEditMode ? 'edit' : 'view');
+      };
     }
-    notice(isEditMode ? 'Edit mode enabled. Widgets can be resized and rearranged.' : 'Layout locked in View mode.', 'info');
-  };
-
-  $('#btnResetLayout').onclick = () => {
-    localStorage.removeItem('genesis_studio_layout_' + user.id);
-    notice('Dashboard layout reset to GENESIS default.', 'success');
-    manufacturerIntelligence();
-  };
-
-  const askDrawer = $('#queryBoxWrap');
-  $('#btnAskAiToggle').onclick = () => {
-    askDrawer.scrollIntoView({ behavior: 'smooth' });
-    $('#aiQueryInput').focus();
-  };
-
-  document.querySelectorAll('.query-pill').forEach(btn => {
-    btn.onclick = () => {
-      $('#aiQueryInput').value = btn.dataset.q;
-      $('#aiQueryForm').dispatchEvent(new Event('submit', { cancelable: true }));
-    };
-  });
-
-  $('#aiQueryForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const queryText = ($('#aiQueryInput')?.value || '').trim();
-    if (!queryText) return;
-    const submitBtn = $('#aiQuerySubmit');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Analyzing…';
-    const resPanel = $('#aiQueryResult');
-    resPanel.style.display = 'block';
-    resPanel.innerHTML = '<span class="muted">GENESIS Intelligence is reading authorized manufacturer data…</span>';
-    try {
-      const res = await api('/intelligence/query', 'POST', { query: queryText });
-      resPanel.innerHTML = `
-        <div style="font-weight:600;margin-bottom:4px;color:#3898ff">Grounded Analysis:</div>
-        <div>${esc(res.answer)}</div>
-      `;
-    } catch (err) {
-      resPanel.innerHTML = `<span style="color:#ef4444">Analysis notice: ${esc(err.message)}</span>`;
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Ask Assistant';
+    if ($('#btnResetLayout')) {
+      $('#btnResetLayout').onclick = () => {
+        if (user) localStorage.removeItem('genesis_studio_layout_' + user.id);
+        notice('Dashboard layout reset.', 'success');
+        draw();
+      };
     }
+    if ($('#btnGoOrders')) $('#btnGoOrders').onclick = () => go('#/orders');
   };
 
-  $('#btnGoOrders').onclick = () => go('#/orders');
+  draw();
 }
 
 
@@ -4075,7 +3712,7 @@ async function renderRoute() {
   const path = pathPart || (user ? '/home' : '/intro');
   const query = new URLSearchParams(queryPart || '');
 
-  $('#app').classList.remove('intro-mode');
+  ($('#desktopApp') || $('#app'))?.classList.remove('intro-mode');
   const brandTarget = user ? '#/home' : '#/intro';
   if ($('#brandHomeLink')) $('#brandHomeLink').setAttribute('href', brandTarget);
   if ($('#mobileBrandLink')) $('#mobileBrandLink').setAttribute('href', brandTarget);
@@ -4105,7 +3742,7 @@ async function renderRoute() {
 
   try {
     if (path === '/intro' || (!user && path === '/')) { introPage(); finishRender(); return; }
-    if (path === '/' || path === '/home') { home(); finishRender(); return; }
+    if (path === '/' || path === '/home') { await home(); finishRender(); return; }
     if (path === '/explore') { await explore(); finishRender(); return; }
     if (path === '/request') { requestWizard(1); finishRender(); return; }
     if (path === '/report') { await reportWizard(1); finishRender(); return; }

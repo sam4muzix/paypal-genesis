@@ -1,0 +1,18 @@
+<svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chassisGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#222d4a"/>
+      <stop offset="100%" stop-color="#0b101f"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="240" rx="150" ry="35" fill="rgba(0,180,255,0.18)"/>
+  <!-- Isometric Chassis -->
+  <polygon points="200,80 340,140 200,200 60,140" fill="url(#chassisGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+  <polygon points="60,140 200,200 200,230 60,170" fill="#11182c" stroke="#2563eb" stroke-width="1"/>
+  <polygon points="200,200 340,140 340,170 200,230" fill="#1a243e" stroke="#38bdf8" stroke-width="1"/>
+  <!-- Top Surface Ports & Grid -->
+  <line x1="130" y1="145" x2="270" y2="145" stroke="rgba(56,189,248,0.3)" stroke-dasharray="3 4"/>
+  <circle cx="200" cy="140" r="18" fill="#070b16" stroke="#00f0ff" stroke-width="1.5"/>
+  <circle cx="200" cy="140" r="8" fill="#0070ba"/>
+  <text x="200" y="275" text-anchor="middle" fill="#38bdf8" font-family="monospace" font-size="11" letter-spacing="1.5">GENESIS HARDWARE ARCHITECTURE</text>
+</svg>
