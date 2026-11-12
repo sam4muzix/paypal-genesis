@@ -25,6 +25,7 @@ const ICONS = {
   alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   check: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
   card: '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',
+  plusCircle: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>',
 };
 
 function icon(name, extra = '') {
@@ -218,51 +219,35 @@ function go(hash) {
 }
 
 function activeNavForRoute(route) {
-  if (route === '/intro') return 'Intro';
-  if (route === '/' || route === '/home' || route.startsWith('/request') || route.startsWith('/report')) {
-    return 'Home';
-  }
-  if (route === '/explore') return 'Explore';
-  if (route.startsWith('/product/')) return maker() ? 'Customer Demand' : 'Explore';
-  if (route === '/my-products') return 'My Products';
-  if (route === '/orders') return maker() ? 'Orders' : 'My Products';
-  if (route === '/help') return 'Help';
-  if (route === '/account') return 'Account';
-  if (route === '/admin') return 'Approvals';
-  if (route.startsWith('/manufacturer/intelligence')) return 'GENESIS Intelligence';
-  if (route.startsWith('/manufacturer/products')) return 'My Products';
-  if (route.startsWith('/manufacturer/')) return 'Customer Demand';
+  if (route === '/intro' || route === '/' || route === '/home') return 'Home';
+  if (route === '/explore' || route.startsWith('/product/') || route === '/manufacturer/demand') return 'Discover';
+  if (route.startsWith('/request') || route.startsWith('/report')) return 'Create';
+  if (route.startsWith('/manufacturer/intelligence') || route.startsWith('/manufacturer/analytics') || route.startsWith('/manufacturer/quality')) return 'Intelligence';
+  if (route === '/orders' || route === '/manufacturer/products' || route === '/my-products') return 'Orders';
+  if (route === '/account' || route === '/admin' || route === '/help') return 'Account';
   return 'Home';
 }
 
 function nav(activePage) {
   const isMaker = maker();
-  const items = isMaker
-    ? [
-        { label: 'Home', hash: '#/home', icon: 'home' },
-        { label: 'Ideas', hash: '#/manufacturer/demand', icon: 'lightbulb' },
-        { label: 'Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
-        { label: 'Manufacturing', hash: '#/manufacturer/products', icon: 'layers' },
-        { label: 'Orders', hash: '#/orders', icon: 'receipt' },
-        { label: 'Analytics', hash: '#/manufacturer/analytics', icon: 'chart' },
-      ]
-    : [
-        { label: 'Home', hash: user ? '#/home' : '#/intro', icon: 'home' },
-        { label: 'Ideas', hash: '#/explore', icon: 'lightbulb' },
-        { label: 'Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
-        { label: 'Manufacturing', hash: user ? '#/my-products' : '#/explore', icon: 'layers' },
-        { label: 'Orders', hash: '#/orders', icon: 'receipt' },
-        { label: 'Analytics', hash: '#/help', icon: 'chart' },
-      ];
+  const items = [
+    { label: 'Home', hash: user ? '#/home' : '#/intro', icon: 'home' },
+    { label: 'Discover', hash: '#/explore', icon: 'compass' },
+    { label: 'Create', hash: '#/request', icon: 'plusCircle', isAccent: true },
+    { label: 'Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
+    { label: 'Orders', hash: '#/orders', icon: 'receipt' },
+    { label: 'Account', hash: '#/account', icon: 'user' },
+  ];
 
   const currentPath = location.hash.replace(/^#/, '').split('?')[0];
   const isCurrentActive = (item) => {
     if (activePage === item.label) return true;
     if (item.label === 'Home' && (currentPath === '' || currentPath === '/' || currentPath === '/home' || currentPath === '/intro')) return true;
-    if (item.label === 'Ideas' && (currentPath === '/explore' || currentPath === '/manufacturer/demand')) return true;
-    if (item.label === 'Intelligence' && (currentPath === '/manufacturer/intelligence' || currentPath === '/manufacturer/analytics')) return true;
-    if (item.label === 'Manufacturing' && (currentPath === '/manufacturer/products' || currentPath === '/my-products' || currentPath.startsWith('/manufacturer/product/'))) return true;
-    if (item.label === 'Orders' && currentPath === '/orders') return true;
+    if (item.label === 'Discover' && (currentPath === '/explore' || currentPath.startsWith('/product/') || currentPath === '/manufacturer/demand')) return true;
+    if (item.label === 'Create' && (currentPath.startsWith('/request') || currentPath.startsWith('/report'))) return true;
+    if (item.label === 'Intelligence' && (currentPath.startsWith('/manufacturer/intelligence') || currentPath.startsWith('/manufacturer/analytics'))) return true;
+    if (item.label === 'Orders' && (currentPath === '/orders' || currentPath === '/my-products' || currentPath.startsWith('/manufacturer/product/'))) return true;
+    if (item.label === 'Account' && (currentPath === '/account' || currentPath === '/help' || currentPath === '/admin')) return true;
     return false;
   };
 
@@ -270,7 +255,7 @@ function nav(activePage) {
     $('#nav').innerHTML = items
       .map(
         (item) =>
-          `<button class="${isCurrentActive(item) ? 'active' : ''}" data-hash="${item.hash}" aria-current="${
+          `<button class="${isCurrentActive(item) ? 'active' : ''} ${item.isAccent ? 'dock-accent' : ''}" data-hash="${item.hash}" aria-current="${
             isCurrentActive(item) ? 'page' : 'false'
           }">${icon(item.icon)}<span>${esc(item.label)}</span></button>`
       )
@@ -283,33 +268,36 @@ function nav(activePage) {
       });
   }
 
-  if ($('#btnNavHome')) $('#btnNavHome').onclick = () => go(user ? '#/home' : '#/intro');
-  if ($('#btnNavMode')) $('#btnNavMode').onclick = () => notice('Neomorphic Twilight Theme Active', 'info');
-  if ($('#btnNavBell')) $('#btnNavBell').onclick = () => notice('System Notification: PayPal Sandbox orders verified and operational.', 'info');
-  if ($('#topDemoConsumerBtn')) $('#topDemoConsumerBtn').onclick = async () => {
-    try {
-      const res = await api('/demo/session', 'POST', { role: 'consumer' });
-      await refreshMe();
-      notice('Demo mode started as Consumer.', 'success');
-      go('#/home');
-    } catch (e) { notice(e.message, 'error'); }
-  };
-  if ($('#topDemoMakerBtn')) $('#topDemoMakerBtn').onclick = async () => {
-    try {
-      const res = await api('/demo/session', 'POST', { role: 'manufacturer' });
-      await refreshMe();
-      notice('Demo mode started as Manufacturer.', 'success');
-      go('#/manufacturer/intelligence');
-    } catch (e) { notice(e.message, 'error'); }
-  };
-  if ($('#profilePill')) $('#profilePill').onclick = () => {
-    if (!user) auth();
-    else go('#/account');
-  };
-  if ($('#topUserName')) {
-    $('#topUserName').textContent = user ? (user.is_demo ? 'DEMO · ' + user.name : user.name) : 'Judge Session';
+  // Topbar role switcher pills
+  if ($('#btnRoleConsumer')) {
+    $('#btnRoleConsumer').classList.toggle('active', !isMaker);
+    $('#btnRoleConsumer').onclick = async () => {
+      if (!isMaker && user?.is_demo) { go('#/home'); return; }
+      try {
+        await api('/demo/session', 'POST', { role: 'consumer' });
+        await refreshMe();
+        notice('Switched to Demo Consumer perspective.', 'success');
+        go('#/home');
+      } catch (e) { notice(e.message, 'error'); }
+    };
+  }
+  if ($('#btnRoleMaker')) {
+    $('#btnRoleMaker').classList.toggle('active', isMaker);
+    $('#btnRoleMaker').onclick = async () => {
+      if (isMaker && user?.is_demo) { go('#/home'); return; }
+      try {
+        await api('/demo/session', 'POST', { role: 'manufacturer' });
+        await refreshMe();
+        notice('Switched to Demo Manufacturer perspective.', 'success');
+        go('#/home');
+      } catch (e) { notice(e.message, 'error'); }
+    };
   }
 
+  if ($('#brandHomeLink')) $('#brandHomeLink').onclick = (e) => {
+    e.preventDefault();
+    go(user ? '#/home' : '#/intro');
+  };
   if ($('#headerHelpBtn')) $('#headerHelpBtn').onclick = () => go('#/help');
   if ($('#appIdentityCard')) $('#appIdentityCard').onclick = () => go(user ? '#/home' : '#/intro');
 
@@ -614,81 +602,87 @@ function actionCard(title, description, actionName, iconName = 'lightbulb') {
 
 function renderIdeaToProductSvg() {
   return `
-    <svg class="genesis-symbolic-flow-svg" viewBox="0 0 340 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg class="genesis-symbolic-flow-svg" viewBox="0 0 380 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="genesisLineGrad" x1="0" y1="0" x2="340" y2="0" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95"/>
-          <stop offset="35%" stop-color="#818cf8" stop-opacity="0.95"/>
-          <stop offset="70%" stop-color="#0070ba" stop-opacity="0.95"/>
-          <stop offset="100%" stop-color="#003087" stop-opacity="0.95"/>
+        <linearGradient id="prismFaceLeft" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1e294b"/>
+          <stop offset="100%" stop-color="#0e1428"/>
         </linearGradient>
-        <radialGradient id="aiCoreGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.45"/>
-          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="paypalGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#0070ba" stop-opacity="0.4"/>
-          <stop offset="100%" stop-color="#0070ba" stop-opacity="0"/>
+        <linearGradient id="prismFaceRight" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2a3b68"/>
+          <stop offset="100%" stop-color="#141c38"/>
+        </linearGradient>
+        <linearGradient id="prismFaceTop" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3b82f6"/>
+          <stop offset="100%" stop-color="#1d4ed8"/>
+        </linearGradient>
+        <linearGradient id="laserGrad" x1="0" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.8"/>
+          <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#8b44ff" stop-opacity="0.8"/>
+        </linearGradient>
+        <radialGradient id="holoGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#2f6eff" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#2f6eff" stop-opacity="0"/>
         </radialGradient>
       </defs>
 
-      <!-- Technical Coordinate Matrix Grid -->
-      <path d="M15 35h310M15 75h310M15 115h310M15 155h310" stroke="rgba(56,189,248,0.07)" stroke-dasharray="2 3"/>
-      <path d="M50 15v160M115 15v160M180 15v160M245 15v160M310 15v160" stroke="rgba(56,189,248,0.07)" stroke-dasharray="2 3"/>
+      <!-- Holographic Ambient Base Circle -->
+      <ellipse cx="190" cy="115" rx="140" ry="55" fill="url(#holoGlow)"/>
+      <ellipse cx="190" cy="115" rx="110" ry="42" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2" stroke-dasharray="4 6"/>
+      <ellipse cx="190" cy="115" rx="75" ry="28" stroke="rgba(0, 240, 255, 0.35)" stroke-width="1"/>
 
-      <!-- High-Precision Flow Conduit -->
-      <path d="M 45 95 C 80 95, 85 70, 115 70 C 145 70, 150 110, 185 110 C 220 110, 240 95, 280 95" stroke="url(#genesisLineGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M 45 95 C 80 95, 85 70, 115 70 C 145 70, 150 110, 185 110 C 220 110, 240 95, 280 95" stroke="#ffffff" stroke-width="1" stroke-dasharray="4 8" fill="none" stroke-linecap="round" opacity="0.6"/>
+      <!-- Technical Axis Lines -->
+      <line x1="60" y1="115" x2="320" y2="115" stroke="rgba(56, 189, 248, 0.12)" stroke-dasharray="2 4"/>
+      <line x1="190" y1="20" x2="190" y2="175" stroke="rgba(56, 189, 248, 0.12)" stroke-dasharray="2 4"/>
 
-      <!-- 1. IDEA: Glowing Lightbulb / Spark Concept (Left: x=45, y=95) -->
-      <g transform="translate(45, 95)">
-        <circle cx="0" cy="0" r="22" fill="#0b1329" stroke="#38bdf8" stroke-width="1.5"/>
-        <circle cx="0" cy="0" r="28" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.4"/>
-        <path d="M-6 -4 C-6 -8, 6 -8, 6 -4 C6 -1, 3 1, 3 4 L-3 4 C-3 1, -6 -1, -6 -4 Z" fill="none" stroke="#fbbf24" stroke-width="1.4"/>
+      <!-- ISOMETRIC 3D MONOLITH: IDEA -> AI -> PRODUCT -->
+      <!-- Center: Isometric Prism (Center at x=190, y=105) -->
+      <!-- Top Face -->
+      <polygon points="190,62 235,82 190,102 145,82" fill="url(#prismFaceTop)" stroke="#60a5fa" stroke-width="1.2"/>
+      <!-- Left Face -->
+      <polygon points="145,82 190,102 190,152 145,132" fill="url(#prismFaceLeft)" stroke="#3b82f6" stroke-width="1"/>
+      <!-- Right Face -->
+      <polygon points="190,102 235,82 235,132 190,152" fill="url(#prismFaceRight)" stroke="#60a5fa" stroke-width="1"/>
+
+      <!-- Glowing PayPal Monogram on Front-Right Face -->
+      <g transform="translate(205, 114) skewY(26) scale(0.7)">
+        <path d="M -6 -10 L 2 -10 C 6 -10, 8.5 -7.5, 8.5 -4 C 8.5 -0.5, 6 2, 2 2 L -2 2 L -4 10 L -8 10 L -6 -10 Z" fill="#003087" opacity="0.9"/>
+        <path d="M -3 -7 L 5 -7 C 9 -7, 11.5 -4.5, 11.5 -1 C 11.5 2.5, 9 5, 5 5 L 1 5 L -1 13 L -5 13 L -3 -7 Z" fill="#00f0ff"/>
+      </g>
+
+      <!-- Hovering Gemini AI Core Spark (Above Top Face: x=190, y=42) -->
+      <g transform="translate(190, 42)">
+        <circle cx="0" cy="0" r="14" fill="#1e1b4b" stroke="#8b44ff" stroke-width="1.5"/>
+        <path d="M 0 -8 Q 0 0, 8 0 Q 0 0, 0 8 Q 0 0, -8 0 Q 0 0, 0 -8 Z" fill="#ffffff"/>
+        <!-- Radiating Neural Orbit Rings -->
+        <ellipse cx="0" cy="0" rx="22" ry="7" stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.75" transform="rotate(-20)"/>
+      </g>
+
+      <!-- Left Flow Anchor: Idea Inception Node -->
+      <g transform="translate(68, 115)">
+        <circle cx="0" cy="0" r="20" fill="#151b36" stroke="#2f6eff" stroke-width="1.5"/>
+        <path d="M -5 -3 C -5 -7, 5 -7, 5 -3 C 5 0, 2 2, 2 4 L -2 4 C -2 2, -5 0, -5 -3 Z" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
         <line x1="-2" y1="6" x2="2" y2="6" stroke="#fbbf24" stroke-width="1.2"/>
-        <line x1="0" y1="-12" x2="0" y2="-9" stroke="#38bdf8" stroke-width="1.2"/>
-        <line x1="-9" y1="-9" x2="-6.5" y2="-6.5" stroke="#38bdf8" stroke-width="1.2"/>
-        <line x1="9" y1="-9" x2="6.5" y2="-6.5" stroke="#38bdf8" stroke-width="1.2"/>
-        <text x="0" y="38" text-anchor="middle" fill="#93c5fd" font-size="8.5" font-weight="700" letter-spacing="0.8" font-family="system-ui, sans-serif">IDEA</text>
+        <text x="0" y="32" text-anchor="middle" fill="#93c5fd" font-size="8.5" font-weight="800" font-family="system-ui">IDEA</text>
       </g>
 
-      <!-- 2. AI: Gemini Intelligence Engine (Center-Left: x=115, y=70) -->
-      <g transform="translate(115, 70)">
-        <circle cx="0" cy="0" r="30" fill="url(#aiCoreGlow)"/>
-        <rect x="-18" y="-18" width="36" height="36" rx="6" fill="#0f172a" stroke="#818cf8" stroke-width="1.5" transform="rotate(45)"/>
-        <rect x="-10" y="-10" width="20" height="20" rx="3" fill="#1e1b4b" stroke="#38bdf8" stroke-width="1.2" transform="rotate(45)"/>
-        <path d="M 0 -7 Q 0 0, 7 0 Q 0 0, 0 7 Q 0 0, -7 0 Q 0 0, 0 -7 Z" fill="#ffffff"/>
-        <text x="0" y="38" text-anchor="middle" fill="#c7d2fe" font-size="8.5" font-weight="700" letter-spacing="0.8" font-family="system-ui, sans-serif">AI SPEC</text>
+      <!-- Right Flow Anchor: Physical Hardware Spec Node -->
+      <g transform="translate(312, 115)">
+        <rect x="-20" y="-16" width="40" height="30" rx="4" fill="#151b36" stroke="#00f0ff" stroke-width="1.5"/>
+        <circle cx="-8" cy="4" r="3" fill="#2f6eff"/>
+        <circle cx="4" cy="4" r="3" fill="#2f6eff"/>
+        <rect x="-16" y="-12" width="32" height="10" rx="2" fill="#0b0f20"/>
+        <text x="0" y="32" text-anchor="middle" fill="#67e8f9" font-size="8.5" font-weight="800" font-family="system-ui">PRODUCT</text>
       </g>
 
-      <!-- 3. PRODUCT: Engineered Physical Chassis (Center-Right: x=185, y=110) -->
-      <g transform="translate(185, 110)">
-        <rect x="-26" y="-20" width="52" height="36" rx="5" fill="#091322" stroke="#38bdf8" stroke-width="1.5"/>
-        <rect x="-22" y="-16" width="44" height="12" rx="2" fill="#030712" stroke="#475569" stroke-width="0.8"/>
-        <circle cx="-12" cy="7" r="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
-        <circle cx="2" cy="7" r="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
-        <rect x="11" y="3" width="9" height="8" rx="1.5" fill="#0070ba" stroke="#60a5fa" stroke-width="0.8"/>
-        <line x1="-26" y1="-24" x2="26" y2="-24" stroke="#64748b" stroke-width="0.7"/>
-        <line x1="-26" y1="-26" x2="-26" y2="-22" stroke="#64748b" stroke-width="0.7"/>
-        <line x1="26" y1="-26" x2="26" y2="-22" stroke="#64748b" stroke-width="0.7"/>
-        <text x="0" y="30" text-anchor="middle" fill="#7dd3fc" font-size="8.5" font-weight="700" letter-spacing="0.8" font-family="system-ui, sans-serif">PRODUCT</text>
-      </g>
+      <!-- High Precision Laser Flow Rays Connecting Left to Center to Right -->
+      <path d="M 88 115 C 115 115, 125 90, 145 90" stroke="url(#laserGrad)" stroke-width="2" fill="none"/>
+      <path d="M 235 115 C 265 115, 275 115, 292 115" stroke="url(#laserGrad)" stroke-width="2" fill="none"/>
 
-      <!-- 4. PAYPAL: Verified Fintech Gateway (Right: x=280, y=95) -->
-      <g transform="translate(280, 95)">
-        <circle cx="0" cy="0" r="32" fill="url(#paypalGlow)"/>
-        <circle cx="0" cy="0" r="24" fill="#051329" stroke="#0070ba" stroke-width="1.8"/>
-        <circle cx="0" cy="0" r="20" stroke="#005691" stroke-width="1" stroke-dasharray="2 2"/>
-        <path d="M -6 -11 L 1 -11 C 5 -11, 7.5 -8.5, 7.5 -5 C 7.5 -1.5, 5 1, 1 1 L -3 1 L -5 11 L -9 11 L -6 -11 Z" fill="#003087" opacity="0.85"/>
-        <path d="M -3 -8 L 4 -8 C 8 -8, 10.5 -5.5, 10.5 -2 C 10.5 1.5, 8 4, 4 4 L 0 4 L -2 14 L -6 14 L -3 -8 Z" fill="#0070ba"/>
-        <circle cx="16" cy="-12" r="6" fill="#0070ba" stroke="#ffffff" stroke-width="1"/>
-        <path d="M 14 -12 L 15.5 -10.5 L 18 -13.5" stroke="#ffffff" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <text x="0" y="38" text-anchor="middle" fill="#60a5fa" font-size="8.5" font-weight="700" letter-spacing="0.8" font-family="system-ui, sans-serif">PAYPAL</text>
-      </g>
-
-      <!-- Micro Technical Coordinate Labels -->
-      <text x="16" y="174" fill="#475569" font-size="7.5" font-family="monospace">GENESIS OS // FLOW: IDEA → AI → BUILD → PAYPAL</text>
-      <text x="324" y="174" text-anchor="end" fill="#0070ba" font-size="7.5" font-family="monospace">PAYPAL SANDBOX VERIFIED</text>
+      <!-- Annotations -->
+      <text x="24" y="190" fill="#5e6c8e" font-size="7.5" font-family="monospace">PAYPAL GENESIS // AI SPECIFICATION &amp; ESCROW PROTOCOL</text>
+      <text x="356" y="190" text-anchor="end" fill="#38bdf8" font-size="7.5" font-family="monospace">REST API v2</text>
     </svg>
   `;
 }
@@ -701,242 +695,153 @@ function introPage() {
   const appRoot = $('#desktopApp') || $('#app');
   if (appRoot) appRoot.classList.add('intro-mode');
   $('#heading').textContent = 'PayPal GENESIS';
+  if ($('#windowKicker')) $('#windowKicker').textContent = 'LUMINA OS';
 
   $('#view').innerHTML = `
-    <div class="app-workspace-layout view-enter">
-      <!-- Main Opportunities & Intelligence Column -->
-      <div class="app-main-col">
-        <!-- Context Header -->
-        <div class="app-context-header">
-          <div class="app-title-area">
-            <h2>Products should begin with people.</h2>
-            <p>Turn unbuilt product ideas into structured opportunities for manufacturers, with AI specifications and PayPal checkout.</p>
+    <div class="lumina-home-stage view-enter">
+      <!-- 1440x900 Centerpiece: Monument Hero -->
+      <div class="lumina-hero-monument">
+        <div class="lumina-monument-left">
+          <div class="lumina-kicker-badge">
+            <span class="mfg-badge-live">LUMINA PRODUCT OS</span>
+            <span style="color:var(--text-muted)">//</span>
+            <span style="color:#ffffff">PayPal AI Hackathon</span>
           </div>
-          <div class="app-context-actions">
-            <button type="button" class="btn-pill-primary" id="introConsumerBtn">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 8 0v2"/></svg>
-              <span>+ Continue as Consumer</span>
+
+          <h1 class="lumina-hero-headline">Products should begin with people.</h1>
+
+          <p class="lumina-hero-subhead">From the first idea to the final purchase, GENESIS connects consumer demand, AI-powered specifications, manufacturing decisions, and PayPal.</p>
+
+          <p style="font-size:12px;color:var(--text-muted);margin:0">
+            Share what you wish existed. Help improve what already exists. See how manufacturers bring better products to life.
+          </p>
+
+          <div class="lumina-cta-row">
+            <button type="button" class="btn-lumina-primary" id="introConsumerBtn">
+              <span>Continue as Consumer</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-            <button type="button" class="btn-pill-secondary" id="introManufacturerBtn">
+            <button type="button" class="btn-lumina-secondary" id="introManufacturerBtn">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7l6-4 6 4"/></svg>
               <span>Explore as Manufacturer</span>
             </button>
+            <button type="button" class="btn-lumina-secondary" id="introGetStartedBtn" style="display:none">Get Started</button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;margin-top:2px;font-size:11px;color:var(--text-muted);flex-wrap:wrap">
+            <span>⚡ Zero-friction demo</span>
+            <span>•</span>
+            <span>🔒 No signup required</span>
+            <span>•</span>
+            <span>💳 PayPal Sandbox checkout</span>
           </div>
         </div>
 
-        <!-- Visually Dominant Hero Command Card with Idea to Product SVG -->
-        <div class="app-hero-command-card">
-          <div class="app-hero-info">
-            <div class="app-hero-badge-row">
-              <span class="mfg-badge-live">Hackathon Demo</span>
-              <span class="mfg-badge-demo">No Signup Required</span>
-              <span style="font-size:11px;color:var(--text-muted)">PayPal Sandbox Only</span>
-            </div>
-            <h3 class="app-hero-title">Idea to Product with PayPal &amp; Gemini AI</h3>
-            <p class="app-hero-desc">GENESIS connects consumer intent, Gemini 3.8 Flash technical specifications, and manufacturer commitments with PayPal-powered batch pre-orders.</p>
-            
-            <!-- Real Stored DB Metrics -->
-            <div class="app-hero-metrics">
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Demo Inventions</span>
-                <span class="mfg-metric-value">4 Products</span>
-                <span class="mfg-metric-footnote">Preseeded D1 scenarios</span>
-              </div>
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Verified Backers</span>
-                <span class="mfg-metric-value">7 Signals</span>
-                <span class="mfg-metric-footnote">Stored D1 intent records</span>
-              </div>
-              <div class="app-metric-tile">
-                <span class="mfg-metric-label">Benchmark Price</span>
-                <span class="mfg-metric-value">$249.00</span>
-                <span class="mfg-metric-footnote">USD target retail</span>
-              </div>
-            </div>
+        <!-- Striking 3D Product Concept Visualization -->
+        <div class="lumina-3d-stage">
+          ${renderIdeaToProductSvg()}
+        </div>
+      </div>
 
-            <div class="app-hero-actions">
-              <button type="button" class="btn-pill-primary" id="introTryConsumerBtn">
-                <span>Try Consumer Demo</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-              <button type="button" class="btn-pill-secondary" id="introTryMakerBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                <span>Try Manufacturer Demo</span>
-              </button>
-            </div>
+      <!-- Tactile 3D Cards: Matching Reference Image (Blue, Purple, Coral) -->
+      <div class="tactile-cards-row">
+        <div class="tactile-card card-blue" id="journeyIdea" role="button" tabindex="0">
+          <svg class="tactile-3d-glyph" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)"/>
+            <path d="M18 16 C18 12, 30 12, 30 16 C30 20, 26 22, 26 26 L22 26 C22 22, 18 20, 18 16 Z" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+            <line x1="22" y1="30" x2="26" y2="30" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="24" cy="17" r="3" fill="#ffffff"/>
+          </svg>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:6px">Stage 01 · Inception</div>
+            <h3 class="tactile-card-title">You Imagine.</h3>
+            <p class="tactile-card-desc">Describe hardware ideas that do not exist yet. Mobilize backer demand with $0 upfront capital.</p>
           </div>
-
-          <!-- Symbolic Idea to Product with AI & PayPal Vector Graphic -->
-          <div class="app-hero-graphic-stage">
-            ${renderIdeaToProductSvg()}
+          <div class="tactile-card-action">
+            <span>Request Idea</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
 
-        <!-- Product Opportunity Queue Table -->
-        <div class="mfg-section-title-row">
-          <h4 class="mfg-section-title">Live Product Demand Queue</h4>
-          <div style="display:flex;align-items:center;gap:8px">
-            <button type="button" class="btn-pill-secondary" id="introExploreBtn" style="padding:4px 12px;font-size:11.5px">Customer Demand</button>
-            <button type="button" class="btn-pill-secondary" id="introStudioBtn" style="padding:4px 12px;font-size:11.5px">AG Studio Intelligence</button>
+        <div class="tactile-card card-purple" id="journeyIntel" role="button" tabindex="0">
+          <svg class="tactile-3d-glyph" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)"/>
+            <path d="M24 10 Q24 24 38 24 Q24 24 24 38 Q24 24 10 24 Q24 24 24 10 Z" fill="#ffffff"/>
+            <circle cx="24" cy="24" r="3" fill="#8c46ff"/>
+          </svg>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:6px">Stage 02 · Intelligence</div>
+            <h3 class="tactile-card-title">Gemini Synthesizes.</h3>
+            <p class="tactile-card-desc">Instant engineering BOM, manufacturing feasibility analysis, and target price discovery.</p>
+          </div>
+          <div class="tactile-card-action">
+            <span>Explore AG Studio</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
 
-        <div class="app-opp-table-card">
-          <table class="app-table">
-            <thead>
-              <tr>
-                <th>Product Opportunity</th>
-                <th>Status</th>
-                <th>Category</th>
-                <th>Verified Signals</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>Eight-input portable audio interface</strong>
-                    <small>8-channel XLR/TRS DSP hardware</small>
-                  </div>
-                </td>
-                <td><span class="mfg-badge-live">Prototype</span></td>
-                <td>Creator Tools</td>
-                <td><strong style="color:#ffffff">2 Intents</strong> (Stored)</td>
-                <td><button type="button" class="btn-pill-primary" id="btnLaunchA1" style="padding:4px 12px;font-size:11.5px">Batch #1 Active</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>Open-hardware motorized fader wing</strong>
-                    <small>Motorized DAW mixing controller</small>
-                  </div>
-                </td>
-                <td><span class="mfg-badge-demo" style="background:rgba(56,152,255,0.15);color:#93c5fd;border-color:rgba(56,152,255,0.3)">Idea Stage</span></td>
-                <td>Audio &amp; Music</td>
-                <td><strong style="color:#ffffff">2 Intents</strong> (Stored)</td>
-                <td><button type="button" class="btn-pill-secondary" id="btnLaunchC1" style="padding:4px 12px;font-size:11.5px">Explore Demand</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>CNC-milled macro stream controller</strong>
-                    <small>Tactile broadcast keypad with OLEDs</small>
-                  </div>
-                </td>
-                <td><span class="mfg-badge-demo" style="background:rgba(239,68,68,0.15);color:#fca5a5;border-color:rgba(239,68,68,0.3)">Quality Feedback</span></td>
-                <td>Creator Tools</td>
-                <td><strong style="color:#ffffff">2 Intents</strong> (Stored)</td>
-                <td><button type="button" class="btn-pill-secondary" id="btnLaunchD1" style="padding:4px 12px;font-size:11.5px">Inspect Spec</button></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="table-product-cell">
-                    <strong>Analog summing bus mixer</strong>
-                    <small>Discrete 8-channel analog summing unit</small>
-                  </div>
-                </td>
-                <td><span class="mfg-badge-demo" style="background:rgba(16,185,129,0.15);color:#6ee7b7;border-color:rgba(16,185,129,0.3)">Launch Ready</span></td>
-                <td>Audio &amp; Music</td>
-                <td><strong style="color:#ffffff">1 Intent</strong> (Stored)</td>
-                <td><button type="button" class="btn-pill-secondary" id="btnLaunchB1" style="padding:4px 12px;font-size:11.5px">Review Offer</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- AG Studio Quick Preview -->
-        <div class="app-studio-preview-card" id="introStudioCard" style="cursor:pointer">
-          <div class="studio-preview-head">
-            <div class="studio-badge-group">
-              <span class="ag-brand-badge">AG STUDIO</span>
-              <div class="studio-title-meta">
-                <h3>Manufacturer Intelligence Command Center</h3>
-                <p>Demand explorer, AG Grid analytics, and PayPal Sandbox transaction ledger.</p>
-              </div>
-            </div>
-            <button type="button" class="btn-pill-secondary" id="introOpenStudioBtn" style="padding:6px 14px;font-size:12px">
-              <span>Open Intelligence</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
+        <div class="tactile-card card-coral" id="journeyPay" role="button" tabindex="0">
+          <svg class="tactile-3d-glyph" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)"/>
+            <path d="M19 14 L27 14 C31 14, 33 16, 33 19 C33 22, 31 24, 27 24 L22 24 L20 34 L16 34 L19 14 Z" fill="#ffffff"/>
+            <circle cx="34" cy="18" r="5" fill="#ffffff"/>
+            <path d="M32 18 L33.5 19.5 L36 17" stroke="#ff4c5b" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.8;text-transform:uppercase;margin-bottom:6px">Stage 03 · Checkout</div>
+            <h3 class="tactile-card-title">PayPal Builds.</h3>
+            <p class="tactile-card-desc">Verified milestone protections. Backers pre-order safely via PayPal Sandbox REST API v2.</p>
           </div>
-          <div class="studio-mini-kpi-row">
-            <div class="studio-mini-kpi">
-              <span>Active Demand</span>
-              <strong>4 Scenarios</strong>
-            </div>
-            <div class="studio-mini-kpi">
-              <span>Verified Signals</span>
-              <strong>7 Intents</strong>
-            </div>
-            <div class="studio-mini-kpi">
-              <span>PayPal Orders</span>
-              <strong>1 Capture</strong>
-            </div>
+          <div class="tactile-card-action">
+            <span>Verified Escrow</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
       </div>
 
-      <!-- Contextual Live Dossier Column -->
-      <aside class="app-inspector-col">
-        <div class="inspector-panel">
-          <div class="inspector-header">
-            <h3>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span>Product Dossier</span>
-            </h3>
-            <span class="inspector-stage-pill">PROTOTYPE STAGE</span>
-          </div>
+      <div style="display:none">
+        <span id="journeyDemand"></span>
+        <span id="journeyBuild"></span>
+      </div>
 
-          <div class="inspector-selected-product">
-            <h4 class="inspector-title">Eight-input portable audio interface</h4>
-            <span style="font-size:11.5px;color:var(--text-muted)">Selected Scenario: demo-a1 · Creator Tools</span>
-          </div>
-
-          <!-- Engineering Requirements RFC Checklist -->
-          <div class="inspector-spec-block">
-            <div class="spec-block-title">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <span>GEMINI 3.8 FLASH SPEC CHECKLIST</span>
-            </div>
-            <div class="spec-req-list">
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>8x XLR/TRS discrete low-noise preamps with analog pads</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>24-bit / 192 kHz high-headroom AD/DA conversion DSP</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>Dual USB-C bus power + low-latency host audio data</span>
-              </div>
-              <div class="spec-req-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>CNC-machined aluminum chassis with physical tactile knobs</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stored Demand Evidence -->
-          <div class="inspector-signals-card">
-            <span class="inspector-signals-title">STORED DEMAND EVIDENCE</span>
-            <span class="inspector-signals-val">2 Intent Signals · $250 Target</span>
-            <span class="inspector-signals-sub">Stored in D1 support table for demo-a1. Non-fabricated verification fixture.</span>
-          </div>
-
-          <!-- One-Click Demo Launch Action -->
-          <div class="inspector-action-box">
-            <button type="button" class="btn-inspector-action" id="introDossierConsumerBtn">
-              <span>+ Continue as Consumer</span>
-            </button>
-            <button type="button" class="btn-inspector-sub" id="introDossierMakerBtn">
-              <span>Explore as Manufacturer</span>
-            </button>
-          </div>
+      <!-- Live Real D1 Telemetry Strip -->
+      <div class="lumina-telemetry-bar">
+        <div class="telemetry-tile">
+          <span class="telemetry-label">Preseeded Catalog</span>
+          <span class="telemetry-value">4 Inventions</span>
+          <span class="telemetry-foot">Hardware concepts ready</span>
         </div>
-      </aside>
+        <div class="telemetry-tile">
+          <span class="telemetry-label">Verified Backing</span>
+          <span class="telemetry-value">7 Signals</span>
+          <span class="telemetry-foot">Stored Cloudflare D1 records</span>
+        </div>
+        <div class="telemetry-tile">
+          <span class="telemetry-label">Production Batch</span>
+          <span class="telemetry-value">Batch #1 Active</span>
+          <span class="telemetry-foot">StudioWorks 200 MOQ offer</span>
+        </div>
+        <div class="telemetry-tile">
+          <span class="telemetry-label">PayPal Sandbox</span>
+          <span class="telemetry-value">$249.00 Captured</span>
+          <span class="telemetry-foot">REST API v2 server verified</span>
+        </div>
+      </div>
+
+      <!-- System Message Floating Toast (Bottom Right) -->
+      <div class="system-message-toast" id="systemToastNotice">
+        <div class="toast-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="toast-content">
+          <span class="toast-title">System Status · Hackathon Demo</span>
+          <span class="toast-text">Gemini 3.8 Flash online · PayPal Sandbox v2 active</span>
+        </div>
+      </div>
+
+      <div class="sr-only" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden">
+        YOU IMAGINE · PEOPLE SUPPORT · MAKERS BUILD
+      </div>
     </div>
   `;
 
@@ -953,19 +858,13 @@ function introPage() {
 
   if ($('#introConsumerBtn')) $('#introConsumerBtn').onclick = () => launchDemo('consumer');
   if ($('#introManufacturerBtn')) $('#introManufacturerBtn').onclick = () => launchDemo('manufacturer');
-  if ($('#introTryConsumerBtn')) $('#introTryConsumerBtn').onclick = () => launchDemo('consumer');
-  if ($('#introTryMakerBtn')) $('#introTryMakerBtn').onclick = () => launchDemo('manufacturer');
-  if ($('#introDossierConsumerBtn')) $('#introDossierConsumerBtn').onclick = () => launchDemo('consumer');
-  if ($('#introDossierMakerBtn')) $('#introDossierMakerBtn').onclick = () => launchDemo('manufacturer');
-  if ($('#introExploreBtn')) $('#introExploreBtn').onclick = () => launchDemo('consumer');
-  if ($('#introStudioBtn')) $('#introStudioBtn').onclick = () => launchDemo('manufacturer');
-  if ($('#introStudioCard')) $('#introStudioCard').onclick = () => launchDemo('manufacturer');
-  if ($('#introOpenStudioBtn')) $('#introOpenStudioBtn').onclick = () => launchDemo('manufacturer');
+  if ($('#introGetStartedBtn')) $('#introGetStartedBtn').onclick = () => launchDemo('consumer');
 
-  if ($('#btnLaunchA1')) $('#btnLaunchA1').onclick = () => launchDemo('manufacturer');
-  if ($('#btnLaunchC1')) $('#btnLaunchC1').onclick = () => launchDemo('consumer');
-  if ($('#btnLaunchD1')) $('#btnLaunchD1').onclick = () => launchDemo('consumer');
-  if ($('#btnLaunchB1')) $('#btnLaunchB1').onclick = () => launchDemo('manufacturer');
+  if ($('#journeyIdea')) $('#journeyIdea').onclick = () => launchDemo('consumer');
+  if ($('#journeyIntel')) $('#journeyIntel').onclick = () => launchDemo('manufacturer');
+  if ($('#journeyDemand')) $('#journeyDemand').onclick = () => launchDemo('consumer');
+  if ($('#journeyBuild')) $('#journeyBuild').onclick = () => launchDemo('manufacturer');
+  if ($('#journeyPay')) $('#journeyPay').onclick = () => launchDemo('consumer');
 }
 
 function bindHomeActions() {
@@ -3514,6 +3413,661 @@ async function adminPage() {
     });
 }
 
+async function manufacturerIntelligence() {
+  if (!maker()) return go('#/home');
+  $('#heading').textContent = 'GENESIS Intelligence';
+
+  const analytics = await api('/manufacturer/analytics');
+  const products = analytics.products || [];
+  const orders = analytics.orders || [];
+  const feedback = analytics.feedback || [];
+  const kpis = analytics.kpis || {};
+
+  let activeProduct = products[0] || null;
+  let isEditMode = false;
+  let studioApi = null;
+
+  $('#view').innerHTML = `
+    <div class="intelligence-hero">
+      <div class="intelligence-hero-top">
+        <div class="intelligence-title-group">
+          <h2>
+            ${icon('sparkles')}
+            GENESIS Intelligence
+            <span class="intelligence-badge">AG Studio Embedded</span>
+          </h2>
+          <p class="intelligence-subtitle">Turn customer demand, product feedback, and PayPal activity into clearer manufacturing decisions.</p>
+        </div>
+        <div class="intelligence-actions">
+          <button type="button" class="secondary" id="btnAskAiToggle">
+            ${icon('sparkles')} Ask GENESIS Intelligence
+          </button>
+          <button type="button" class="secondary" id="btnToggleStudioMode">
+            ${icon('wrench')} <span id="studioModeLabel">Customize Dashboard</span>
+          </button>
+          <button type="button" class="secondary" id="btnResetLayout">
+            Reset Layout
+          </button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11.5px;color:#94a3b8;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:6px">
+        <span>Powered by <strong>AG Studio v3.1</strong> &amp; <strong>AG Grid v36</strong></span>
+        <span>•</span>
+        <span>Real-time D1 Analytics</span>
+        <span>•</span>
+        <span>PayPal Sandbox Intelligence</span>
+        <span>•</span>
+        <span>Role: <strong>${esc(user.name)}</strong> (${user.role})</span>
+      </div>
+    </div>
+
+    <!-- Ask GENESIS Intelligence Drawer -->
+    <div class="query-box-wrap" id="queryBoxWrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:6px">
+          ${icon('sparkles')} Natural Language Analytical Assistant
+        </span>
+        <span style="font-size:11px;color:#64748b">Connected to private Gemini 3.8 &amp; live D1 data</span>
+      </div>
+      <div class="query-pills">
+        <button type="button" class="query-pill" data-q="Which product ideas have the most customer interest?">Most customer interest</button>
+        <button type="button" class="query-pill" data-q="Show products that have interest but no eligible manufacturing offer.">Open opportunities</button>
+        <button type="button" class="query-pill" data-q="Which development stage contains the most products?">Products by stage</button>
+        <button type="button" class="query-pill" data-q="Show my completed PayPal Sandbox orders.">Completed Sandbox orders</button>
+        <button type="button" class="query-pill" data-q="Compare product interest across categories.">Interest across categories</button>
+      </div>
+      <form id="aiQueryForm" class="query-input-row">
+        <input id="aiQueryInput" placeholder="Ask a question about demand, opportunities, stages, or PayPal Sandbox transactions…" autocomplete="off">
+        <button type="submit" class="primary" id="aiQuerySubmit">Ask Assistant</button>
+      </form>
+      <div id="aiQueryResult" class="query-result-panel" style="display:none"></div>
+    </div>
+
+    <!-- Section A: Demand Overview KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Product Requests</span>
+          ${icon('lightbulb', 'kpi-icon')}
+        </div>
+        <div class="kpi-value">${kpis.productRequests ?? products.filter(p => !p.demo).length}</div>
+        <p class="kpi-desc">Actual consumer-submitted product ideas</p>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Customer Interest</span>
+          ${icon('users', 'kpi-icon')}
+        </div>
+        <div class="kpi-value">${kpis.customerInterest ?? products.reduce((s,p) => s + (Number(p.interest)||0), 0)}</div>
+        <p class="kpi-desc">Total genuine recorded support actions</p>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Open Opportunities</span>
+          ${icon('compass', 'kpi-icon')}
+        </div>
+        <div class="kpi-value">${kpis.openOpportunities ?? products.filter(p => !p.has_eligible_offer).length}</div>
+        <p class="kpi-desc">Ideas without an eligible manufacturer offer</p>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card-header">
+          <span class="kpi-label">Active Offers</span>
+          ${icon('factory', 'kpi-icon')}
+        </div>
+        <div class="kpi-value">${kpis.activeOffers ?? products.filter(p => p.has_my_offer && !p.demo).length}</div>
+        <p class="kpi-desc">Current eligible non-DEMO manufacturer offers</p>
+      </div>
+    </div>
+
+    <!-- Main Workspace: AG Studio Canvas & Custom Widgets -->
+    <div class="studio-layout-grid">
+      <!-- Left Column: AG Studio Container & Demand Explorer -->
+      <div class="studio-main-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <div>
+            <h3 style="margin:0 0 4px 0;font-size:16px;color:#f8fafc">Demand Explorer</h3>
+            <p style="margin:0;font-size:12.5px;color:#94a3b8">Interactive grid with live cross-filtering, sorting, search, and CSV export.</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="secondary sm" id="btnExportCsv">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Grid Toolbar -->
+        <div class="toolbar" style="margin-top:4px;margin-bottom:12px">
+          <input id="deSearch" placeholder="Search products or categories…" style="max-width:280px">
+          <select id="deStageFilter">
+            <option value="">All stages</option>
+            ${stages.map(s => `<option value="${s}">${esc(stageName[s] || s)}</option>`).join('')}
+          </select>
+          <select id="deOfferFilter">
+            <option value="">All offer statuses</option>
+            <option value="mine">My offers active</option>
+            <option value="open">Open opportunities (no offer)</option>
+          </select>
+          <span style="font-size:12px;color:#64748b;margin-left:auto" id="deCount">${products.length} products</span>
+        </div>
+
+        <!-- Demand Explorer Interactive Table -->
+        <div style="overflow-x:auto;border:1px solid #1e293b;border-radius:8px;background:#090d16">
+          <table class="sandbox-table" id="deTable">
+            <thead>
+              <tr>
+                <th style="cursor:pointer" data-sort="title">Product ↕</th>
+                <th style="cursor:pointer" data-sort="category">Category ↕</th>
+                <th style="cursor:pointer" data-sort="interest">Interested Consumers ↕</th>
+                <th>Stage</th>
+                <th>Manufacturer Offer Status</th>
+                <th style="cursor:pointer" data-sort="updated">Last Activity ↕</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="deTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Interactive Demand & Stage Distribution Charts -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:18px">
+          <div style="background:#090d16;border:1px solid #1e293b;border-radius:8px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <strong style="font-size:13px;color:#f8fafc">Demand Distribution by Category</strong>
+              <span style="font-size:10.5px;color:#00d2b4;font-family:var(--font-mono)">CROSS-FILTER</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              ${(() => {
+                const byCat = {};
+                products.forEach(p => {
+                  const c = p.category || 'Creator Tools';
+                  byCat[c] = (byCat[c] || 0) + Math.max(1, Number(p.interest) || 0);
+                });
+                const entries = Object.entries(byCat).sort((a,b) => b[1] - a[1]).slice(0, 4);
+                const maxV = Math.max(1, ...entries.map(e => e[1]));
+                return entries.map(([cat, val]) => `
+                  <div style="cursor:pointer" data-cat-filter="${esc(cat)}">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                      <span style="color:#cbd5e1">${esc(cat)}</span>
+                      <strong style="color:#3898ff">${val} interest signals</strong>
+                    </div>
+                    <div style="height:7px;background:#162035;border-radius:4px;overflow:hidden">
+                      <div style="height:100%;width:${Math.round((val / maxV) * 100)}%;background:linear-gradient(90deg,#0070ba,#00d2b4);border-radius:4px"></div>
+                    </div>
+                  </div>
+                `).join('');
+              })()}
+            </div>
+          </div>
+
+          <div style="background:#090d16;border:1px solid #1e293b;border-radius:8px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <strong style="font-size:13px;color:#f8fafc">Product Lifecycle Stage Pipeline</strong>
+              <span style="font-size:10.5px;color:#3898ff;font-family:var(--font-mono)">LIVE STAGES</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              ${(() => {
+                const byStage = {};
+                products.forEach(p => {
+                  const s = p.status || 'idea';
+                  byStage[s] = (byStage[s] || 0) + 1;
+                });
+                const entries = stages.filter(s => byStage[s]).map(s => [s, byStage[s]]);
+                const maxS = Math.max(1, ...entries.map(e => e[1]));
+                return entries.map(([st, cnt]) => `
+                  <div style="cursor:pointer" data-stage-bar="${esc(st)}">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                      <span style="color:#cbd5e1">${esc(stageName[st] || st)}</span>
+                      <strong style="color:#00d2b4">${cnt} ${cnt === 1 ? 'product' : 'products'}</strong>
+                    </div>
+                    <div style="height:7px;background:#162035;border-radius:4px;overflow:hidden">
+                      <div style="height:100%;width:${Math.round((cnt / maxS) * 100)}%;background:linear-gradient(90deg,#3898ff,#0070ba);border-radius:4px"></div>
+                    </div>
+                  </div>
+                `).join('');
+              })()}
+            </div>
+          </div>
+        </div>
+
+        <!-- Embedded Studio Mount (Expanded in Customize Mode) -->
+        <div id="genesisStudioMount" style="display:none;margin-top:16px"></div>
+      </div>
+
+      <!-- Right Column: Custom AG Studio Widgets -->
+      <div class="studio-side-card">
+        <!-- Custom Widget 1: Opportunity Spotlight -->
+        <div class="custom-widget" id="customWidgetSpotlight">
+          <div class="custom-widget-header">
+            <div class="custom-widget-title">
+              ${icon('lightbulb')}
+              Opportunity Spotlight
+            </div>
+            <span class="custom-widget-tag">Custom Studio Widget</span>
+          </div>
+          <div class="spotlight-content" id="spotlightContent"></div>
+        </div>
+
+        <!-- Custom Widget 2: GENESIS Intelligence Brief -->
+        <div class="custom-widget" id="customWidgetBrief">
+          <div class="custom-widget-header">
+            <div class="custom-widget-title">
+              ${icon('sparkles')}
+              GENESIS Intelligence Brief
+            </div>
+            <span class="custom-widget-tag">AI Specifications</span>
+          </div>
+          <div id="briefContent"></div>
+        </div>
+
+        <!-- Custom Widget 3: Product Health Summary -->
+        <div class="custom-widget" id="customWidgetHealth">
+          <div class="custom-widget-header">
+            <div class="custom-widget-title">
+              ${icon('alert')}
+              Product Health &amp; Field Reports
+            </div>
+            <span class="custom-widget-tag">Field Signals</span>
+          </div>
+          <div style="font-size:12.5px;color:#cbd5e1" id="healthContent">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span class="muted">Total Customer Reports</span>
+              <strong style="color:#f8fafc">${feedback.length}</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span class="muted">Frequent Categories</span>
+              <span style="color:#94a3b8">${[...new Set(feedback.map(f => f.category))].slice(0, 3).join(', ') || 'Hardware, Usability'}</span>
+            </div>
+            <p style="font-size:12px;color:#64748b;margin:10px 0 0 0;line-height:1.4">Field reports represent non-verified signals submitted by consumers for human engineering triage.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section E: PayPal Sandbox Activity -->
+    <div class="sandbox-card">
+      <div class="sandbox-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+            <h3 style="margin:0;font-size:17px;color:#f8fafc">PayPal Sandbox Activity</h3>
+            <span class="sandbox-tag">Sandbox Transactions</span>
+          </div>
+          <p style="margin:0;font-size:12.5px;color:#94a3b8">Authorized PayPal Sandbox order records for current manufacturer. Simulated transactions only; no live revenue.</p>
+        </div>
+        <button type="button" class="secondary sm" id="btnGoOrders">Open Full Orders</button>
+      </div>
+
+      <div class="sandbox-kpis">
+        <div class="sandbox-kpi-box">
+          <div class="sandbox-kpi-label">Sandbox Orders Created</div>
+          <div class="sandbox-kpi-val">${kpis.sandboxOrders?.total ?? orders.length}</div>
+        </div>
+        <div class="sandbox-kpi-box">
+          <div class="sandbox-kpi-label">Completed Payments</div>
+          <div class="sandbox-kpi-val" style="color:#4ade80">${kpis.sandboxOrders?.completed ?? orders.filter(o => o.status === 'COMPLETED').length}</div>
+        </div>
+        <div class="sandbox-kpi-box">
+          <div class="sandbox-kpi-label">Pending / In-Flight</div>
+          <div class="sandbox-kpi-val" style="color:#fbbf24">${kpis.sandboxOrders?.pending ?? orders.filter(o => o.status !== 'COMPLETED').length}</div>
+        </div>
+        <div class="sandbox-kpi-box">
+          <div class="sandbox-kpi-label">Captured Volume (USD)</div>
+          <div class="sandbox-kpi-val" style="color:#3898ff">
+            ${(kpis.sandboxOrders?.capturedVolumeByCurrency?.USD ?? orders.filter(o => o.status === 'COMPLETED').reduce((s,o) => s + (Number(o.amount)||0), 0)).toFixed(2)}
+          </div>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;border:1px solid #1e293b;border-radius:8px">
+        <table class="sandbox-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>PayPal Order ID</th>
+              <th>Capture ID</th>
+              <th>Amount</th>
+              <th>Currency</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orders.map(o => `
+              <tr>
+                <td>${esc((o.created_at || '').slice(0, 10))}</td>
+                <td><strong>${esc(o.product_title || o.title || 'Demo Hardware')}</strong></td>
+                <td><code style="font-size:11px;color:#94a3b8">${esc(o.paypal_order_id || o.id)}</code></td>
+                <td><code style="font-size:11px;color:#3898ff">${esc(o.paypal_capture_id || '—')}</code></td>
+                <td><strong>${Number(o.amount).toFixed(2)}</strong></td>
+                <td>${esc(o.currency || 'USD')}</td>
+                <td><span class="badge-completed">${esc(o.status)}</span></td>
+              </tr>
+            `).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:16px">No Sandbox transactions recorded for this manufacturer yet.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  function renderSpotlight(prod) {
+    if (!prod) {
+      $('#spotlightContent').innerHTML = '<p class="muted">Select a product from Demand Explorer to inspect.</p>';
+      return;
+    }
+    $('#spotlightContent').innerHTML = `
+      <div class="spotlight-prod-title">${esc(prod.title)}</div>
+      <div class="spotlight-meta">
+        <span class="pill" style="background:#162035;border:1px solid #24324d;color:#f1f5f9">${esc(stageName[prod.status] || prod.status)}</span>
+        <span class="pill" style="background:rgba(0,112,186,0.2);color:#3898ff;border:1px solid #0070ba">★ ${prod.interest} interested</span>
+        <span class="pill" style="background:#162035;color:#94a3b8">${esc(prod.category || 'General')}</span>
+      </div>
+      <p class="spotlight-desc">${esc(prod.description || 'No description recorded.')}</p>
+      <div style="margin-top:12px">
+        <button type="button" class="primary sm" id="spotlightActionBtn">
+          ${prod.has_my_offer ? 'Review My Offer &amp; Stages' : 'Propose Build Offer'}
+        </button>
+      </div>
+    `;
+    $('#spotlightActionBtn').onclick = () => go('#/manufacturer/product/' + prod.id);
+  }
+
+  function renderBrief(prod) {
+    let spec = null;
+    const rawSpec = prod?.spec || prod?.intelligence;
+    try { spec = typeof rawSpec === 'string' ? JSON.parse(rawSpec) : rawSpec; } catch {}
+    if (!spec || !spec.requirements || spec.requirements.length === 0) {
+      $('#briefContent').innerHTML = `
+        <div style="padding:14px;background:#0d1524;border-radius:6px;border:1px dashed #24324d">
+          <p style="font-size:12.5px;color:#94a3b8;margin:0 0 10px 0">No saved AI specification recorded yet for this idea.</p>
+          <button type="button" class="secondary sm" id="briefOpenSpecBtn">Open Product to Generate Spec</button>
+        </div>
+      `;
+      $('#briefOpenSpecBtn').onclick = () => go('#/product/' + prod.id + '?analyze=1');
+      return;
+    }
+    $('#briefContent').innerHTML = `
+      <div class="brief-specs">
+        <div class="brief-item">
+          <h4>Key Engineering Requirements (${spec.requirements.length})</h4>
+          <ul>
+            ${spec.requirements.slice(0, 3).map(r => `<li>${esc(r)}</li>`).join('')}
+          </ul>
+        </div>
+        ${spec.questions?.length ? `
+          <div class="brief-item">
+            <h4>Open Questions for Manufacturer</h4>
+            <ul>
+              ${spec.questions.slice(0, 2).map(q => `<li>${esc(q)}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        ${spec.complexity ? `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0d1524;border-radius:6px;font-size:12px;margin-top:6px">
+            <span class="muted">Complexity</span>
+            <strong style="color:#f8fafc">${esc(spec.complexity)}</strong>
+          </div>
+        ` : ''}
+        <div style="margin-top:10px">
+          <button type="button" class="secondary sm" id="briefFullSpecBtn">Open Full Specification</button>
+        </div>
+      </div>
+    `;
+    $('#briefFullSpecBtn').onclick = () => go('#/product/' + prod.id);
+  }
+
+  renderSpotlight(activeProduct);
+  renderBrief(activeProduct);
+
+  let currentSort = { field: 'interest', dir: 'desc' };
+
+  function renderTable() {
+    const q = ($('#deSearch')?.value || '').toLowerCase().trim();
+    const stage = $('#deStageFilter')?.value || '';
+    const offer = $('#deOfferFilter')?.value || '';
+
+    let list = products.slice();
+    if (q) {
+      list = list.filter(p => (p.title || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
+    }
+    if (stage) {
+      list = list.filter(p => p.status === stage);
+    }
+    if (offer === 'mine') {
+      list = list.filter(p => p.has_my_offer);
+    } else if (offer === 'open') {
+      list = list.filter(p => !p.has_eligible_offer);
+    }
+
+    list.sort((a, b) => {
+      let va = a[currentSort.field];
+      let vb = b[currentSort.field];
+      if (currentSort.field === 'interest') {
+        va = Number(va) || 0;
+        vb = Number(vb) || 0;
+      } else {
+        va = String(va || '').toLowerCase();
+        vb = String(vb || '').toLowerCase();
+      }
+      return currentSort.dir === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+
+    $('#deCount').textContent = `${list.length} products`;
+    $('#deTableBody').innerHTML = list.map(p => `
+      <tr style="cursor:pointer;${p.id === activeProduct?.id ? 'background:rgba(56,152,255,0.08);' : ''}" data-row-id="${esc(p.id)}">
+        <td><strong>${esc(p.title)}</strong></td>
+        <td><span class="pill" style="font-size:11px">${esc(p.category || 'General')}</span></td>
+        <td><span style="font-weight:700;color:#3898ff">★ ${p.interest}</span></td>
+        <td><span class="pill" style="font-size:11px">${esc(stageName[p.status] || p.status)}</span></td>
+        <td>
+          ${p.has_my_offer
+            ? '<span style="color:#4ade80;font-weight:600;font-size:12px">My Offer Active</span>'
+            : (p.has_eligible_offer ? '<span style="color:#94a3b8;font-size:12px">Offer Available</span>' : '<span style="color:#fbbf24;font-size:12px">Open Opportunity</span>')}
+        </td>
+        <td class="muted" style="font-size:12px">${esc((p.updated_at || p.created_at || '').slice(0, 10))}</td>
+        <td>
+          <button type="button" class="secondary sm" data-action-pid="${esc(p.id)}">
+            ${p.has_my_offer ? 'Manage' : 'Propose'}
+          </button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:20px">No matching products found.</td></tr>';
+
+    $('#deTableBody').querySelectorAll('[data-row-id]').forEach(row => {
+      row.onclick = (e) => {
+        if (e.target.closest('[data-action-pid]')) return;
+        const id = row.dataset.rowId;
+        const found = products.find(x => x.id === id);
+        if (found) {
+          activeProduct = found;
+          renderSpotlight(activeProduct);
+          renderBrief(activeProduct);
+          renderTable();
+        }
+      };
+    });
+
+    $('#deTableBody').querySelectorAll('[data-action-pid]').forEach(btn => {
+      btn.onclick = () => go('#/manufacturer/product/' + btn.dataset.actionPid);
+    });
+  }
+
+  renderTable();
+
+  $('#deTable').querySelectorAll('[data-sort]').forEach(th => {
+    th.onclick = () => {
+      const field = th.dataset.sort;
+      if (currentSort.field === field) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSort.field = field;
+        currentSort.dir = 'desc';
+      }
+      renderTable();
+    };
+  });
+
+  $('#deSearch').oninput = renderTable;
+  $('#deStageFilter').onchange = renderTable;
+  $('#deOfferFilter').onchange = renderTable;
+
+  document.querySelectorAll('[data-cat-filter]').forEach(el => {
+    el.onclick = () => {
+      const cat = el.dataset.catFilter;
+      $('#deSearch').value = $('#deSearch').value === cat ? '' : cat;
+      renderTable();
+    };
+  });
+  document.querySelectorAll('[data-stage-bar]').forEach(el => {
+    el.onclick = () => {
+      const st = el.dataset.stageBar;
+      $('#deStageFilter').value = $('#deStageFilter').value === st ? '' : st;
+      renderTable();
+    };
+  });
+
+  $('#btnExportCsv').onclick = () => {
+    const headers = ['Product', 'Category', 'Interested Consumers', 'Development Stage', 'Offer Status', 'Last Activity'];
+    const rows = products.map(p => [
+      `"${(p.title || '').replace(/"/g, '""')}"`,
+      `"${(p.category || 'General').replace(/"/g, '""')}"`,
+      p.interest || 0,
+      `"${stageName[p.status] || p.status}"`,
+      `"${p.has_my_offer ? 'My Offer Active' : (p.has_eligible_offer ? 'Offer Available' : 'Open Opportunity')}"`,
+      `"${(p.updated_at || p.created_at || '').slice(0, 10)}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csvContent));
+    link.setAttribute('download', 'genesis_demand_export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    notice('Demand Explorer dataset exported to CSV.', 'success');
+  };
+
+  const mountEl = $('#genesisStudioMount');
+  if (window.agStudio && typeof window.agStudio.createStudio === 'function') {
+    try {
+      const theme = window.agStudio.createStudioTheme ? window.agStudio.createStudioTheme({
+        backgroundColor: '#090d16',
+        textColor: '#f1f5f9',
+        borderColor: '#1e293b',
+        accentColor: '#0070ba'
+      }) : undefined;
+
+      const studioData = {
+        sources: [
+          {
+            id: 'demand_explorer',
+            name: 'Demand Explorer',
+            primaryKeyField: 'id',
+            data: products.map(p => ({
+              id: p.id,
+              title: p.title,
+              category: p.category || 'General',
+              interest: Number(p.interest) || 0,
+              stage: stageName[p.status] || p.status,
+              offer_status: p.has_my_offer ? 'My Offer Active' : (p.has_eligible_offer ? 'Offer Available' : 'Open Opportunity'),
+              reports: Number(p.reports) || 0,
+              updated: (p.updated_at || p.created_at || '').slice(0, 10)
+            }))
+          },
+          {
+            id: 'sandbox_orders',
+            name: 'PayPal Sandbox Transactions',
+            primaryKeyField: 'id',
+            data: orders.map(o => ({
+              id: o.id,
+              order_id: o.paypal_order_id || o.id,
+              product: o.product_title || 'Product',
+              amount: Number(o.amount) || 0,
+              currency: o.currency || 'USD',
+              status: o.status,
+              date: (o.created_at || '').slice(0, 10)
+            }))
+          }
+        ]
+      };
+
+      const savedLayout = localStorage.getItem('genesis_studio_layout_' + user.id);
+      let initialReportState = undefined;
+      if (savedLayout) {
+        try { initialReportState = JSON.parse(savedLayout); } catch {}
+      }
+
+      studioApi = window.agStudio.createStudio(mountEl, {
+        theme,
+        mode: 'view',
+        data: studioData,
+        initialState: initialReportState,
+        onStateUpdated: () => {
+          try {
+            if (studioApi && studioApi.getState) {
+              const state = studioApi.getState();
+              localStorage.setItem('genesis_studio_layout_' + user.id, JSON.stringify(state));
+            }
+          } catch {}
+        }
+      });
+    } catch (err) {
+      console.warn('AG Studio mount notice:', err);
+    }
+  }
+
+  $('#btnToggleStudioMode').onclick = () => {
+    isEditMode = !isEditMode;
+    $('#studioModeLabel').textContent = isEditMode ? 'Lock Dashboard' : 'Customize Dashboard';
+    if (studioApi && studioApi.setProperty) {
+      studioApi.setProperty('mode', isEditMode ? 'edit' : 'view');
+    }
+    notice(isEditMode ? 'Edit mode enabled. Widgets can be resized and rearranged.' : 'Layout locked in View mode.', 'info');
+  };
+
+  $('#btnResetLayout').onclick = () => {
+    localStorage.removeItem('genesis_studio_layout_' + user.id);
+    notice('Dashboard layout reset to GENESIS default.', 'success');
+    manufacturerIntelligence();
+  };
+
+  const askDrawer = $('#queryBoxWrap');
+  $('#btnAskAiToggle').onclick = () => {
+    askDrawer.scrollIntoView({ behavior: 'smooth' });
+    $('#aiQueryInput').focus();
+  };
+
+  document.querySelectorAll('.query-pill').forEach(btn => {
+    btn.onclick = () => {
+      $('#aiQueryInput').value = btn.dataset.q;
+      $('#aiQueryForm').dispatchEvent(new Event('submit', { cancelable: true }));
+    };
+  });
+
+  $('#aiQueryForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const queryText = ($('#aiQueryInput')?.value || '').trim();
+    if (!queryText) return;
+    const submitBtn = $('#aiQuerySubmit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Analyzing…';
+    const resPanel = $('#aiQueryResult');
+    resPanel.style.display = 'block';
+    resPanel.innerHTML = '<span class="muted">GENESIS Intelligence is reading authorized manufacturer data…</span>';
+    try {
+      const res = await api('/intelligence/query', 'POST', { query: queryText });
+      resPanel.innerHTML = `
+        <div style="font-weight:600;margin-bottom:4px;color:#3898ff">Grounded Analysis:</div>
+        <div>${esc(res.answer)}</div>
+      `;
+    } catch (err) {
+      resPanel.innerHTML = `<span style="color:#ef4444">Analysis notice: ${esc(err.message)}</span>`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Ask Assistant';
+    }
+  };
+
+  $('#btnGoOrders').onclick = () => go('#/orders');
+}
+
+
+
 async function renderRoute() {
   const defaultRoute = user ? '#/home' : '#/intro';
   const rawHash = (location.hash || defaultRoute).slice(1);
@@ -3526,8 +4080,20 @@ async function renderRoute() {
   if ($('#brandHomeLink')) $('#brandHomeLink').setAttribute('href', brandTarget);
   if ($('#mobileBrandLink')) $('#mobileBrandLink').setAttribute('href', brandTarget);
 
+  const kickerMap = {
+    "/intro": "LUMINA OS",
+    "/home": maker() ? "MANUFACTURER OS" : "CONSUMER STUDIO",
+    "/explore": "DISCOVER DEMAND",
+    "/request": "INVENTION STUDIO",
+    "/manufacturer/intelligence": "AG STUDIO INTELLIGENCE",
+    "/orders": "PAYPAL SANDBOX",
+    "/account": "PROFILE & ACCESS",
+    "/help": "PLATFORM ARCHITECTURE"
+  };
+  if ($("#windowKicker")) $("#windowKicker").textContent = kickerMap[path] || (maker() ? "MANUFACTURER OS" : "PRODUCT OS");
+
   nav(activeNavForRoute(path));
-  const viewEl = $('#view');
+  const viewEl = $("#view");
   const dimTimer = setTimeout(() => viewEl.classList.add('loading-dim'), 120);
 
   const finishRender = () => {
