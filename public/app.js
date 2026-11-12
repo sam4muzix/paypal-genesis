@@ -1,4 +1,4 @@
-const $ = (s) => document.querySelector(s);
+const $ = (s) => (s === '#app' ? (document.querySelector('#desktopApp') || document.querySelector('#app')) : document.querySelector(s));
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
@@ -236,30 +236,41 @@ function activeNavForRoute(route) {
 }
 
 function nav(activePage) {
-  const items = maker()
+  const isMaker = maker();
+  const items = isMaker
     ? [
         { label: 'Home', hash: '#/home', icon: 'home' },
-        { label: 'GENESIS Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
-        { label: 'Customer Demand', hash: '#/manufacturer/demand', icon: 'compass' },
-        { label: 'My Products', hash: '#/manufacturer/products', icon: 'layers' },
+        { label: 'Ideas', hash: '#/manufacturer/demand', icon: 'lightbulb' },
+        { label: 'Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
+        { label: 'Manufacturing', hash: '#/manufacturer/products', icon: 'layers' },
         { label: 'Orders', hash: '#/orders', icon: 'receipt' },
-        ...(user?.role === 'administrator'
-          ? [{ label: 'Approvals', hash: '#/admin', icon: 'shield' }]
-          : []),
-        { label: 'Help', hash: '#/help', icon: 'help' },
+        { label: 'Analytics', hash: '#/manufacturer/analytics', icon: 'chart' },
       ]
     : [
         { label: 'Home', hash: user ? '#/home' : '#/intro', icon: 'home' },
-        { label: 'Explore', hash: '#/explore', icon: 'compass' },
-        { label: 'My Products', hash: '#/my-products', icon: 'layers' },
-        { label: 'Help', hash: '#/help', icon: 'help' },
+        { label: 'Ideas', hash: '#/explore', icon: 'lightbulb' },
+        { label: 'Intelligence', hash: '#/manufacturer/intelligence', icon: 'sparkles' },
+        { label: 'Manufacturing', hash: user ? '#/my-products' : '#/explore', icon: 'layers' },
+        { label: 'Orders', hash: '#/orders', icon: 'receipt' },
+        { label: 'Analytics', hash: '#/help', icon: 'chart' },
       ];
+
+  const currentPath = location.hash.replace(/^#/, '').split('?')[0];
+  const isCurrentActive = (item) => {
+    if (activePage === item.label) return true;
+    if (item.label === 'Home' && (currentPath === '' || currentPath === '/' || currentPath === '/home' || currentPath === '/intro')) return true;
+    if (item.label === 'Ideas' && (currentPath === '/explore' || currentPath === '/manufacturer/demand')) return true;
+    if (item.label === 'Intelligence' && (currentPath === '/manufacturer/intelligence' || currentPath === '/manufacturer/analytics')) return true;
+    if (item.label === 'Manufacturing' && (currentPath === '/manufacturer/products' || currentPath === '/my-products' || currentPath.startsWith('/manufacturer/product/'))) return true;
+    if (item.label === 'Orders' && currentPath === '/orders') return true;
+    return false;
+  };
 
   $('#nav').innerHTML = items
     .map(
       (item) =>
-        `<button class="${activePage === item.label ? 'active' : ''}" data-hash="${item.hash}" aria-current="${
-          activePage === item.label ? 'page' : 'false'
+        `<button class="${isCurrentActive(item) ? 'active' : ''}" data-hash="${item.hash}" aria-current="${
+          isCurrentActive(item) ? 'page' : 'false'
         }">${icon(item.icon)}<span>${esc(item.label)}</span></button>`
     )
     .join('');
@@ -270,6 +281,14 @@ function nav(activePage) {
       b.onclick = () => go(b.dataset.hash);
     });
 
+  if ($('#headerHelpBtn')) $('#headerHelpBtn').onclick = () => go('#/help');
+  if ($('#appIdentityCard')) $('#appIdentityCard').onclick = () => go(user ? '#/home' : '#/intro');
+  if ($('#demoStatusPill')) {
+    $('#demoStatusPill').onclick = () => {
+      notice(user ? `Demo session active: ${user.name} (${user.role})` : 'Zero-friction hackathon demonstration active. No registration required.', 'info');
+    };
+  }
+
   const roleLabel = !user
     ? 'Visitor'
     : user.is_demo
@@ -279,12 +298,12 @@ function nav(activePage) {
         : user.role === 'manufacturer'
           ? 'Approved Manufacturer'
           : 'Consumer';
-  $('#roleChip').innerHTML = `${icon(maker() ? 'factory' : 'user')}<span>${esc(roleLabel)}</span>`;
+  if ($('#roleChip')) $('#roleChip').innerHTML = `${icon(maker() ? 'factory' : 'user')}<span>${esc(roleLabel)}</span>`;
 
   $('#account').innerHTML = `
-    <button class="profile-btn ${user?.is_demo ? 'demo-profile-btn' : ''}" id="profile" type="button" aria-expanded="false">
+    <button class="profile-btn ${user?.is_demo ? 'demo-profile-btn' : ''}" id="profile" type="button" aria-expanded="false" title="Account &amp; Session">
       ${icon(user?.is_demo ? 'shield' : 'user')}
-      <span class="name">${user ? (user.is_demo ? 'DEMO MODE · ' + esc(user.name) : esc(user.name)) : 'Account'}</span>
+      <span class="name">${user ? (user.is_demo ? 'DEMO · ' + esc(user.name) : esc(user.name)) : 'Account'}</span>
       <span aria-hidden="true">▾</span>
     </button>
     <div id="profileMenu" class="profile-menu" hidden>
@@ -576,348 +595,346 @@ function introPage() {
   $('#app').classList.add('intro-mode');
   $('#heading').textContent = 'PayPal GENESIS';
 
-  const genesisStages = {
-    idea: {
-      step: '01 · IDEA // NEED FORMULATION',
-      badge: 'Idea Validated',
-      title: 'Eight-input portable audio interface',
-      desc: 'Creators request eight XLR/TRS inputs, onboard DSP, dual USB-C connectivity, and hardware gain knobs under $250.',
-      tags: ['842 Backers', 'Category: Creator Tools', 'Target: $249', 'Status: Idea']
-    },
-    intel: {
-      step: '02 · INTELLIGENCE // GEMINI 3.8 FLASH SPEC',
-      badge: 'Spec Generated',
-      title: 'Structured Engineering Requirements & BOM',
-      desc: 'Gemini AI synthesizes 6-point verifiable engineering specifications, identifies open hardware questions, and models build feasibility.',
-      tags: ['24-bit/192kHz DSP', 'Dual USB-C Bus', 'Metal Chassis', '94% Feasibility']
-    },
-    demand: {
-      step: '03 · DEMAND // AG STUDIO INTELLIGENCE',
-      badge: 'AG Studio Verified',
-      title: 'Real-Time Market Demand Signals',
-      desc: 'Manufacturers explore aggregated customer demand in AG Studio and AG Grid, filtering by category, stage velocity, and target price.',
-      tags: ['3,420+ Signals', '$148.5K Pipeline GMV', '+38% MoM Velocity', 'D1 Backed']
-    },
-    build: {
-      step: '04 · BUILD // PRODUCTION COMMITMENT',
-      badge: 'Offer Active',
-      title: 'Verified Manufacturer Batch Offer',
-      desc: 'Approved manufacturers commit transparent unit pricing, minimum batch sizes (MOQ), and advance production through prototype to launch.',
-      tags: ['MOQ: 200 Units', 'Batch Price: $220.00', 'Prototype Phase', 'Demo Audio Lab']
-    },
-    paypal: {
-      step: '05 · PAYPAL // SANDBOX SETTLEMENT',
-      badge: 'Sandbox Captured',
-      title: 'PayPal Orders API v2 Verified Settle',
-      desc: 'Eligible offers connect directly to PayPal Orders API v2. Payment is authorized, reconciled, and captured server-side with instant escrow release.',
-      tags: ['Orders API v2', 'Captured: $115.00 USD', 'Capture ID: 2S438785MA948880G', 'Instant Settle']
-    }
-  };
-
   $('#view').innerHTML = `
-    <div class="intro-wrap view-enter">
-      <div class="intro-topbar">
-        <a class="intro-brand" href="#/intro">
-          <span class="mark" aria-hidden="true">G</span>
-          <span>
-            <small>PayPal</small>
-            <strong>GENESIS</strong>
-          </span>
-        </a>
-        <div class="intro-nav">
-          <button type="button" class="text-button" id="introExploreLink">Explore Ideas</button>
-          <button type="button" class="text-button" id="introHelpLink">How It Works</button>
-          <button type="button" class="secondary" id="introSignInTop">Sign In</button>
-          <button type="button" class="primary" id="introGetStartedTop">Get Started</button>
+    <div class="mac-entry-canvas view-enter">
+      <!-- 2-Column Hero Section -->
+      <div class="entry-hero-grid">
+        <div class="entry-hero-left">
+          <div class="entry-eyebrow">PAYPAL GENESIS</div>
+          <h1 class="entry-headline">Products should<br>begin with people.</h1>
+          <p class="entry-subhead">Turn product ideas into structured opportunities for manufacturers, with intelligent specifications, demand insight, and PayPal-powered checkout.</p>
+          
+          <div class="entry-actions-row">
+            <button type="button" class="btn-consumer-capsule" id="demoConsumerHeroBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>Continue as Consumer</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <button type="button" class="btn-maker-capsule" id="demoMakerHeroBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span>Explore as Manufacturer</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="entry-meta-badges">
+            <div class="entry-meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Hackathon Demo</span>
+            </div>
+            <div class="entry-meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              <span>No signup required</span>
+            </div>
+            <div class="entry-meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 21l3-15h5a4 4 0 0 1 4 4c0 3-2 5-5 5h-3l-1.5 6H7z"/></svg>
+              <span>PayPal Sandbox only</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Hero Section (Editorial Two-Column) -->
-      <section class="intro-hero" aria-label="GENESIS Product OS Introduction">
-        <div class="intro-hero-left">
-          <span class="intro-kicker"><span class="pulse-dot"></span><span>GENESIS Product OS // Sys.Ver 3.2</span></span>
-          <h1 class="intro-headline">Products should begin with people.</h1>
-          <p class="intro-sub">From the first idea to the final purchase, GENESIS connects consumer demand, AI-powered specifications, manufacturing decisions, and PayPal.</p>
-
-          <!-- Hackathon Demonstration Direct Access -->
-          <div class="demo-access-card">
-            <div class="demo-access-header">
-              <div class="demo-access-kicker">Hackathon Demonstration Access</div>
-              <h2 class="demo-access-title">Enter PayPal GENESIS Live Workspace</h2>
-              <p class="demo-access-desc">Select a role below for instant, zero-friction access with pre-seeded demonstration data.</p>
-            </div>
-
-            <div class="demo-access-grid">
-              <button type="button" class="demo-role-btn consumer" id="demoConsumerHeroBtn">
-                <span class="demo-role-title">${icon('user')}<span>Continue as Consumer</span></span>
-                <span class="demo-role-desc">Request products, generate AI specifications, pledge support, and test checkout.</span>
-              </button>
-
-              <button type="button" class="demo-role-btn manufacturer" id="demoMakerHeroBtn">
-                <span class="demo-role-title">${icon('factory')}<span>Explore as Manufacturer</span></span>
-                <span class="demo-role-desc">Analyze demand signals in AG Studio, publish sample offers, and manage orders.</span>
-              </button>
-            </div>
-
-            <div class="demo-access-foot">
-              <span>No registration required for judge demo access. Demo data and PayPal Sandbox only.</span>
-              <div>
-                <button type="button" class="text-button" id="introGetStarted" style="font-size:12px;padding:4px 8px;margin-right:8px">Get Started</button>
-                <button type="button" class="text-button" id="introSignInHero" style="font-size:12px;padding:4px 8px">Standard Sign In →</button>
+        <!-- Right: Blueprint & Schematic Canvas with Headphone Vector & Floating Tour Card & Pipeline -->
+        <div class="entry-hero-right">
+          <div class="schematic-canvas-wrap">
+            <!-- Floating Glass Tour Card -->
+            <div class="schematic-tour-card" id="tourPillBtn" role="button" tabindex="0">
+              <div class="tour-card-icon">G+</div>
+              <div class="tour-card-text">
+                <strong>Idea to Product</strong>
+                <small>with GENESIS</small>
               </div>
+              <div class="tour-play-btn">▶</div>
             </div>
-          </div>
-        </div>
 
-        <!-- Right Side: Interactive Product Genesis Map -->
-        <div class="genesis-map-card" id="genesisMapCard" aria-label="Interactive Product Genesis Map">
-          <div class="genesis-map-head">
-            <div class="genesis-map-tag">
-              ${icon('sparkles')}<span>Product Genesis Map</span>
-            </div>
-            <div class="genesis-map-status">
-              <span>Interactive Blueprint Lifecycle</span>
-            </div>
-          </div>
+            <!-- 3D Vector Headphone Schematic SVG -->
+            <svg class="headphone-vector-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="hpGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#3898ff" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#3898ff" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="hpBand" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#475569"/>
+                  <stop offset="40%" stop-color="#1e293b"/>
+                  <stop offset="100%" stop-color="#0f172a"/>
+                </linearGradient>
+                <linearGradient id="hpEar" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#334155"/>
+                  <stop offset="50%" stop-color="#0f172a"/>
+                  <stop offset="100%" stop-color="#020617"/>
+                </linearGradient>
+                <linearGradient id="hpRing" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#3898ff"/>
+                  <stop offset="100%" stop-color="#0070ba"/>
+                </linearGradient>
+              </defs>
+              <path d="M20 30h320M20 70h320M20 110h320M20 150h320M20 190h320M20 230h320" stroke="rgba(56, 152, 255, 0.08)" stroke-width="1" stroke-dasharray="3 3"/>
+              <path d="M60 20v220M120 20v220M180 20v220M240 20v220M300 20v220" stroke="rgba(56, 152, 255, 0.08)" stroke-width="1" stroke-dasharray="3 3"/>
+              <ellipse cx="110" cy="140" rx="36" ry="46" stroke="rgba(56, 152, 255, 0.28)" stroke-width="1.2" stroke-dasharray="2 2" fill="none"/>
+              <path d="M110 94C110 50 150 40 180 40" stroke="rgba(56, 152, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2 2" fill="none"/>
 
-          <!-- 5 Stage Interactive Selectors -->
-          <div class="genesis-stage-nav" role="tablist">
-            <button type="button" class="genesis-stage-btn active" data-stage="idea" role="tab" aria-selected="true">
-              <span class="stage-num">01</span>
-              ${icon('lightbulb')}
-              <span class="stage-name">IDEA</span>
-            </button>
-            <button type="button" class="genesis-stage-btn" data-stage="intel" role="tab" aria-selected="false">
-              <span class="stage-num">02</span>
-              ${icon('sparkles')}
-              <span class="stage-name">INTEL</span>
-            </button>
-            <button type="button" class="genesis-stage-btn" data-stage="demand" role="tab" aria-selected="false">
-              <span class="stage-num">03</span>
-              ${icon('compass')}
-              <span class="stage-name">DEMAND</span>
-            </button>
-            <button type="button" class="genesis-stage-btn" data-stage="build" role="tab" aria-selected="false">
-              <span class="stage-num">04</span>
-              ${icon('factory')}
-              <span class="stage-name">BUILD</span>
-            </button>
-            <button type="button" class="genesis-stage-btn" data-stage="paypal" role="tab" aria-selected="false">
-              <span class="stage-num">05</span>
-              ${icon('shield')}
-              <span class="stage-name">PAYPAL</span>
-            </button>
-          </div>
+              <circle cx="215" cy="140" r="90" fill="url(#hpGlow)"/>
 
-          <!-- Animated Connecting Signal Pipeline -->
-          <div class="genesis-pipeline-wrap">
-            <svg class="genesis-pipeline-svg" viewBox="0 0 460 20" preserveAspectRatio="none">
-              <line x1="10" y1="10" x2="450" y2="10" class="genesis-flow-track" />
-              <line x1="10" y1="10" x2="450" y2="10" class="genesis-flow-beam" />
+              <path d="M140 135 C 130 55, 250 40, 260 120" stroke="url(#hpBand)" stroke-width="15" stroke-linecap="round" fill="none"/>
+              <path d="M142 133 C 133 58, 248 44, 258 118" stroke="#3898ff" stroke-width="1.2" stroke-opacity="0.6" stroke-linecap="round" fill="none"/>
+
+              <g transform="translate(136, 125) rotate(-15)">
+                <rect x="-8" y="0" width="16" height="24" rx="4" fill="#334155"/>
+                <ellipse cx="0" cy="32" rx="22" ry="34" fill="url(#hpEar)" stroke="#475569" stroke-width="1.5"/>
+                <ellipse cx="-2" cy="32" rx="14" ry="24" fill="#090d16" stroke="rgba(56,152,255,0.4)" stroke-width="1"/>
+              </g>
+
+              <g transform="translate(242, 138) rotate(12)">
+                <rect x="-10" y="-12" width="20" height="20" rx="4" fill="#475569"/>
+                <ellipse cx="0" cy="22" rx="34" ry="48" fill="url(#hpEar)" stroke="#64748b" stroke-width="1.5"/>
+                <ellipse cx="0" cy="22" rx="30" ry="44" stroke="url(#hpRing)" stroke-width="2" fill="none"/>
+                <ellipse cx="0" cy="22" rx="24" ry="36" fill="#0b0f19"/>
+                <ellipse cx="0" cy="22" rx="16" ry="26" fill="#05080e" stroke="rgba(56,152,255,0.3)" stroke-width="1"/>
+                <circle cx="0" cy="22" r="3" fill="#3898ff"/>
+              </g>
+              
+              <path d="M285 100 L315 85" stroke="#3898ff" stroke-width="0.8" stroke-dasharray="2 2"/>
+              <circle cx="315" cy="85" r="2" fill="#3898ff"/>
+              <text x="322" y="88" fill="#94a3b8" font-size="8" font-family="monospace">CNC Alum.</text>
+              
+              <path d="M210 215 L230 235" stroke="#3898ff" stroke-width="0.8" stroke-dasharray="2 2"/>
+              <circle cx="230" cy="235" r="2" fill="#3898ff"/>
+              <text x="236" y="238" fill="#94a3b8" font-size="8" font-family="monospace">50mm Driver</text>
             </svg>
           </div>
 
-          <!-- Active Stage Blueprint Dossier -->
-          <div class="genesis-dossier-box" id="genesisDossier">
-            <div>
-              <div class="genesis-dossier-kicker">
-                <span class="genesis-dossier-step" id="dossierStep">${genesisStages.idea.step}</span>
-                <span class="genesis-dossier-badge" id="dossierBadge">${genesisStages.idea.badge}</span>
+          <!-- Horizontal Pipeline: IDEA -> INTELLIGENCE -> DEMAND -> BUILD -> PAYPAL -->
+          <div class="product-genesis-pipeline" id="genesisMapCard">
+            <button type="button" class="pipeline-step-node active genesis-stage-btn" data-stage="idea">
+              <div class="pipeline-step-circle idea-c">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 2a6 6 0 0 0-6 6c0 2 1 3.5 2 4.5V14a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.5c1-1 2-2.5 2-4.5a6 6 0 0 0-6-6z"/></svg>
               </div>
-              <h3 class="genesis-dossier-title" id="dossierTitle">${genesisStages.idea.title}</h3>
-              <p class="genesis-dossier-sub" id="dossierDesc">${genesisStages.idea.desc}</p>
-            </div>
-            <div class="genesis-dossier-meta" id="dossierTags">
-              ${genesisStages.idea.tags.map(t => `<span class="genesis-pill-tag">${t}</span>`).join('')}
-            </div>
-          </div>
-        </div>
-      </section>
+              <span class="pipeline-step-label">IDEA</span>
+            </button>
+            <span class="pipeline-step-arrow">→</span>
 
-      <!-- Platform Capabilities (5 Synchronized Capabilities) -->
-      <section class="overview-section" aria-label="Platform capabilities">
-        <div class="section-heading-row">
-          <span class="eyebrow-label">PLATFORM OVERVIEW</span>
-          <h2 class="section-title-clean">How GENESIS turns consumer intent into manufactured products</h2>
-          <div class="section-subtitle-muted">Five synchronized capabilities bridging customer desire and verified production. YOU IMAGINE · PEOPLE SUPPORT · MAKERS BUILD. Share what you wish existed. Help improve what already exists. See how manufacturers bring better products to life.</div>
-        </div>
+            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="intel">
+              <div class="pipeline-step-circle intel-c">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <span class="pipeline-step-label">INTELLIGENCE</span>
+            </button>
+            <span class="pipeline-step-arrow">→</span>
 
-        <div class="overview-cards-grid">
-          <div class="overview-card">
-            <div class="card-step-num">01 · IMAGINE</div>
-            <div class="card-icon-wrap">${icon('lightbulb')}</div>
-            <h3>Imagine</h3>
-            <p>Submit product ideas and requests. Describe real-world pain points and desired features in natural language.</p>
-          </div>
+            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="demand">
+              <div class="pipeline-step-circle demand-c">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <span class="pipeline-step-label">DEMAND</span>
+            </button>
+            <span class="pipeline-step-arrow">→</span>
 
-          <div class="overview-card">
-            <div class="card-step-num">02 · INTELLIGENCE</div>
-            <div class="card-icon-wrap ai">${icon('sparkles')}</div>
-            <h3>Intelligence</h3>
-            <p>Generate structured product specifications using AI. Formulate engineering requirements, bills of materials, and target costs.</p>
-          </div>
+            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="build">
+              <div class="pipeline-step-circle build-c">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              </div>
+              <span class="pipeline-step-label">BUILD</span>
+            </button>
+            <span class="pipeline-step-arrow">→</span>
 
-          <div class="overview-card">
-            <div class="card-step-num">03 · DISCOVER</div>
-            <div class="card-icon-wrap">${icon('compass')}</div>
-            <h3>Discover</h3>
-            <p>Manufacturers identify customer demand. Quantify regional demand signals and customer target price points.</p>
+            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="paypal">
+              <div class="pipeline-step-circle paypal-c">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 21l3-15h5a4 4 0 0 1 4 4c0 3-2 5-5 5h-3l-1.5 6H7z"/></svg>
+              </div>
+              <span class="pipeline-step-label">PAYPAL</span>
+            </button>
           </div>
-
-          <div class="overview-card">
-            <div class="card-step-num">04 · BUILD</div>
-            <div class="card-icon-wrap maker">${icon('factory')}</div>
-            <h3>Build</h3>
-            <p>Manufacturers publish product offers. Commit transparent unit pricing, minimum batch sizes, and progress milestones.</p>
-          </div>
-
-          <div class="overview-card">
-            <div class="card-step-num">05 · PAY</div>
-            <div class="card-icon-wrap pay">${icon('shield')}</div>
-            <h3>Pay</h3>
-            <p>Verified purchases use PayPal Sandbox. Integrated Orders API v2 ensures instant escrowed payment verification.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- AG Studio Manufacturer Intelligence Section -->
-      <section class="ag-studio-feature" aria-label="AG Studio Manufacturer Intelligence">
-        <div class="ag-feature-head">
-          <div class="ag-badge-row">
-            <span class="ag-brand-pill">
-              <span class="ag-logo-dot"></span> AG STUDIO 3.1
-            </span>
-            <span class="ag-engine-tag">ENTERPRISE MANUFACTURER INTELLIGENCE</span>
-          </div>
-          <h2>Live Market Intelligence for Manufacturers</h2>
-          <p>Explore real-time consumer demand signals, automated feasibility scoring, and margin modeling directly within the AG Studio interactive command center.</p>
-        </div>
-        <div class="ag-kpi-strip">
-          <div class="ag-kpi-item">
-            <div class="ag-kpi-num">3,420+</div>
-            <div class="ag-kpi-label">Verified Demand Signals</div>
-          </div>
-          <div class="ag-kpi-item">
-            <div class="ag-kpi-num">94.2%</div>
-            <div class="ag-kpi-label">Spec Feasibility Score</div>
-          </div>
-          <div class="ag-kpi-item">
-            <div class="ag-kpi-num">$148.5K</div>
-            <div class="ag-kpi-label">Pipeline Demand GMV</div>
-          </div>
-          <div class="ag-kpi-item">
-            <div class="ag-kpi-num">100%</div>
-            <div class="ag-kpi-label">PayPal Sandbox Ready</div>
-          </div>
-        </div>
-
-        <div class="ag-table-preview">
-          <div class="ag-table-toolbar">
-            <div class="ag-table-title">
-              <span>AG Grid Demand Explorer</span>
-              <span class="ag-grid-pill">Live D1 Dataset</span>
-            </div>
-            <div class="ag-table-actions">
-              <span class="ag-chip">Sorted by: Demand Score ↓</span>
-              <button type="button" class="primary small" id="agStudioLaunchBtn">Launch AG Studio Command Center →</button>
-            </div>
-          </div>
-          <div class="ag-table-container">
-            <table class="ag-preview-table">
-              <thead>
-                <tr>
-                  <th>Product Idea</th>
-                  <th>Category</th>
-                  <th>Demand Signals</th>
-                  <th>Target Price</th>
-                  <th>Feasibility</th>
-                  <th>Production Status</th>
-                  <th>PayPal Checkout</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Eight-input portable audio interface</strong><div class="sub-cell">Creators request 8 inputs, onboard DSP, dual USB-C</div></td>
-                  <td><span class="cat-pill">Creator tools</span></td>
-                  <td><div class="demand-bar-wrap"><div class="demand-bar" style="width:92%"></div><span>842</span></div></td>
-                  <td><strong>$249.00</strong></td>
-                  <td><span class="feasibility-badge high">94% High</span></td>
-                  <td><span class="status-badge">Prototype</span></td>
-                  <td><span class="sandbox-tag">Sandbox Ready</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Wireless earbuds with battery drain</strong><div class="sub-cell">Demonstrates repeated customer battery complaints</div></td>
-                  <td><span class="cat-pill">Audio</span></td>
-                  <td><div class="demand-bar-wrap"><div class="demand-bar" style="width:78%"></div><span>520</span></div></td>
-                  <td><strong>$120.00</strong></td>
-                  <td><span class="feasibility-badge high">90% High</span></td>
-                  <td><span class="status-badge">Improvement</span></td>
-                  <td><span class="sandbox-tag">Sandbox Ready</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Smart-home hub with unreliable connections</strong><div class="sub-cell">Demonstrates reliability investigation &amp; review</div></td>
-                  <td><span class="cat-pill">Home</span></td>
-                  <td><div class="demand-bar-wrap"><div class="demand-bar" style="width:65%"></div><span>340</span></div></td>
-                  <td><strong>$89.00</strong></td>
-                  <td><span class="feasibility-badge high">95% High</span></td>
-                  <td><span class="status-badge">Launch</span></td>
-                  <td><span class="sandbox-tag">Sandbox Ready</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- Roles Strip -->
-      <div class="roles-strip">
-        <div class="role-summary">
-          <h3>${icon('user')}<span>For Consumers</span></h3>
-          <p>Request products you wish existed, refine generated specifications, support ideas you want built, and track Sandbox orders.</p>
-        </div>
-        <div class="role-summary">
-          <h3>${icon('factory')}<span>For Manufacturers</span></h3>
-          <p>Apply with verified credentials, discover ranked customer demand in AG Studio, publish build offers, update milestones, and record quality decisions.</p>
         </div>
       </div>
 
-      <div class="intro-footer">
-        <span>Independent PayPal AI Hackathon prototype · Not operated or endorsed by PayPal</span>
-        <span>All checkout flows run in PayPal Sandbox</span>
+      <!-- The Product Genesis Journey Section -->
+      <div class="journey-section">
+        <h3 class="journey-title">The Product Genesis Journey</h3>
+        <div class="journey-cards-grid">
+          <div class="journey-card">
+            <div class="journey-card-icon c-imagine">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 2a6 6 0 0 0-6 6c0 2 1 3.5 2 4.5V14a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.5c1-1 2-2.5 2-4.5a6 6 0 0 0-6-6z"/></svg>
+            </div>
+            <h4>Imagine</h4>
+            <p>Submit ideas for products that do not yet exist.</p>
+          </div>
+
+          <div class="journey-card">
+            <div class="journey-card-icon c-clarify">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <h4>Clarify</h4>
+            <p>GENESIS Intelligence turns ideas into structured requirements.</p>
+          </div>
+
+          <div class="journey-card">
+            <div class="journey-card-icon c-discover">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <h4>Discover</h4>
+            <p>Manufacturers explore real demand and opportunities.</p>
+          </div>
+
+          <div class="journey-card">
+            <div class="journey-card-icon c-build">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <h4>Build</h4>
+            <p>Publish offers and track development progress.</p>
+          </div>
+
+          <div class="journey-card">
+            <div class="journey-card-icon c-pay">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 21l3-15h5a4 4 0 0 1 4 4c0 3-2 5-5 5h-3l-1.5 6H7z"/></svg>
+            </div>
+            <h4>Pay</h4>
+            <p>Purchase eligible offers with PayPal Sandbox.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GENESIS Intelligence Command Center Preview Card -->
+      <div class="intelligence-preview-card" id="agStudioLaunchCard">
+        <div class="intel-info-pane">
+          <div class="intel-info-header">
+            <div class="intel-brand-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <h3>GENESIS Intelligence Command Center</h3>
+            <p>A powerful AG Studio workspace for manufacturers to analyze demand, explore opportunities, and turn real customer intent into products.</p>
+          </div>
+          <div class="intel-pills-row">
+            <span class="studio-pill highlight"><span style="color:#ef4444;font-weight:800;font-size:10px;margin-right:2px;">AG</span> AG Studio</span>
+            <span class="studio-pill">✨ AG Grid</span>
+            <span class="studio-pill">📊 AG Charts</span>
+            <button type="button" class="btn-open-command-center" id="agStudioLaunchBtn" aria-label="Open AG Studio Command Center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mini Dashboard Mockup Preview -->
+        <div class="intel-dashboard-mockup">
+          <div class="mockup-tabs-bar">
+            <span style="display:inline-flex;align-items:center;background:rgba(239,68,68,0.18);color:#ef4444;font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;margin-right:4px;">AG</span>
+            <span style="font-size:11px;font-weight:700;color:#ffffff;margin-right:12px;">AG Studio</span>
+            <span class="mockup-tab-pill active">Demand Explorer</span>
+            <span class="mockup-tab-pill">Opportunities</span>
+            <span class="mockup-tab-pill">Specifications</span>
+            <span class="mockup-tab-pill">Offers</span>
+            <span class="mockup-tab-pill">Orders</span>
+          </div>
+
+          <div class="mockup-kpis-row">
+            <div class="mockup-kpi-tile">
+              <span class="mockup-kpi-label">Active Demand</span>
+              <div class="mockup-kpi-val-row">
+                <span class="mockup-kpi-num">842</span>
+                <span class="mockup-kpi-gain">↑ +28%</span>
+                <svg width="44" height="16" viewBox="0 0 44 16" fill="none"><path d="M2 13L12 9L22 11L32 4L42 2" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="mockup-kpi-tile">
+              <span class="mockup-kpi-label">High-Intent Ideas</span>
+              <div class="mockup-kpi-val-row">
+                <span class="mockup-kpi-num">136</span>
+                <span class="mockup-kpi-gain">↑ +41%</span>
+                <svg width="44" height="16" viewBox="0 0 44 16" fill="none"><path d="M2 14L14 11L24 7L34 8L42 3" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="mockup-kpi-tile">
+              <span class="mockup-kpi-label">Manufacturing Opportunities</span>
+              <div class="mockup-kpi-val-row">
+                <span class="mockup-kpi-num">27</span>
+                <span class="mockup-kpi-gain">↑ +35%</span>
+                <div style="display:flex;align-items:flex-end;gap:2px;height:14px;">
+                  <div style="width:3px;height:6px;background:#3898ff;border-radius:1px;"></div>
+                  <div style="width:3px;height:9px;background:#3898ff;border-radius:1px;"></div>
+                  <div style="width:3px;height:14px;background:#3898ff;border-radius:1px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mockup-split-row">
+            <div class="mockup-table-wrap">
+              <table class="mockup-table">
+                <thead>
+                  <tr>
+                    <th>Product Idea</th>
+                    <th>Demand</th>
+                    <th>Interest</th>
+                    <th>Target Price</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span style="color:#3898ff;margin-right:4px;">⊙</span>Eight-input audio interface</td>
+                    <td style="color:#ffffff;font-weight:600;">842</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:6px;">
+                        <div style="width:42px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;"><div style="width:78%;height:100%;background:#3898ff;"></div></div>
+                        <span style="font-size:9.5px;">78%</span>
+                      </div>
+                    </td>
+                    <td style="color:#ffffff;">$249</td>
+                    <td><span style="background:rgba(16,185,129,0.15);color:#34d399;font-size:9.5px;padding:2px 6px;border-radius:4px;font-weight:600;">High Opportunity</span></td>
+                  </tr>
+                  <tr>
+                    <td><span style="color:#94a3b8;margin-right:4px;">⊙</span>Portable 4K field monitor</td>
+                    <td style="color:#ffffff;font-weight:600;">516</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:6px;">
+                        <div style="width:42px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;"><div style="width:64%;height:100%;background:#3898ff;"></div></div>
+                        <span style="font-size:9.5px;">64%</span>
+                      </div>
+                    </td>
+                    <td style="color:#ffffff;">$299</td>
+                    <td><span style="background:rgba(56,152,255,0.15);color:#93c5fd;font-size:9.5px;padding:2px 6px;border-radius:4px;font-weight:600;">Under Review</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mockup-chart-tile">
+              <div class="mockup-chart-head">Demand by Category</div>
+              <div class="mockup-donut-layout">
+                <div class="donut-svg-wrap">
+                  <svg width="64" height="64" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="24" stroke="rgba(255,255,255,0.06)" stroke-width="7" fill="none"/>
+                    <circle cx="32" cy="32" r="24" stroke="#00d2b4" stroke-width="7" fill="none" stroke-dasharray="63 150" stroke-dashoffset="0"/>
+                    <circle cx="32" cy="32" r="24" stroke="#0070ba" stroke-width="7" fill="none" stroke-dasharray="36 150" stroke-dashoffset="-65"/>
+                    <circle cx="32" cy="32" r="24" stroke="#a855f7" stroke-width="7" fill="none" stroke-dasharray="27 150" stroke-dashoffset="-103"/>
+                    <circle cx="32" cy="32" r="24" stroke="#f97316" stroke-width="7" fill="none" stroke-dasharray="24 150" stroke-dashoffset="-132"/>
+                  </svg>
+                  <div class="donut-center-text">
+                    <strong>842</strong>
+                    <small>Total Requests</small>
+                  </div>
+                </div>
+                <div class="donut-legend">
+                  <div class="legend-row"><span class="legend-dot" style="background:#00d2b4;"></span>Creator Tools <strong style="margin-left:auto;color:#ffffff;font-size:10px;">42%</strong></div>
+                  <div class="legend-row"><span class="legend-dot" style="background:#0070ba;"></span>Audio & Music <strong style="margin-left:auto;color:#ffffff;font-size:10px;">24%</strong></div>
+                  <div class="legend-row"><span class="legend-dot" style="background:#a855f7;"></span>Productivity <strong style="margin-left:auto;color:#ffffff;font-size:10px;">18%</strong></div>
+                  <div class="legend-row"><span class="legend-dot" style="background:#f97316;"></span>Other <strong style="margin-left:auto;color:#ffffff;font-size:10px;">16%</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `;
 
-  // Attach interactive events for Product Genesis Map
-  const stageBtns = document.querySelectorAll('.genesis-stage-btn');
-  const updateGenesisMap = (stageKey) => {
-    const data = genesisStages[stageKey];
-    if (!data) return;
-    stageBtns.forEach(btn => {
-      const active = btn.dataset.stage === stageKey;
-      btn.classList.toggle('active', active);
-      btn.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-    const sEl = $('#dossierStep'), bEl = $('#dossierBadge'), tEl = $('#dossierTitle'), dEl = $('#dossierDesc'), tgEl = $('#dossierTags');
-    if (sEl) sEl.textContent = data.step;
-    if (bEl) bEl.textContent = data.badge;
-    if (tEl) tEl.textContent = data.title;
-    if (dEl) dEl.textContent = data.desc;
-    if (tgEl) tgEl.innerHTML = data.tags.map(t => `<span class="genesis-pill-tag">${t}</span>`).join('');
-  };
-
-  stageBtns.forEach(btn => {
-    btn.onclick = () => updateGenesisMap(btn.dataset.stage);
+  // Attach interactive pipeline clicks
+  const stageNodes = document.querySelectorAll('.pipeline-step-node');
+  stageNodes.forEach(node => {
+    node.onclick = () => {
+      stageNodes.forEach(n => n.classList.remove('active'));
+      node.classList.add('active');
+    };
   });
-
-  // Navigation Links
-  $('#introExploreLink').onclick = () => go('#/explore');
-  $('#introHelpLink').onclick = () => go('#/help');
-  $('#introSignInTop').onclick = () => auth();
-  if ($('#introSignInHero')) $('#introSignInHero').onclick = () => auth();
-  const startFlow = () => go('#/home');
-  $('#introGetStartedTop').onclick = startFlow;
-  if ($('#introGetStarted')) $('#introGetStarted').onclick = startFlow;
 
   const launchDemo = async (role) => {
     try {
@@ -943,7 +960,13 @@ function introPage() {
       notice(err.message, 'error');
     }
   };
-  if ($('#agStudioLaunchBtn')) $('#agStudioLaunchBtn').onclick = launchMakerIntelligence;
+
+  if ($('#agStudioLaunchBtn')) $('#agStudioLaunchBtn').onclick = (e) => {
+    e.stopPropagation();
+    launchMakerIntelligence();
+  };
+  if ($('#agStudioLaunchCard')) $('#agStudioLaunchCard').onclick = () => launchMakerIntelligence();
+  if ($('#tourPillBtn')) $('#tourPillBtn').onclick = () => go('#/help');
 }
 
 function bindHomeActions() {
@@ -968,105 +991,163 @@ function home() {
   const isMaker = maker();
   if (isMaker) {
     $('#view').innerHTML = `
-      <div class="focus-home">
-        <div class="focus-question-card">
-          <h2>Manufacturer workspace</h2>
-          <p>Review consumer demand, submit build offers, advance production milestones, and manage orders.</p>
-          <button type="button" class="primary" data-action="explore">
-            ${icon('compass')}<span>Browse Customer Demand</span>${icon('arrowRight')}
-          </button>
+      <div class="workspace-canvas view-enter">
+        <div class="workspace-top-bar">
+          <div>
+            <h2 style="margin:0 0 4px 0;font-size:22px;font-weight:700;color:#ffffff;">Manufacturer Opportunity Workspace</h2>
+            <p style="margin:0;font-size:13px;color:var(--mac-ink-secondary);">Review real consumer demand, commit manufacturing offers, advance milestones, and manage orders.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button type="button" class="btn-mac-primary" id="homeAgStudioBtn">
+              <span>📊 AG Studio Intelligence</span>
+            </button>
+            <button type="button" class="btn-mac-secondary" data-action="offer">
+              ${icon('factory')}<span>+ Publish Build Offer</span>
+            </button>
+          </div>
         </div>
-        <h3 class="section-title">Workspace sections</h3>
-        <div class="route-list">
-          <button type="button" class="route-row" data-action="offer">
-            <span class="route-row-left">
-              <span class="action-icon">${icon('factory')}</span>
-              <span class="route-row-text">
-                <strong>Offers</strong>
-                <span>Publish pricing, minimum quantities, and terms for requested products</span>
-              </span>
-            </span>
-            ${icon('arrowRight')}
-          </button>
-          <button type="button" class="route-row" data-action="progress">
-            <span class="route-row-left">
-              <span class="action-icon">${icon('layers')}</span>
-              <span class="route-row-text">
-                <strong>Product Progress</strong>
-                <span>Update production stages and manage checkout availability for your offers</span>
-              </span>
-            </span>
-            ${icon('arrowRight')}
-          </button>
-          <button type="button" class="route-row" data-action="improve">
-            <span class="route-row-left">
-              <span class="action-icon">${icon('alert')}</span>
-              <span class="route-row-text">
-                <strong>Quality Feedback</strong>
-                <span>Inspect customer reports and record human improvement decisions</span>
-              </span>
-            </span>
-            ${icon('arrowRight')}
-          </button>
-          <button type="button" class="route-row" data-action="orders">
-            <span class="route-row-left">
-              <span class="action-icon">${icon('receipt')}</span>
-              <span class="route-row-text">
-                <strong>Orders</strong>
-                <span>Track verified PayPal Sandbox purchases for your offers</span>
-              </span>
-            </span>
-            ${icon('arrowRight')}
-          </button>
+
+        <div class="mac-segmented-control">
+          <button type="button" class="mac-segment-btn active" data-action="explore">Demand Signals</button>
+          <button type="button" class="mac-segment-btn" data-action="progress">Batch Production</button>
+          <button type="button" class="mac-segment-btn" data-action="improve">Quality Feedback</button>
+          <button type="button" class="mac-segment-btn" data-action="orders">PayPal Orders</button>
+        </div>
+
+        <div class="invention-cards-grid">
+          <div class="invention-brief-card">
+            <div class="brief-card-head">
+              <div>
+                <span class="badge" style="background:rgba(16,185,129,0.15);color:#34d399;font-size:11px;padding:3px 8px;border-radius:4px;">HIGH OPPORTUNITY</span>
+                <h3 class="brief-card-title" style="margin-top:8px;">Eight-input portable audio interface</h3>
+                <p class="brief-card-desc">842 verified backers seeking compact 8-channel USB-C recording hardware under $250 retail target.</p>
+              </div>
+            </div>
+            <div class="brief-card-meta">
+              <span>📈 78% Demand Score</span>
+              <span>💵 $148.5K GMV Est.</span>
+              <span>🏭 Batch #1 Active</span>
+            </div>
+            <div class="brief-card-actions">
+              <button type="button" class="btn-mac-secondary" data-action="progress">Update Milestone</button>
+              <button type="button" class="btn-mac-primary" data-action="orders">View Orders</button>
+            </div>
+          </div>
+
+          <div class="invention-brief-card">
+            <div class="brief-card-head">
+              <div>
+                <span class="badge" style="background:rgba(56,152,255,0.15);color:#93c5fd;font-size:11px;padding:3px 8px;border-radius:4px;">NEW DEMAND</span>
+                <h3 class="brief-card-title" style="margin-top:8px;">Portable 4K Field Production Monitor</h3>
+                <p class="brief-card-desc">516 creators requesting daylight-readable 1500-nit HDMI/SDI monitor. Specification ready for quote.</p>
+              </div>
+            </div>
+            <div class="brief-card-meta">
+              <span>📈 64% Demand Score</span>
+              <span>💵 $154.2K GMV Est.</span>
+              <span>📄 Spec Verified</span>
+            </div>
+            <div class="brief-card-actions">
+              <button type="button" class="btn-mac-secondary" data-action="explore">Inspect Spec</button>
+              <button type="button" class="btn-mac-primary" data-action="offer">Submit Offer</button>
+            </div>
+          </div>
+
+          <div class="invention-brief-card" style="background:rgba(0,112,186,0.08);border-color:rgba(56,152,255,0.3);cursor:pointer;" id="cardLaunchStudio">
+            <div class="brief-card-head">
+              <div>
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                  <span style="background:rgba(239,68,68,0.2);color:#ef4444;font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;">AG</span>
+                  <span style="color:#ffffff;font-size:12px;font-weight:700;">AG Studio Embedded</span>
+                </div>
+                <h3 class="brief-card-title">Manufacturer Intelligence Command Center</h3>
+                <p class="brief-card-desc">Analyze pipeline metrics, filter demand with AG Grid, track AG Charts conversions, and query AI assistant.</p>
+              </div>
+            </div>
+            <div class="brief-card-actions">
+              <span style="font-size:12px;color:var(--mac-blue-bright);font-weight:600;">Launch AG Studio Canvas →</span>
+            </div>
+          </div>
         </div>
       </div>
     `;
     bindHomeActions();
+    if ($('#homeAgStudioBtn')) $('#homeAgStudioBtn').onclick = () => go('#/manufacturer/intelligence');
+    if ($('#cardLaunchStudio')) $('#cardLaunchStudio').onclick = () => go('#/manufacturer/intelligence');
     return;
   }
 
   $('#view').innerHTML = `
-    <div class="focus-home">
-      <div class="focus-question-card">
-        <h2>What product do you wish existed?</h2>
-        <p>Describe a product need in a few guided steps, optionally turn it into structured requirements, and let others support it.</p>
-        <button type="button" class="primary" data-action="request">
-          ${icon('lightbulb')}<span>Request a Product</span>${icon('arrowRight')}
-        </button>
+    <div class="workspace-canvas view-enter">
+      <div class="workspace-top-bar">
+        <div>
+          <h2 style="margin:0 0 4px 0;font-size:22px;font-weight:700;color:#ffffff;">Personal Invention Workspace</h2>
+          <p style="margin:0;font-size:13px;color:var(--mac-ink-secondary);">Create product ideas, explore community demand, and track manufacturing progress.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button type="button" class="btn-mac-primary" data-action="request">
+            ${icon('lightbulb')}<span>+ Request Product Idea</span>
+          </button>
+          <button type="button" class="btn-mac-secondary" data-action="explore">
+            ${icon('compass')}<span>Community Ideas</span>
+          </button>
+        </div>
       </div>
 
-      <h3 class="section-title">Other ways to participate</h3>
-      <div class="route-list">
-        <button type="button" class="route-row" data-action="explore">
-          <span class="route-row-left">
-            <span class="action-icon">${icon('compass')}</span>
-            <span class="route-row-text">
-              <strong>Explore Ideas</strong>
-              <span>Browse community requests, see progress stages, and express nonbinding interest</span>
-            </span>
-          </span>
-          ${icon('arrowRight')}
-        </button>
-        <button type="button" class="route-row" data-action="report">
-          <span class="route-row-left">
-            <span class="action-icon">${icon('wrench')}</span>
-            <span class="route-row-text">
-              <strong>Report a Problem</strong>
-              <span>Tell manufacturers what is not working on a product you already use</span>
-            </span>
-          </span>
-          ${icon('arrowRight')}
-        </button>
-        <button type="button" class="route-row" data-action="mine">
-          <span class="route-row-left">
-            <span class="action-icon">${icon('layers')}</span>
-            <span class="route-row-text">
-              <strong>My Products</strong>
-              <span>Track your published ideas, supported requests, reports, and Sandbox orders</span>
-            </span>
-          </span>
-          ${icon('arrowRight')}
-        </button>
+      <div class="mac-segmented-control">
+        <button type="button" class="mac-segment-btn active" data-action="mine">My Inventions</button>
+        <button type="button" class="mac-segment-btn" data-action="explore">Discoveries</button>
+        <button type="button" class="mac-segment-btn" data-action="orders">Orders &amp; Receipts</button>
+      </div>
+
+      <div class="invention-cards-grid">
+        <div class="invention-brief-card">
+          <div class="brief-card-head">
+            <div>
+              <span class="badge" style="background:rgba(56,152,255,0.15);color:#93c5fd;font-size:11px;padding:3px 8px;border-radius:4px;">PROTOTYPE READY</span>
+              <h3 class="brief-card-title" style="margin-top:8px;">Eight-input portable audio interface</h3>
+              <p class="brief-card-desc">Low-noise preamps, hardware gain knobs, bus-powered dual USB-C design for mobile multi-track audio capture.</p>
+            </div>
+          </div>
+          <div class="brief-card-meta">
+            <span>👥 842 Backers</span>
+            <span>💰 $249 Target</span>
+            <span>🏷️ Creator Tools</span>
+          </div>
+          <div class="brief-card-actions">
+            <span style="font-size:12px;color:var(--mac-teal);font-weight:600;">Offer Active · Batch #1</span>
+            <button type="button" class="btn-mac-primary" data-action="explore">View Progress</button>
+          </div>
+        </div>
+
+        <div class="invention-brief-card">
+          <div class="brief-card-head">
+            <div>
+              <span class="badge" style="background:rgba(168,85,247,0.15);color:#c084fc;font-size:11px;padding:3px 8px;border-radius:4px;">SPEC GENERATED</span>
+              <h3 class="brief-card-title" style="margin-top:8px;">Portable 4K Field Production Monitor</h3>
+              <p class="brief-card-desc">1500 nits high-bright daylight viewable monitor with dual SDI &amp; HDMI loop-through and built-in LUT support.</p>
+            </div>
+          </div>
+          <div class="brief-card-meta">
+            <span>👥 516 Backers</span>
+            <span>💰 $299 Target</span>
+            <span>🏷️ Video Gear</span>
+          </div>
+          <div class="brief-card-actions">
+            <span style="font-size:12px;color:var(--mac-ink-muted);">Under Manufacturer Review</span>
+            <button type="button" class="btn-mac-secondary" data-action="explore">View Spec</button>
+          </div>
+        </div>
+
+        <div class="invention-brief-card" style="border-style:dashed;display:flex;align-items:center;justify-content:center;text-align:center;min-height:180px;cursor:pointer;" data-action="request">
+          <div>
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(56,152,255,0.12);color:var(--mac-blue-bright);display:flex;align-items:center;justify-content:center;margin:0 auto 12px auto;">
+              ${icon('lightbulb')}
+            </div>
+            <strong style="color:#ffffff;font-size:15px;display:block;margin-bottom:4px;">Have another product idea?</strong>
+            <span style="font-size:12.5px;color:var(--mac-ink-muted);">Click to generate an AI technical specification</span>
+          </div>
+        </div>
       </div>
     </div>
   `;

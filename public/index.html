@@ -1,51 +1,93 @@
 <!doctype html>
-<html lang="en" style="background:#090d16;color:#f1f5f9">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PayPal GENESIS — Products should begin with people</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230070ba'/><text x='16' y='23' font-family='system-ui,sans-serif' font-size='20' font-weight='800' fill='white' text-anchor='middle'>G</text></svg>">
-  <style>html,body{background:#090d16;color:#f1f5f9;margin:0}</style>
-  <link rel="stylesheet" href="/style.css?v=20261112-os1">
+  <link rel="stylesheet" href="/style.css?v=20261112-native1">
   <script src="/ag-studio.min.js"></script>
 </head>
 <body>
-  <div id="app">
+  <div id="desktopApp" class="mac-window">
+    <!-- macOS Navigation Rail -->
     <aside id="sidebar" aria-label="Primary navigation">
-      <a class="brand" href="#/home" id="brandHomeLink">
-        <span class="mark" aria-hidden="true">G</span>
-        <span>
-          <small>PayPal</small>
-          <strong>GENESIS</strong>
-        </span>
+      <div class="mac-traffic-lights" aria-hidden="true">
+        <span class="mac-dot mac-close" title="Close window"></span>
+        <span class="mac-dot mac-minimize" title="Minimize window"></span>
+        <span class="mac-dot mac-zoom" title="Full screen"></span>
+      </div>
+
+      <a class="brand" href="#/home" id="brandHomeLink" aria-label="PayPal GENESIS Home">
+        <div class="brand-squircle">
+          <span class="mark" aria-hidden="true">G</span>
+        </div>
+        <div class="brand-text">
+          <span class="brand-sub">PayPal</span>
+          <span class="brand-name">GENESIS</span>
+        </div>
       </a>
-      <nav id="nav"></nav>
-      <div class="aside-foot">
-        <span id="roleChip" class="role-chip">Visitor</span>
-        <p class="aside-note">Sandbox prototype · No real charges</p>
+
+      <nav id="nav" aria-label="App Navigation"></nav>
+
+      <div class="aside-foot" id="asideFoot">
+        <div class="app-identity-card" id="appIdentityCard">
+          <div class="app-identity-icon">
+            <svg viewBox="0 0 24 24" fill="none" class="identity-wave">
+              <path d="M3 13.5C5.5 13.5 6.5 7 9 7C11.5 7 12.5 17 15 17C17.5 17 18.5 10.5 21 10.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="app-identity-meta">
+            <strong>GENESIS</strong>
+            <small>Product OS v3.2</small>
+          </div>
+        </div>
+        <div id="roleChip" class="role-chip" style="display:none">Visitor</div>
       </div>
     </aside>
-    <main>
-      <header id="appHeader">
-        <div class="header-title">
-          <a class="mobile-brand" href="#/home" id="mobileBrandLink">
+
+    <!-- Main Canvas Area -->
+    <main id="mainCanvas">
+      <header id="appHeader" class="mac-toolbar">
+        <div class="header-left">
+          <a class="mobile-brand" href="#/home" id="mobileBrandLink" aria-label="Home">
             <span class="mark sm" aria-hidden="true">G</span>
-            <span><strong>GENESIS</strong></span>
+            <span>GENESIS</span>
           </a>
-          <h1 id="heading">Home</h1>
+          <div class="window-title-group" id="windowTitleGroup">
+            <span class="window-kicker">PAYPAL GENESIS</span>
+            <span class="window-sep">/</span>
+            <h1 id="heading" class="window-title">Home</h1>
+          </div>
         </div>
-        <div id="account"></div>
+
+        <div class="header-right">
+          <div class="mac-status-pill" id="demoStatusPill">
+            <span class="mac-status-dot"></span>
+            <span class="mac-status-text">Hackathon Demo &nbsp;·&nbsp; No signup required</span>
+          </div>
+
+          <button type="button" class="mac-icon-tool" id="headerHelpBtn" title="How GENESIS Works" aria-label="Help">
+            <svg viewBox="0 0 24 24" class="icon" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+
+          <div id="account"></div>
+        </div>
       </header>
+
       <div id="bannerSlot"></div>
       <div id="notice" role="status" aria-live="polite" tabindex="-1"></div>
+
       <section id="view" class="view-stage"></section>
     </main>
   </div>
+
   <dialog id="modal" aria-labelledby="modalTitle">
     <button class="close" id="modalClose" type="button" aria-label="Close">×</button>
     <div id="modalNotice" role="alert" aria-live="polite"></div>
     <div id="modalBody"></div>
   </dialog>
-  <script type="module" src="/app.js?v=20261112-os1"></script>
+
+  <script type="module" src="/app.js?v=20261112-native1"></script>
 </body>
 </html>
