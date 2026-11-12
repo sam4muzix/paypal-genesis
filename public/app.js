@@ -266,20 +266,49 @@ function nav(activePage) {
     return false;
   };
 
-  $('#nav').innerHTML = items
-    .map(
-      (item) =>
-        `<button class="${isCurrentActive(item) ? 'active' : ''}" data-hash="${item.hash}" aria-current="${
-          isCurrentActive(item) ? 'page' : 'false'
-        }">${icon(item.icon)}<span>${esc(item.label)}</span></button>`
-    )
-    .join('');
+  if ($('#nav')) {
+    $('#nav').innerHTML = items
+      .map(
+        (item) =>
+          `<button class="${isCurrentActive(item) ? 'active' : ''}" data-hash="${item.hash}" aria-current="${
+            isCurrentActive(item) ? 'page' : 'false'
+          }">${icon(item.icon)}<span>${esc(item.label)}</span></button>`
+      )
+      .join('');
 
-  $('#nav')
-    .querySelectorAll('button')
-    .forEach((b) => {
-      b.onclick = () => go(b.dataset.hash);
-    });
+    $('#nav')
+      .querySelectorAll('button')
+      .forEach((b) => {
+        b.onclick = () => go(b.dataset.hash);
+      });
+  }
+
+  if ($('#btnNavHome')) $('#btnNavHome').onclick = () => go(user ? '#/home' : '#/intro');
+  if ($('#btnNavMode')) $('#btnNavMode').onclick = () => notice('Neomorphic Twilight Theme Active', 'info');
+  if ($('#btnNavBell')) $('#btnNavBell').onclick = () => notice('System Notification: PayPal Sandbox orders verified and operational.', 'info');
+  if ($('#topDemoConsumerBtn')) $('#topDemoConsumerBtn').onclick = async () => {
+    try {
+      const res = await api('/demo/session', 'POST', { role: 'consumer' });
+      await refreshMe();
+      notice('Demo mode started as Consumer.', 'success');
+      go('#/home');
+    } catch (e) { notice(e.message, 'error'); }
+  };
+  if ($('#topDemoMakerBtn')) $('#topDemoMakerBtn').onclick = async () => {
+    try {
+      const res = await api('/demo/session', 'POST', { role: 'manufacturer' });
+      await refreshMe();
+      notice('Demo mode started as Manufacturer.', 'success');
+      go('#/manufacturer/intelligence');
+    } catch (e) { notice(e.message, 'error'); }
+  };
+  if ($('#profilePill')) $('#profilePill').onclick = () => {
+    if (!user) auth();
+    else go('#/account');
+  };
+  if ($('#topUserName')) {
+    $('#topUserName').textContent = user ? (user.is_demo ? 'DEMO · ' + user.name : user.name) : 'Judge Session';
+  }
 
   if ($('#headerHelpBtn')) $('#headerHelpBtn').onclick = () => go('#/help');
   if ($('#appIdentityCard')) $('#appIdentityCard').onclick = () => go(user ? '#/home' : '#/intro');
@@ -363,6 +392,7 @@ function nav(activePage) {
   }
 
   const slot = $('#bannerSlot');
+  if (!slot) return;
   if (user && user.is_demo) {
     slot.innerHTML = `<div class="banner banner-demo" style="background:rgba(0,112,186,0.18);border:1px solid rgba(56,152,255,0.4);display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-radius:10px;margin-bottom:16px;">
       <span style="font-size:13.5px;color:#f1f5f9">
@@ -592,349 +622,225 @@ function introPage() {
     go('#/home');
     return;
   }
-  $('#app').classList.add('intro-mode');
+  const appRoot = $('#desktopApp') || $('#app');
+  if (appRoot) appRoot.classList.add('intro-mode');
   $('#heading').textContent = 'PayPal GENESIS';
 
   $('#view').innerHTML = `
-    <div class="mac-entry-canvas view-enter">
-      <!-- 2-Column Hero Section -->
-      <div class="entry-hero-grid">
-        <div class="entry-hero-left">
-          <div class="entry-eyebrow">PAYPAL GENESIS</div>
-          <h1 class="entry-headline">Products should<br>begin with people.</h1>
-          <p class="entry-subhead">Turn product ideas into structured opportunities for manufacturers, with intelligent specifications, demand insight, and PayPal-powered checkout.</p>
-          
-          <div class="entry-actions-row">
-            <button type="button" class="btn-consumer-capsule" id="demoConsumerHeroBtn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Continue as Consumer</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-            <button type="button" class="btn-maker-capsule" id="demoMakerHeroBtn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              <span>Explore as Manufacturer</span>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-          </div>
-
-          <div class="entry-meta-badges">
-            <div class="entry-meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Hackathon Demo</span>
+    <div class="reference-stage-grid view-enter">
+      <!-- LEFT COLUMN: TELEMETRY & PRODUCT SPOTLIGHT -->
+      <aside class="ref-left-col">
+        <!-- Telemetry Multiplier Curve Card -->
+        <div class="ref-telemetry-card">
+          <div class="telemetry-chart-wrap">
+            <div class="telemetry-axis-labels">
+              <span>4.00x</span>
+              <span>3.00x</span>
+              <span>2.00x</span>
+              <span>1.00x</span>
             </div>
-            <div class="entry-meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              <span>No signup required</span>
-            </div>
-            <div class="entry-meta-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 21l3-15h5a4 4 0 0 1 4 4c0 3-2 5-5 5h-3l-1.5 6H7z"/></svg>
-              <span>PayPal Sandbox only</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Blueprint & Schematic Canvas with Headphone Vector & Floating Tour Card & Pipeline -->
-        <div class="entry-hero-right">
-          <div class="schematic-canvas-wrap">
-            <!-- Floating Glass Tour Card -->
-            <div class="schematic-tour-card" id="tourPillBtn" role="button" tabindex="0">
-              <div class="tour-card-icon">G+</div>
-              <div class="tour-card-text">
-                <strong>Idea to Product</strong>
-                <small>with GENESIS</small>
-              </div>
-              <div class="tour-play-btn">▶</div>
-            </div>
-
-            <!-- 3D Vector Headphone Schematic SVG -->
-            <svg class="headphone-vector-svg" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="telemetry-val-badge">2.54x</div>
+            <svg class="telemetry-svg-curve" viewBox="0 0 240 140" fill="none">
               <defs>
-                <radialGradient id="hpGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#3898ff" stop-opacity="0.35"/>
-                  <stop offset="100%" stop-color="#3898ff" stop-opacity="0"/>
-                </radialGradient>
-                <linearGradient id="hpBand" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#475569"/>
-                  <stop offset="40%" stop-color="#1e293b"/>
-                  <stop offset="100%" stop-color="#0f172a"/>
-                </linearGradient>
-                <linearGradient id="hpEar" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#334155"/>
-                  <stop offset="50%" stop-color="#0f172a"/>
-                  <stop offset="100%" stop-color="#020617"/>
-                </linearGradient>
-                <linearGradient id="hpRing" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#3898ff"/>
-                  <stop offset="100%" stop-color="#0070ba"/>
+                <linearGradient id="curveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
                 </linearGradient>
               </defs>
-              <path d="M20 30h320M20 70h320M20 110h320M20 150h320M20 190h320M20 230h320" stroke="rgba(56, 152, 255, 0.08)" stroke-width="1" stroke-dasharray="3 3"/>
-              <path d="M60 20v220M120 20v220M180 20v220M240 20v220M300 20v220" stroke="rgba(56, 152, 255, 0.08)" stroke-width="1" stroke-dasharray="3 3"/>
-              <ellipse cx="110" cy="140" rx="36" ry="46" stroke="rgba(56, 152, 255, 0.28)" stroke-width="1.2" stroke-dasharray="2 2" fill="none"/>
-              <path d="M110 94C110 50 150 40 180 40" stroke="rgba(56, 152, 255, 0.25)" stroke-width="1.2" stroke-dasharray="2 2" fill="none"/>
-
-              <circle cx="215" cy="140" r="90" fill="url(#hpGlow)"/>
-
-              <path d="M140 135 C 130 55, 250 40, 260 120" stroke="url(#hpBand)" stroke-width="15" stroke-linecap="round" fill="none"/>
-              <path d="M142 133 C 133 58, 248 44, 258 118" stroke="#3898ff" stroke-width="1.2" stroke-opacity="0.6" stroke-linecap="round" fill="none"/>
-
-              <g transform="translate(136, 125) rotate(-15)">
-                <rect x="-8" y="0" width="16" height="24" rx="4" fill="#334155"/>
-                <ellipse cx="0" cy="32" rx="22" ry="34" fill="url(#hpEar)" stroke="#475569" stroke-width="1.5"/>
-                <ellipse cx="-2" cy="32" rx="14" ry="24" fill="#090d16" stroke="rgba(56,152,255,0.4)" stroke-width="1"/>
-              </g>
-
-              <g transform="translate(242, 138) rotate(12)">
-                <rect x="-10" y="-12" width="20" height="20" rx="4" fill="#475569"/>
-                <ellipse cx="0" cy="22" rx="34" ry="48" fill="url(#hpEar)" stroke="#64748b" stroke-width="1.5"/>
-                <ellipse cx="0" cy="22" rx="30" ry="44" stroke="url(#hpRing)" stroke-width="2" fill="none"/>
-                <ellipse cx="0" cy="22" rx="24" ry="36" fill="#0b0f19"/>
-                <ellipse cx="0" cy="22" rx="16" ry="26" fill="#05080e" stroke="rgba(56,152,255,0.3)" stroke-width="1"/>
-                <circle cx="0" cy="22" r="3" fill="#3898ff"/>
-              </g>
-              
-              <path d="M285 100 L315 85" stroke="#3898ff" stroke-width="0.8" stroke-dasharray="2 2"/>
-              <circle cx="315" cy="85" r="2" fill="#3898ff"/>
-              <text x="322" y="88" fill="#94a3b8" font-size="8" font-family="monospace">CNC Alum.</text>
-              
-              <path d="M210 215 L230 235" stroke="#3898ff" stroke-width="0.8" stroke-dasharray="2 2"/>
-              <circle cx="230" cy="235" r="2" fill="#3898ff"/>
-              <text x="236" y="238" fill="#94a3b8" font-size="8" font-family="monospace">50mm Driver</text>
+              <path d="M 45 125 C 90 120, 160 110, 215 35" class="telemetry-glow-path"/>
+              <path d="M 45 125 C 90 120, 160 110, 215 35 L 215 130 L 45 130 Z" fill="url(#curveGrad)"/>
+              <circle cx="215" cy="35" r="4.5" fill="#ffffff" stroke="#38bdf8" stroke-width="2.5"/>
             </svg>
           </div>
 
-          <!-- Horizontal Pipeline: IDEA -> INTELLIGENCE -> DEMAND -> BUILD -> PAYPAL -->
-          <div class="product-genesis-pipeline" id="genesisMapCard">
-            <button type="button" class="pipeline-step-node active genesis-stage-btn" data-stage="idea">
-              <div class="pipeline-step-circle idea-c">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 2a6 6 0 0 0-6 6c0 2 1 3.5 2 4.5V14a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.5c1-1 2-2.5 2-4.5a6 6 0 0 0-6-6z"/></svg>
-              </div>
-              <span class="pipeline-step-label">IDEA</span>
-            </button>
-            <span class="pipeline-step-arrow">→</span>
-
-            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="intel">
-              <div class="pipeline-step-circle intel-c">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              </div>
-              <span class="pipeline-step-label">INTELLIGENCE</span>
-            </button>
-            <span class="pipeline-step-arrow">→</span>
-
-            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="demand">
-              <div class="pipeline-step-circle demand-c">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </div>
-              <span class="pipeline-step-label">DEMAND</span>
-            </button>
-            <span class="pipeline-step-arrow">→</span>
-
-            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="build">
-              <div class="pipeline-step-circle build-c">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              </div>
-              <span class="pipeline-step-label">BUILD</span>
-            </button>
-            <span class="pipeline-step-arrow">→</span>
-
-            <button type="button" class="pipeline-step-node genesis-stage-btn" data-stage="paypal">
-              <div class="pipeline-step-circle paypal-c">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 21l3-15h5a4 4 0 0 1 4 4c0 3-2 5-5 5h-3l-1.5 6H7z"/></svg>
-              </div>
-              <span class="pipeline-step-label">PAYPAL</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- The Product Genesis Journey Section -->
-      <div class="journey-section">
-        <h3 class="journey-title">The Product Genesis Journey</h3>
-        <div class="journey-cards-grid">
-          <div class="journey-card">
-            <div class="journey-card-icon c-imagine">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 2a6 6 0 0 0-6 6c0 2 1 3.5 2 4.5V14a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1.5c1-1 2-2.5 2-4.5a6 6 0 0 0-6-6z"/></svg>
-            </div>
-            <h4>Imagine</h4>
-            <p>Submit ideas for products that do not yet exist.</p>
-          </div>
-
-          <div class="journey-card">
-            <div class="journey-card-icon c-clarify">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            </div>
-            <h4>Clarify</h4>
-            <p>GENESIS Intelligence turns ideas into structured requirements.</p>
-          </div>
-
-          <div class="journey-card">
-            <div class="journey-card-icon c-discover">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            </div>
-            <h4>Discover</h4>
-            <p>Manufacturers explore real demand and opportunities.</p>
-          </div>
-
-          <div class="journey-card">
-            <div class="journey-card-icon c-build">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-            </div>
-            <h4>Build</h4>
-            <p>Publish offers and track development progress.</p>
-          </div>
-
-          <div class="journey-card">
-            <div class="journey-card-icon c-pay">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 21l3-15h5a4 4 0 0 1 4 4c0 3-2 5-5 5h-3l-1.5 6H7z"/></svg>
-            </div>
-            <h4>Pay</h4>
-            <p>Purchase eligible offers with PayPal Sandbox.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- GENESIS Intelligence Command Center Preview Card -->
-      <div class="intelligence-preview-card" id="agStudioLaunchCard">
-        <div class="intel-info-pane">
-          <div class="intel-info-header">
-            <div class="intel-brand-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            </div>
-            <h3>GENESIS Intelligence Command Center</h3>
-            <p>A powerful AG Studio workspace for manufacturers to analyze demand, explore opportunities, and turn real customer intent into products.</p>
-          </div>
-          <div class="intel-pills-row">
-            <span class="studio-pill highlight"><span style="color:#ef4444;font-weight:800;font-size:10px;margin-right:2px;">AG</span> AG Studio</span>
-            <span class="studio-pill">✨ AG Grid</span>
-            <span class="studio-pill">📊 AG Charts</span>
-            <button type="button" class="btn-open-command-center" id="agStudioLaunchBtn" aria-label="Open AG Studio Command Center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
+          <!-- Multiplier Velocity Capsules -->
+          <div class="ref-velocity-row">
+            <button type="button" class="ref-pill-node c-blue" data-stage="idea">1.45x</button>
+            <button type="button" class="ref-pill-node c-orange" data-stage="intel">3.42x</button>
+            <button type="button" class="ref-pill-node c-purple" data-stage="demand">5.22x</button>
+            <button type="button" class="ref-pill-node c-green" data-stage="build">1.20x</button>
           </div>
         </div>
 
-        <!-- Mini Dashboard Mockup Preview -->
-        <div class="intel-dashboard-mockup">
-          <div class="mockup-tabs-bar">
-            <span style="display:inline-flex;align-items:center;background:rgba(239,68,68,0.18);color:#ef4444;font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;margin-right:4px;">AG</span>
-            <span style="font-size:11px;font-weight:700;color:#ffffff;margin-right:12px;">AG Studio</span>
-            <span class="mockup-tab-pill active">Demand Explorer</span>
-            <span class="mockup-tab-pill">Opportunities</span>
-            <span class="mockup-tab-pill">Specifications</span>
-            <span class="mockup-tab-pill">Offers</span>
-            <span class="mockup-tab-pill">Orders</span>
-          </div>
-
-          <div class="mockup-kpis-row">
-            <div class="mockup-kpi-tile">
-              <span class="mockup-kpi-label">Active Demand</span>
-              <div class="mockup-kpi-val-row">
-                <span class="mockup-kpi-num">842</span>
-                <span class="mockup-kpi-gain">↑ +28%</span>
-                <svg width="44" height="16" viewBox="0 0 44 16" fill="none"><path d="M2 13L12 9L22 11L32 4L42 2" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </div>
-            </div>
-            <div class="mockup-kpi-tile">
-              <span class="mockup-kpi-label">High-Intent Ideas</span>
-              <div class="mockup-kpi-val-row">
-                <span class="mockup-kpi-num">136</span>
-                <span class="mockup-kpi-gain">↑ +41%</span>
-                <svg width="44" height="16" viewBox="0 0 44 16" fill="none"><path d="M2 14L14 11L24 7L34 8L42 3" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"/></svg>
-              </div>
-            </div>
-            <div class="mockup-kpi-tile">
-              <span class="mockup-kpi-label">Manufacturing Opportunities</span>
-              <div class="mockup-kpi-val-row">
-                <span class="mockup-kpi-num">27</span>
-                <span class="mockup-kpi-gain">↑ +35%</span>
-                <div style="display:flex;align-items:flex-end;gap:2px;height:14px;">
-                  <div style="width:3px;height:6px;background:#3898ff;border-radius:1px;"></div>
-                  <div style="width:3px;height:9px;background:#3898ff;border-radius:1px;"></div>
-                  <div style="width:3px;height:14px;background:#3898ff;border-radius:1px;"></div>
-                </div>
+        <!-- Spotlight Item Card (Hurley / Knife / Join / 23h:43m / 128) -->
+        <div class="ref-spotlight-card" id="genesisMapCard">
+          <div class="spotlight-header">
+            <div class="spotlight-creator">
+              <div class="spotlight-avatar">H</div>
+              <div class="spotlight-creator-text">
+                <small>Last Win</small>
+                <strong>Hurley</strong>
               </div>
             </div>
           </div>
 
-          <div class="mockup-split-row">
-            <div class="mockup-table-wrap">
-              <table class="mockup-table">
-                <thead>
-                  <tr>
-                    <th>Product Idea</th>
-                    <th>Demand</th>
-                    <th>Interest</th>
-                    <th>Target Price</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><span style="color:#3898ff;margin-right:4px;">⊙</span>Eight-input audio interface</td>
-                    <td style="color:#ffffff;font-weight:600;">842</td>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:6px;">
-                        <div style="width:42px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;"><div style="width:78%;height:100%;background:#3898ff;"></div></div>
-                        <span style="font-size:9.5px;">78%</span>
-                      </div>
-                    </td>
-                    <td style="color:#ffffff;">$249</td>
-                    <td><span style="background:rgba(16,185,129,0.15);color:#34d399;font-size:9.5px;padding:2px 6px;border-radius:4px;font-weight:600;">High Opportunity</span></td>
-                  </tr>
-                  <tr>
-                    <td><span style="color:#94a3b8;margin-right:4px;">⊙</span>Portable 4K field monitor</td>
-                    <td style="color:#ffffff;font-weight:600;">516</td>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:6px;">
-                        <div style="width:42px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;"><div style="width:64%;height:100%;background:#3898ff;"></div></div>
-                        <span style="font-size:9.5px;">64%</span>
-                      </div>
-                    </td>
-                    <td style="color:#ffffff;">$299</td>
-                    <td><span style="background:rgba(56,152,255,0.15);color:#93c5fd;font-size:9.5px;padding:2px 6px;border-radius:4px;font-weight:600;">Under Review</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="spotlight-graphic">
+            <svg width="150" height="48" viewBox="0 0 150 48" fill="none">
+              <path d="M20 38 L80 18 L120 12 L100 28 Z" fill="url(#cRedGrad)" stroke="#fb7185" stroke-width="1.2"/>
+              <path d="M35 44 L95 24 L135 18 L115 34 Z" fill="url(#cPurpGrad)" stroke="#c084fc" stroke-width="1.2"/>
+              <defs>
+                <linearGradient id="cRedGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#f43f5e"/>
+                  <stop offset="100%" stop-color="#881337"/>
+                </linearGradient>
+                <linearGradient id="cPurpGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#a855f7"/>
+                  <stop offset="100%" stop-color="#3b82f6"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
 
-            <div class="mockup-chart-tile">
-              <div class="mockup-chart-head">Demand by Category</div>
-              <div class="mockup-donut-layout">
-                <div class="donut-svg-wrap">
-                  <svg width="64" height="64" viewBox="0 0 64 64">
-                    <circle cx="32" cy="32" r="24" stroke="rgba(255,255,255,0.06)" stroke-width="7" fill="none"/>
-                    <circle cx="32" cy="32" r="24" stroke="#00d2b4" stroke-width="7" fill="none" stroke-dasharray="63 150" stroke-dashoffset="0"/>
-                    <circle cx="32" cy="32" r="24" stroke="#0070ba" stroke-width="7" fill="none" stroke-dasharray="36 150" stroke-dashoffset="-65"/>
-                    <circle cx="32" cy="32" r="24" stroke="#a855f7" stroke-width="7" fill="none" stroke-dasharray="27 150" stroke-dashoffset="-103"/>
-                    <circle cx="32" cy="32" r="24" stroke="#f97316" stroke-width="7" fill="none" stroke-dasharray="24 150" stroke-dashoffset="-132"/>
-                  </svg>
-                  <div class="donut-center-text">
-                    <strong>842</strong>
-                    <small>Total Requests</small>
-                  </div>
-                </div>
-                <div class="donut-legend">
-                  <div class="legend-row"><span class="legend-dot" style="background:#00d2b4;"></span>Creator Tools <strong style="margin-left:auto;color:#ffffff;font-size:10px;">42%</strong></div>
-                  <div class="legend-row"><span class="legend-dot" style="background:#0070ba;"></span>Audio & Music <strong style="margin-left:auto;color:#ffffff;font-size:10px;">24%</strong></div>
-                  <div class="legend-row"><span class="legend-dot" style="background:#a855f7;"></span>Productivity <strong style="margin-left:auto;color:#ffffff;font-size:10px;">18%</strong></div>
-                  <div class="legend-row"><span class="legend-dot" style="background:#f97316;"></span>Other <strong style="margin-left:auto;color:#ffffff;font-size:10px;">16%</strong></div>
-                </div>
-              </div>
+          <div class="spotlight-actions-bar">
+            <button type="button" class="ref-join-btn" id="btnJoinSpotlight">Join</button>
+            <div class="spotlight-timer">
+              <span>23h : 43m</span>
+              <small>👥 128</small>
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- Checked Row at bottom of left column -->
+        <div class="ref-checked-row">
+          <span>Checked <strong style="color:#ffffff">0.0 $</strong></span>
+          <span style="display:flex;align-items:center;gap:4px">All <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+        </div>
+      </aside>
+
+      <!-- CENTER STAGE: INFORMATION, 3D SHOWCASE & 3 SOFT-3D CARDS -->
+      <section class="ref-center-col">
+        <div class="showcase-header-bar">
+          <span class="showcase-label">Information</span>
+        </div>
+
+        <!-- 3D Floating Showcase with Neon Circular Ring & Conversion Pricing -->
+        <div class="ref-3d-showcase">
+          <div class="floating-item-ring-wrap">
+            <div class="neon-circular-ring"></div>
+            <!-- Futuristic Voltaire 3D Rifle/Tool Vector -->
+            <svg class="showcase-product-svg" width="180" height="90" viewBox="0 0 180 90" fill="none">
+              <path d="M15 28 L40 32 L75 30 L155 46 L165 72 L145 68 L130 52 L60 48 L35 44 Z" fill="#b91c1c" stroke="#fca5a5" stroke-width="1.4"/>
+              <path d="M75 30 L110 32 L105 48 L70 48 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1"/>
+              <path d="M120 40 L150 44 L142 58 L115 54 Z" fill="#e11d48"/>
+              <text x="80" y="44" fill="#ffffff" font-size="7" font-weight="800" font-family="monospace">VOLTAIRE</text>
+              <circle cx="155" cy="46" r="3" fill="#38bdf8"/>
+            </svg>
+          </div>
+
+          <div class="ref-price-conversion">
+            <div class="price-main-row">
+              <span>7.19 <span class="price-symbol">$</span></span>
+              <span class="price-arrow">»</span>
+              <span>8.15 <span class="price-symbol">$</span></span>
+            </div>
+            <div class="price-sub-row">
+              <span class="price-sub-tag">1.7 $</span>
+              <button type="button" class="ref-receive-btn" id="demoConsumerHeroBtn">
+                <span>receive 2.54x</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Three Bold Colorful 3D Rounded Cards (Blue, Purple, Coral-Red) -->
+        <div class="ref-3d-cards-row">
+          <!-- Card 1: Blue (vk/idea) -->
+          <div class="ref-3d-feature-card card-blue" id="btnCardIdea" role="button" tabindex="0">
+            <div class="card-3d-glyph">W</div>
+            <p class="card-3d-desc">Don't miss the latest news &amp; giveaways in our VK group.</p>
+            <div class="card-3d-arrow">→</div>
+          </div>
+
+          <!-- Card 2: Purple (X/Intelligence) -->
+          <div class="ref-3d-feature-card card-purple" id="btnCardIntel" role="button" tabindex="0">
+            <div class="card-3d-glyph">✕</div>
+            <p class="card-3d-desc">To make real Xs, you need to replenish the balance.</p>
+            <div class="card-3d-arrow">→</div>
+          </div>
+
+          <!-- Card 3: Coral-Red (%/PayPal) -->
+          <div class="ref-3d-feature-card card-coral" id="btnCardPay" role="button" tabindex="0">
+            <div class="card-3d-glyph">%</div>
+            <p class="card-3d-desc">Put the nickname "csgorun.ru" &amp; get 10 % to replenish</p>
+            <div class="card-3d-arrow">→</div>
+          </div>
+        </div>
+
+        <!-- Statistic Row at Bottom of Center Column -->
+        <div class="ref-stats-bar">
+          <span class="stats-bar-title">Statistic</span>
+          <div class="stats-bar-items">
+            <span class="stats-bar-item">👥 73</span>
+            <span class="stats-bar-item">💰 24.80</span>
+            <span class="stats-bar-item">⚡ 56</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: ACTIVITY STREAM & PINNED SYSTEM TOAST -->
+      <aside class="ref-right-col">
+        <div class="feed-header-bar">
+          <button type="button" class="feed-collapse-btn" title="Collapse Feed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+          <div class="feed-online-count">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 8 0v2"/></svg>
+            <span>438</span>
+          </div>
+        </div>
+
+        <!-- Live Activity Stream List -->
+        <div class="feed-items-list">
+          <div class="feed-entry">
+            <div class="feed-avatar" style="background:#f59e0b">🐔</div>
+            <div class="feed-body">
+              <div class="feed-meta-row">
+                <span class="feed-user-tag">sQich <small style="color:var(--ink-muted)">[32]</small></span>
+                <span class="feed-time">12:35</span>
+              </div>
+              <p class="feed-msg">Messages are sent as chats if the person you're</p>
+            </div>
+          </div>
+
+          <div class="feed-entry">
+            <div class="feed-avatar" style="background:#10b981">🤖</div>
+            <div class="feed-body">
+              <div class="feed-meta-row">
+                <span class="feed-user-tag">Ra1n <small style="color:var(--ink-muted)">[8]</small></span>
+                <span class="feed-time">12:33</span>
+              </div>
+              <p class="feed-msg">there is still gonna be call of duty and stuff</p>
+            </div>
+          </div>
+
+          <div class="feed-entry">
+            <div class="feed-avatar" style="background:#e11d48">🦊</div>
+            <div class="feed-body">
+              <div class="feed-meta-row">
+                <span class="feed-user-tag">Hurley <small style="color:var(--ink-muted)">[13]</small></span>
+                <span class="feed-time">11:21</span>
+              </div>
+              <p class="feed-msg">do surf utopia its a great map</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pinned Bottom System Message Toast -->
+        <div class="ref-system-toast" id="systemMessageToast">
+          <div class="toast-runner-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="13" cy="4" r="2"/><path d="m5 21 4-7 4 3 4-8"/><path d="m9 14 3-6 4 2"/></svg>
+          </div>
+          <div class="toast-body">
+            <div class="toast-head-row">
+              <strong class="toast-title">System Message</strong>
+              <span class="toast-time">10:33</span>
+            </div>
+            <p class="toast-desc">Your surfing... Hurts my brain.</p>
+          </div>
+        </div>
+      </aside>
     </div>
   `;
-
-  // Attach interactive pipeline clicks
-  const stageNodes = document.querySelectorAll('.pipeline-step-node');
-  stageNodes.forEach(node => {
-    node.onclick = () => {
-      stageNodes.forEach(n => n.classList.remove('active'));
-      node.classList.add('active');
-    };
-  });
 
   const launchDemo = async (role) => {
     try {
@@ -948,25 +854,18 @@ function introPage() {
   };
 
   $('#demoConsumerHeroBtn').onclick = () => launchDemo('consumer');
-  $('#demoMakerHeroBtn').onclick = () => launchDemo('manufacturer');
+  if ($('#btnCardIdea')) $('#btnCardIdea').onclick = () => launchDemo('consumer');
+  if ($('#btnCardIntel')) $('#btnCardIntel').onclick = () => launchDemo('manufacturer');
+  if ($('#btnCardPay')) $('#btnCardPay').onclick = () => launchDemo('consumer');
+  if ($('#btnJoinSpotlight')) $('#btnJoinSpotlight').onclick = () => launchDemo('consumer');
 
-  const launchMakerIntelligence = async () => {
-    try {
-      await api('/demo/session', 'POST', { role: 'manufacturer' });
-      await refreshMe();
-      notice('Manufacturer Intelligence Command Center launched.', 'success');
-      go('#/manufacturer/intelligence');
-    } catch (err) {
-      notice(err.message, 'error');
-    }
-  };
-
-  if ($('#agStudioLaunchBtn')) $('#agStudioLaunchBtn').onclick = (e) => {
-    e.stopPropagation();
-    launchMakerIntelligence();
-  };
-  if ($('#agStudioLaunchCard')) $('#agStudioLaunchCard').onclick = () => launchMakerIntelligence();
-  if ($('#tourPillBtn')) $('#tourPillBtn').onclick = () => go('#/help');
+  document.querySelectorAll('.ref-pill-node').forEach((p) => {
+    p.onclick = () => {
+      document.querySelectorAll('.ref-pill-node').forEach((x) => x.style.transform = 'none');
+      p.style.transform = 'translateY(-2px)';
+      notice(`Velocity ${p.textContent} telemetry selected.`, 'info');
+    };
+  });
 }
 
 function bindHomeActions() {
