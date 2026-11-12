@@ -1,0 +1,10 @@
+ALTER TABLE products ADD COLUMN group_id TEXT;
+ALTER TABLE products ADD COLUMN intelligence TEXT;
+ALTER TABLE users ADD COLUMN email_verified_at TEXT;
+ALTER TABLE offers ADD COLUMN eligible INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE orders ADD COLUMN capture_id TEXT;
+CREATE TABLE recommendations (id TEXT PRIMARY KEY, product_id TEXT NOT NULL REFERENCES products(id), kind TEXT NOT NULL, severity TEXT NOT NULL, evidence TEXT NOT NULL, uncertainty TEXT NOT NULL, action TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', reviewed_by TEXT REFERENCES users(id), reviewed_at TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE verification_tokens (token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),expires_at TEXT NOT NULL);
+CREATE TABLE rate_limits (key TEXT PRIMARY KEY,count INTEGER NOT NULL,window_start INTEGER NOT NULL);
+CREATE INDEX idx_group ON products(group_id);
+CREATE INDEX idx_recommendations_product ON recommendations(product_id);

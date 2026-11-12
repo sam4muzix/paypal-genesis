@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" style="background:#090d16;color:#f1f5f9">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PayPal GENESIS — Products should begin with people</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230070ba'/><text x='16' y='23' font-family='system-ui,sans-serif' font-size='20' font-weight='800' fill='white' text-anchor='middle'>G</text></svg>">
+  <style>html,body{background:#090d16;color:#f1f5f9;margin:0}</style>
+  <link rel="stylesheet" href="/style.css?v=20261112-dark1">
+  <script src="/ag-studio.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar" aria-label="Primary navigation">
+      <a class="brand" href="#/home" id="brandHomeLink">
+        <span class="mark" aria-hidden="true">G</span>
+        <span>
+          <small>PayPal</small>
+          <strong>GENESIS</strong>
+        </span>
+      </a>
+      <nav id="nav"></nav>
+      <div class="aside-foot">
+        <span id="roleChip" class="role-chip">Visitor</span>
+        <p class="aside-note">Sandbox prototype · No real charges</p>
+      </div>
+    </aside>
+    <main>
+      <header id="appHeader">
+        <div class="header-title">
+          <a class="mobile-brand" href="#/home" id="mobileBrandLink">
+            <span class="mark sm" aria-hidden="true">G</span>
+            <span><strong>GENESIS</strong></span>
+          </a>
+          <h1 id="heading">Home</h1>
+        </div>
+        <div id="account"></div>
+      </header>
+      <div id="bannerSlot"></div>
+      <div id="notice" role="status" aria-live="polite" tabindex="-1"></div>
+      <section id="view" class="view-stage"></section>
+    </main>
+  </div>
+  <dialog id="modal" aria-labelledby="modalTitle">
+    <button class="close" id="modalClose" type="button" aria-label="Close">×</button>
+    <div id="modalNotice" role="alert" aria-live="polite"></div>
+    <div id="modalBody"></div>
+  </dialog>
+  <script type="module" src="/app.js?v=20261112-dark1"></script>
+</body>
+</html>

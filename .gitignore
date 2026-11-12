@@ -1,0 +1,15 @@
+node_modules/
+.dev.vars
+.env
+.env.*
+!.env.example
+.wrangler/
+dist/
+playwright-report/
+test-results/
+*.sqlite
+*.db
+.DS_Store
+video/
+submission/*.mp4
+*.mov

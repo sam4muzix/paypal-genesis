@@ -1,0 +1,26 @@
+{
+  "name": "paypal-genesis",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "genesis-prod",
+      "database_id": "300f4290-5648-46c3-9e80-78cd9901e81f"
+    }
+  ],
+  "routes": [
+    {
+      "pattern": "genesis.greenmixlabs.com",
+      "zone_name": "greenmixlabs.com",
+      "custom_domain": true
+    }
+  ]
+}

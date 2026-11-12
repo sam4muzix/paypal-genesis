@@ -1,0 +1,772 @@
+{
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "voice": "Leda",
+  "music": {
+    "enabled": false,
+    "src": null
+  },
+  "totalFrames": 3996,
+  "totalDurationSec": 133.2,
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "WHAT IS GENESIS?",
+      "narrationText": "Have you ever wished a product existed, but couldn't find anyone making it? Or bought something that could have been designed better? GENESIS connects people with product ideas to manufacturers who can bring those ideas closer to reality. Anyone can share an idea, and approved manufacturers can respond with offers.",
+      "narrationFile": "audio/ch1.wav",
+      "narrationDurationSec": 18.973,
+      "visualTailSec": 1.8,
+      "audioStartFrame": 5,
+      "startFrame": 0,
+      "endFrame": 624,
+      "frames": 624,
+      "beats": [
+        {
+          "text": "Have you ever wished a product existed, but couldn't find anyone making it?",
+          "startSec": 0.167,
+          "endSec": 4.53
+        },
+        {
+          "text": "Or bought something that could have been designed better?",
+          "startSec": 4.78,
+          "endSec": 7.261
+        },
+        {
+          "text": "GENESIS connects people with product ideas to manufacturers who can bring those ideas closer to reality.",
+          "startSec": 7.511,
+          "endSec": 13.908
+        },
+        {
+          "text": "Anyone can share an idea, and approved manufacturers can respond with offers.",
+          "startSec": 14.158,
+          "endSec": 19.14
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch1_intro",
+          "clip": "clips/ch1_intro.mp4",
+          "fromSec": 0,
+          "toSec": 20.8,
+          "fromFrame": 0,
+          "toFrame": 624,
+          "recordSec": 21.4,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "PEOPLE  →  MANUFACTURERS",
+          "atSec": 7.511,
+          "atFrame": 225
+        },
+        {
+          "text": "FROM IDEA TO REALITY",
+          "atSec": 12.801,
+          "atFrame": 384
+        },
+        {
+          "text": "GET STARTED",
+          "atSec": 14.158,
+          "atFrame": 425
+        }
+      ],
+      "zooms": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 4.68,
+          "text": "Have you ever wished a product existed, but couldn't find anyone making it?"
+        },
+        {
+          "startSec": 4.78,
+          "endSec": 7.411,
+          "text": "Or bought something that could have been designed better?"
+        },
+        {
+          "startSec": 7.511,
+          "endSec": 14.058,
+          "text": "GENESIS connects people with product ideas to manufacturers who can bring those ideas closer to reality."
+        },
+        {
+          "startSec": 14.158,
+          "endSec": 19.29,
+          "text": "Anyone can share an idea, and approved manufacturers can respond with offers."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch2",
+      "title": "HOW CONSUMERS USE IT",
+      "narrationText": "Imagine you need a portable audio interface that records eight microphones at once. You open GENESIS, describe what you need, choose the features that matter, and publish your idea. That's it. Other people can now discover your request.",
+      "narrationFile": "audio/ch2.wav",
+      "narrationDurationSec": 13.319,
+      "visualTailSec": 1.8,
+      "audioStartFrame": 5,
+      "startFrame": 624,
+      "endFrame": 1078,
+      "frames": 454,
+      "beats": [
+        {
+          "text": "Imagine you need a portable audio interface that records eight microphones at once.",
+          "startSec": 0.167,
+          "endSec": 4.561
+        },
+        {
+          "text": "You open GENESIS, describe what you need, choose the features that matter, and publish your idea.",
+          "startSec": 4.811,
+          "endSec": 10.129
+        },
+        {
+          "text": "That's it. Other people can now discover your request.",
+          "startSec": 10.379,
+          "endSec": 13.486
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch2_request",
+          "clip": "clips/ch2_request.mp4",
+          "fromSec": 0,
+          "toSec": 15.133,
+          "fromFrame": 0,
+          "toFrame": 454,
+          "recordSec": 15.733,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "OPEN GENESIS",
+          "atSec": 4.811,
+          "atFrame": 144
+        },
+        {
+          "text": "1 · DESCRIBE IT",
+          "atSec": 5.798,
+          "atFrame": 174
+        },
+        {
+          "text": "2 · CHOOSE WHAT MATTERS",
+          "atSec": 7.114,
+          "atFrame": 213
+        },
+        {
+          "text": "3 · PUBLISH IT",
+          "atSec": 9.142,
+          "atFrame": 274
+        },
+        {
+          "text": "VISIBLE TO EVERYONE",
+          "atSec": 11.012,
+          "atFrame": 330
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 56,
+          "y": 38
+        },
+        {
+          "t": 5.598,
+          "s": 1,
+          "x": 56,
+          "y": 38
+        },
+        {
+          "t": 6.398,
+          "s": 1.16,
+          "x": 56,
+          "y": 38
+        },
+        {
+          "t": 10.342,
+          "s": 1.16,
+          "x": 56,
+          "y": 30
+        },
+        {
+          "t": 11.612,
+          "s": 1,
+          "x": 56,
+          "y": 30
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 4.711,
+          "text": "Imagine you need a portable audio interface that records eight microphones at once."
+        },
+        {
+          "startSec": 4.811,
+          "endSec": 10.279,
+          "text": "You open GENESIS, describe what you need, choose the features that matter, and publish your idea."
+        },
+        {
+          "startSec": 10.379,
+          "endSec": 13.636,
+          "text": "That's it. Other people can now discover your request."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch3",
+      "title": "WHAT THE AI DOES",
+      "narrationText": "GENESIS Intelligence helps turn your idea into clearer product requirements. It organizes the important features, identifies questions that still need answers, and gives you a specification you can review, edit, and save. You stay in control of your idea.",
+      "narrationFile": "audio/ch3.wav",
+      "narrationDurationSec": 17.093,
+      "visualTailSec": 1.8,
+      "audioStartFrame": 5,
+      "startFrame": 1078,
+      "endFrame": 1645,
+      "frames": 567,
+      "beats": [
+        {
+          "text": "GENESIS Intelligence helps turn your idea into clearer product requirements.",
+          "startSec": 0.167,
+          "endSec": 5.164
+        },
+        {
+          "text": "It organizes the important features, identifies questions that still need answers, and gives you a specification you can review, edit, and save.",
+          "startSec": 5.414,
+          "endSec": 14.324
+        },
+        {
+          "text": "You stay in control of your idea.",
+          "startSec": 14.574,
+          "endSec": 17.26
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch3_a",
+          "clip": "clips/ch3_a.mp4",
+          "fromSec": 0,
+          "toSec": 5.4,
+          "fromFrame": 0,
+          "toFrame": 162,
+          "recordSec": 6,
+          "fadeInFrames": 0,
+          "note": null
+        },
+        {
+          "id": "ch3_b",
+          "clip": "clips/ch3_b.mp4",
+          "fromSec": 5.4,
+          "toSec": 18.9,
+          "fromFrame": 162,
+          "toFrame": 567,
+          "recordSec": 14.1,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "GENESIS INTELLIGENCE",
+          "atSec": 0.167,
+          "atFrame": 5
+        },
+        {
+          "text": "REQUIREMENTS",
+          "atSec": 5.414,
+          "atFrame": 162
+        },
+        {
+          "text": "OPEN QUESTIONS",
+          "atSec": 7.703,
+          "atFrame": 231
+        },
+        {
+          "text": "REVIEW · EDIT · SAVE",
+          "atSec": 12.901,
+          "atFrame": 387
+        },
+        {
+          "text": "YOU STAY IN CONTROL",
+          "atSec": 14.574,
+          "atFrame": 437
+        }
+      ],
+      "zooms": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 5.314,
+          "text": "GENESIS Intelligence helps turn your idea into clearer product requirements."
+        },
+        {
+          "startSec": 5.414,
+          "endSec": 14.474,
+          "text": "It organizes the important features, identifies questions that still need answers, and gives you a specification you can review, edit, and save."
+        },
+        {
+          "startSec": 14.574,
+          "endSec": 17.41,
+          "text": "You stay in control of your idea."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch4",
+      "title": "COMMUNITY SUPPORT AND FEEDBACK",
+      "narrationText": "Other consumers can explore ideas and show they're interested. They can also report problems with products they already use. This gives manufacturers a clearer view of what people want and what needs improvement.",
+      "narrationFile": "audio/ch4.wav",
+      "narrationDurationSec": 12.181,
+      "visualTailSec": 1.8,
+      "audioStartFrame": 5,
+      "startFrame": 1645,
+      "endFrame": 2065,
+      "frames": 420,
+      "beats": [
+        {
+          "text": "Other consumers can explore ideas and show they're interested.",
+          "startSec": 0.167,
+          "endSec": 3.776
+        },
+        {
+          "text": "They can also report problems with products they already use.",
+          "startSec": 4.026,
+          "endSec": 7.492
+        },
+        {
+          "text": "This gives manufacturers a clearer view of what people want and what needs improvement.",
+          "startSec": 7.742,
+          "endSec": 12.348
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch4_community",
+          "clip": "clips/ch4_community.mp4",
+          "fromSec": 0,
+          "toSec": 14,
+          "fromFrame": 0,
+          "toFrame": 420,
+          "recordSec": 14.6,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "EXPLORE IDEAS",
+          "atSec": 1.331,
+          "atFrame": 40
+        },
+        {
+          "text": "I'M INTERESTED",
+          "atSec": 2.379,
+          "atFrame": 71
+        },
+        {
+          "text": "REPORT A PROBLEM",
+          "atSec": 4.821,
+          "atFrame": 145
+        },
+        {
+          "text": "CLEARER VIEW OF DEMAND",
+          "atSec": 9.171,
+          "atFrame": 275
+        }
+      ],
+      "zooms": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 3.926,
+          "text": "Other consumers can explore ideas and show they're interested."
+        },
+        {
+          "startSec": 4.026,
+          "endSec": 7.642,
+          "text": "They can also report problems with products they already use."
+        },
+        {
+          "startSec": 7.742,
+          "endSec": 12.498,
+          "text": "This gives manufacturers a clearer view of what people want and what needs improvement."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch5",
+      "title": "HOW MANUFACTURERS USE IT",
+      "narrationText": "For manufacturers, GENESIS provides a place to discover real customer requests. They can review an idea, propose to build it, share pricing, and update progress. Every offer stays linked to the original request. Customer feedback also helps them decide what to improve before or after a product reaches the market.",
+      "narrationFile": "audio/ch5.wav",
+      "narrationDurationSec": 19.738,
+      "visualTailSec": 1.8,
+      "audioStartFrame": 5,
+      "startFrame": 2065,
+      "endFrame": 2712,
+      "frames": 647,
+      "beats": [
+        {
+          "text": "For manufacturers, GENESIS provides a place to discover real customer requests.",
+          "startSec": 0.167,
+          "endSec": 5.088
+        },
+        {
+          "text": "They can review an idea, propose to build it, share pricing, and update progress.",
+          "startSec": 5.338,
+          "endSec": 10.993
+        },
+        {
+          "text": "Every offer stays linked to the original request.",
+          "startSec": 11.243,
+          "endSec": 14.252
+        },
+        {
+          "text": "Customer feedback also helps them decide what to improve before or after a product reaches the market.",
+          "startSec": 14.502,
+          "endSec": 19.905
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch5_work",
+          "clip": "clips/ch5_work.mp4",
+          "fromSec": 0,
+          "toSec": 21.567,
+          "fromFrame": 0,
+          "toFrame": 647,
+          "recordSec": 22.167,
+          "fadeInFrames": 0,
+          "note": null
+        }
+      ],
+      "events": [
+        {
+          "text": "CUSTOMER DEMAND",
+          "atSec": 3.095,
+          "atFrame": 93
+        },
+        {
+          "text": "OFFER & PRICING",
+          "atSec": 7.083,
+          "atFrame": 212
+        },
+        {
+          "text": "DEVELOPMENT PROGRESS",
+          "atSec": 9.876,
+          "atFrame": 296
+        },
+        {
+          "text": "FEEDBACK & DECISIONS",
+          "atSec": 14.502,
+          "atFrame": 435
+        }
+      ],
+      "zooms": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 5.238,
+          "text": "For manufacturers, GENESIS provides a place to discover real customer requests."
+        },
+        {
+          "startSec": 5.338,
+          "endSec": 11.143,
+          "text": "They can review an idea, propose to build it, share pricing, and update progress."
+        },
+        {
+          "startSec": 11.243,
+          "endSec": 14.402,
+          "text": "Every offer stays linked to the original request."
+        },
+        {
+          "startSec": 14.502,
+          "endSec": 20.055,
+          "text": "Customer feedback also helps them decide what to improve before or after a product reaches the market."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch6",
+      "title": "HOW PAYPAL WORKS",
+      "narrationText": "When a manufacturer has an eligible offer, a verified consumer can continue to PayPal checkout. GENESIS checks the Sandbox payment result before recording the order as confirmed. Both the purchase and its progress can then be followed inside the platform.",
+      "narrationFile": "audio/ch6.wav",
+      "narrationDurationSec": 14.548,
+      "visualTailSec": 1.8,
+      "audioStartFrame": 5,
+      "startFrame": 2712,
+      "endFrame": 3203,
+      "frames": 491,
+      "beats": [
+        {
+          "text": "When a manufacturer has an eligible offer, a verified consumer can continue to PayPal checkout.",
+          "startSec": 0.167,
+          "endSec": 5.843
+        },
+        {
+          "text": "GENESIS checks the Sandbox payment result before recording the order as confirmed.",
+          "startSec": 6.093,
+          "endSec": 10.625
+        },
+        {
+          "text": "Both the purchase and its progress can then be followed inside the platform.",
+          "startSec": 10.875,
+          "endSec": 14.715
+        }
+      ],
+      "segments": [
+        {
+          "id": "ch6_a",
+          "clip": "clips/ch6_a.mp4",
+          "fromSec": 0,
+          "toSec": 4.9,
+          "fromFrame": 0,
+          "toFrame": 147,
+          "recordSec": 5.5,
+          "fadeInFrames": 0,
+          "note": null
+        },
+        {
+          "id": "ch6_b",
+          "clip": "clips/ch6_b.mp4",
+          "fromSec": 4.9,
+          "toSec": 7.1,
+          "fromFrame": 147,
+          "toFrame": 213,
+          "recordSec": 2.8,
+          "fadeInFrames": 6,
+          "note": "PAYPAL SANDBOX · NO REAL MONEY"
+        },
+        {
+          "id": "ch6_c",
+          "clip": "clips/ch6_c.mp4",
+          "fromSec": 7.1,
+          "toSec": 10.867,
+          "fromFrame": 213,
+          "toFrame": 326,
+          "recordSec": 4.367,
+          "fadeInFrames": 6,
+          "note": "PAYPAL SANDBOX · VERIFIED ORDER FROM AN EARLIER TEST PURCHASE"
+        },
+        {
+          "id": "ch6_d",
+          "clip": "clips/ch6_d.mp4",
+          "fromSec": 10.867,
+          "toSec": 16.367,
+          "fromFrame": 326,
+          "toFrame": 491,
+          "recordSec": 6.1,
+          "fadeInFrames": 0,
+          "note": "PAYPAL SANDBOX · NO REAL MONEY"
+        }
+      ],
+      "events": [
+        {
+          "text": "ELIGIBLE OFFER",
+          "atSec": 1.78,
+          "atFrame": 53
+        },
+        {
+          "text": "PAYPAL SANDBOX CHECKOUT",
+          "atSec": 4.887,
+          "atFrame": 147
+        },
+        {
+          "text": "PAYMENT CONFIRMED · SANDBOX",
+          "atSec": 7.093,
+          "atFrame": 213
+        },
+        {
+          "text": "PURCHASE & PROGRESS",
+          "atSec": 10.875,
+          "atFrame": 326
+        }
+      ],
+      "zooms": [
+        {
+          "t": 0,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 3.036,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 3.836,
+          "s": 1.12,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 4.787,
+          "s": 1.12,
+          "x": 50,
+          "y": 50
+        },
+        {
+          "t": 4.887,
+          "s": 1,
+          "x": 50,
+          "y": 50
+        }
+      ],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 5.993,
+          "text": "When a manufacturer has an eligible offer, a verified consumer can continue to PayPal checkout."
+        },
+        {
+          "startSec": 6.093,
+          "endSec": 10.775,
+          "text": "GENESIS checks the Sandbox payment result before recording the order as confirmed."
+        },
+        {
+          "startSec": 10.875,
+          "endSec": 14.865,
+          "text": "Both the purchase and its progress can then be followed inside the platform."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch7",
+      "title": "WHY IT MATTERS",
+      "narrationText": "For consumers, GENESIS means a voice in what gets created, better visibility, and a way to support useful ideas. For manufacturers, it means clearer demand, practical feedback, and a direct path from customer interest to a purchase.",
+      "narrationFile": "audio/ch7.wav",
+      "narrationDurationSec": 15.204,
+      "visualTailSec": 2,
+      "audioStartFrame": 5,
+      "startFrame": 3203,
+      "endFrame": 3720,
+      "frames": 517,
+      "beats": [
+        {
+          "text": "For consumers, GENESIS means a voice in what gets created, better visibility, and a way to support useful ideas.",
+          "startSec": 0.167,
+          "endSec": 7.541
+        },
+        {
+          "text": "For manufacturers, it means clearer demand, practical feedback, and a direct path from customer interest to a purchase.",
+          "startSec": 7.791,
+          "endSec": 15.371
+        }
+      ],
+      "segments": [],
+      "events": [
+        {
+          "text": "A voice in what gets created",
+          "side": "consumer",
+          "kind": "bullet",
+          "atSec": 2.076,
+          "atFrame": 62
+        },
+        {
+          "text": "Better visibility",
+          "side": "consumer",
+          "kind": "bullet",
+          "atSec": 4.052,
+          "atFrame": 122
+        },
+        {
+          "text": "A way to support useful ideas",
+          "side": "consumer",
+          "kind": "bullet",
+          "atSec": 6.158,
+          "atFrame": 185
+        },
+        {
+          "text": "Clearer demand",
+          "side": "maker",
+          "kind": "bullet",
+          "atSec": 9.575,
+          "atFrame": 287
+        },
+        {
+          "text": "Practical feedback",
+          "side": "maker",
+          "kind": "bullet",
+          "atSec": 10.594,
+          "atFrame": 318
+        },
+        {
+          "text": "A direct path from interest to purchase",
+          "side": "maker",
+          "kind": "bullet",
+          "atSec": 12.25,
+          "atFrame": 368
+        }
+      ],
+      "zooms": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 7.691,
+          "text": "For consumers, GENESIS means a voice in what gets created, better visibility, and a way to support useful ideas."
+        },
+        {
+          "startSec": 7.791,
+          "endSec": 15.521,
+          "text": "For manufacturers, it means clearer demand, practical feedback, and a direct path from customer interest to a purchase."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    },
+    {
+      "id": "ch8",
+      "title": "CLOSING",
+      "narrationText": "PayPal GENESIS. Products should begin with people.",
+      "narrationFile": "audio/ch8.wav",
+      "narrationDurationSec": 3.668,
+      "visualTailSec": 5.5,
+      "audioStartFrame": 5,
+      "startFrame": 3720,
+      "endFrame": 3996,
+      "frames": 276,
+      "beats": [
+        {
+          "text": "PayPal GENESIS. Products should begin with people.",
+          "startSec": 0.167,
+          "endSec": 3.835
+        }
+      ],
+      "segments": [],
+      "events": [],
+      "zooms": [],
+      "captions": [
+        {
+          "startSec": 0.167,
+          "endSec": 3.985,
+          "text": "PayPal GENESIS. Products should begin with people."
+        }
+      ],
+      "transition": {
+        "fadeInFrames": 6
+      }
+    }
+  ]
+}
