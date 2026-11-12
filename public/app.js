@@ -105,10 +105,25 @@ const paymentBadgeClass = {
 const maker = () => ['manufacturer', 'administrator'].includes(user?.role);
 
 function getProductVisual(prod = {}) {
-  const hay = `${prod.id || ''} ${prod.title || ''} ${prod.category || ''} ${prod.description || ''}`.toLowerCase();
-  const title = prod.title || 'GENESIS Hardware Concept';
-  if (hay.includes('audio interface') || hay.includes('recording interface') || hay.includes('demo-a1') || hay.includes('demo-a2') || (hay.includes('creator') && hay.includes('interface'))) {
+  const id = String(prod.id || '').toLowerCase();
+  const titleStr = String(prod.title || '').toLowerCase();
+  const catStr = String(prod.category || '').toLowerCase();
+  const hay = `${id} ${titleStr} ${catStr} ${String(prod.description || '').toLowerCase()}`.trim();
+  const title = prod.title || 'GENESIS Concept';
+  if (!hay || id === 'genesis-neutral' || id === 'genesis-orders-empty') {
+    return { src: '/assets/products/hardware-chassis.svg', isSvg: true, alt: title };
+  }
+  if (id === 'demo-a2' || titleStr.includes('recording interface') || titleStr.includes('multichannel')) {
+    return { src: '/assets/products/audio-interface.svg', isSvg: true, alt: title };
+  }
+  if (id === 'demo-a1' || titleStr.includes('eight-input') || titleStr.includes('eight input') || titleStr.includes('8-input') || titleStr.includes('audio interface')) {
     return { src: '/assets/products/audio-interface-3d.jpg', isSvg: false, alt: title };
+  }
+  if (hay.includes('earbud') || hay.includes('headphone') || catStr.includes('audio')) {
+    return { src: '/assets/products/studio-headphones.svg', isSvg: true, alt: title };
+  }
+  if (hay.includes('smart-home') || hay.includes('smart home') || hay.includes('hub') || hay.includes('iot') || hay.includes('matter') || hay.includes('appliance') || catStr === 'home') {
+    return { src: '/assets/products/appliance.svg', isSvg: true, alt: title };
   }
   if (hay.includes('monitor') || hay.includes('display') || hay.includes('screen') || hay.includes('4k') || hay.includes('video')) {
     return { src: '/assets/products/field-monitor.svg', isSvg: true, alt: title };
@@ -116,22 +131,42 @@ function getProductVisual(prod = {}) {
   if (hay.includes('keyboard') || hay.includes('keycap') || hay.includes('typing')) {
     return { src: '/assets/products/creator-keyboard.svg', isSvg: true, alt: title };
   }
-  if (hay.includes('earbud') || hay.includes('headphone') || hay.includes('audio')) {
-    return { src: '/assets/products/studio-headphones.svg', isSvg: true, alt: title };
-  }
   if (hay.includes('camera') || hay.includes('lens') || hay.includes('photo')) {
     return { src: '/assets/products/camera.svg', isSvg: true, alt: title };
   }
   if (hay.includes('watch') || hay.includes('wearable') || hay.includes('fitness')) {
     return { src: '/assets/products/smartwatch.svg', isSvg: true, alt: title };
   }
-  if (hay.includes('laptop') || hay.includes('notebook') || hay.includes('workstation')) {
+  if (hay.includes('laptop') || hay.includes('notebook') || hay.includes('workstation') || hay.includes('computing')) {
     return { src: '/assets/products/laptop.svg', isSvg: true, alt: title };
   }
-  if (hay.includes('home') || hay.includes('hub') || hay.includes('matter') || hay.includes('appliance')) {
-    return { src: '/assets/products/appliance.svg', isSvg: true, alt: title };
-  }
   return { src: '/assets/products/hardware-chassis.svg', isSvg: true, alt: title };
+}
+
+function pickDiverseShowcase(list) {
+  const uniqueTitle = [];
+  const seenTitles = new Set();
+  for (const p of list || []) {
+    const tKey = (p.title || '').trim().toLowerCase();
+    if (tKey && !seenTitles.has(tKey)) {
+      seenTitles.add(tKey);
+      uniqueTitle.push(p);
+    }
+  }
+  const source = uniqueTitle.length ? uniqueTitle : (list || []);
+  const diverse = [];
+  const usedVisuals = new Set();
+  const remainder = [];
+  for (const p of source) {
+    const visSrc = getProductVisual(p).src;
+    if (!usedVisuals.has(visSrc)) {
+      usedVisuals.add(visSrc);
+      diverse.push(p);
+    } else {
+      remainder.push(p);
+    }
+  }
+  return [...diverse, ...remainder];
 }
 
 function renderProductThumb(prod, cls = 'idea-card-thumb') {
@@ -469,7 +504,7 @@ function auth(defaultEmail = '', infoMessage = '') {
       closeModal();
       await refreshMe();
       notice(`Demo mode started as ${role === 'manufacturer' ? 'Manufacturer' : 'Consumer'}.`, 'success');
-      go('#' + (res.redirect || '/home'));
+      go('#/home');
     } catch (err) {
       modalNotice(err.message, 'error');
     }
@@ -725,10 +760,6 @@ function renderIdeaToProductSvg() {
 }
 
 function introPage() {
-  if (user) {
-    go('#/home');
-    return;
-  }
   const appRoot = $('#desktopApp') || $('#app');
   if (appRoot) appRoot.classList.add('intro-mode');
   $('#heading').textContent = 'PayPal GENESIS';
@@ -791,10 +822,10 @@ function introPage() {
 
   const launchDemo = async (role) => {
     try {
-      const res = await api('/demo/session', 'POST', { role });
+      await api('/demo/session', 'POST', { role });
       await refreshMe();
       notice(`Demo mode started as ${role === 'manufacturer' ? 'Manufacturer' : 'Consumer'}.`, 'success');
-      go('#' + (res.redirect || '/home'));
+      go('#/home');
     } catch (err) {
       notice(err.message, 'error');
     }
@@ -849,34 +880,29 @@ async function home() {
 
   if (!products.length) {
     products = [
-      { id: 'demo-a1', title: 'Eight-input portable audio interface', category: 'Creator Tools', status: 'prototype', supporters: 2, interest: 2, description: 'Mobile creators request eight discrete XLR/TRS combo preamps, 24-bit/192 kHz conversion DSP, and dual USB-C bus power.', demo: 1 }
+      { id: 'genesis-neutral', title: 'No product opportunities recorded yet', category: 'GENESIS Platform', status: 'idea', supporters: 0, interest: 0, description: 'Submit or import consumer demand records to evaluate engineering requirements and batch production.', demo: 0 }
     ];
   }
 
   let selectedId = products[0].id;
+  let hasSelectedFeatured = false;
   let activeTab = 'overview';
 
-  const seenTitles = new Set();
-  const distinctProducts = [];
-  for (const p of products) {
-    const key = (p.title || '').trim().toLowerCase();
-    if (!seenTitles.has(key)) {
-      seenTitles.add(key);
-      distinctProducts.push(p);
-    }
+  const showcaseProducts = pickDiverseShowcase(products);
+  if (!isMaker && showcaseProducts.length) {
+    selectedId = showcaseProducts[0].id;
   }
-  const showcaseProducts = distinctProducts.length >= 3 ? distinctProducts : products;
 
   if (isMaker) {
     const renderMaker = () => {
       const active = products.find((p) => p.id === selectedId) || products[0];
       const vis = getProductVisual(active);
       const specObj = safeParseJson(active.spec || active.intelligence);
-      const reqs = specObj?.requirements || [
-        '8 × XLR/TRS discrete low-noise combo preamps with tactile gain knobs',
-        '24-bit / 192 kHz high-headroom AD/DA conversion DSP',
-        'Dual USB-C bus power architecture with ultra-low host latency',
-        'CNC-machined matte aluminum chassis ($249 consumer target retail)'
+      const reqs = (Array.isArray(specObj?.requirements) && specObj.requirements.length) ? specObj.requirements : [
+        `Category: ${active.category || 'Hardware'}`,
+        `Current stage: ${stageName[active.status] || active.status || 'Idea'}`,
+        active.description || 'Pending structured Gemini specification generation.',
+        active.target_price ? `Consumer target retail: $${Number(active.target_price)}` : 'Pricing pending manufacturer quote'
       ];
       const stIdx = ['idea', 'clarifying', 'demand'].includes(active.status) ? 0
         : ['prototype', 'tooling'].includes(active.status) ? 1
@@ -892,12 +918,12 @@ async function home() {
             <div class="mfg-hero-panel">
               <div class="mfg-context-header">
                 <div>
-                  <span class="stage-kicker">GENESIS MANUFACTURING</span>
+                  <span class="stage-kicker">GENESIS MANUFACTURING · SELECTED OPPORTUNITY</span>
                   <h2 style="margin:0;font-size:clamp(26px,2.8vw,34px);font-weight:800;color:#fff">Product Opportunity</h2>
                   <p style="margin:4px 0 0;font-size:13.5px;color:var(--text-secondary)">Turn verified consumer demand into a real product.</p>
                 </div>
                 <div class="mfg-switcher-pills">
-                  ${showcaseProducts.slice(0, 4).map((p) => `
+                  ${showcaseProducts.slice(0, 5).map((p) => `
                     <button type="button" class="mfg-opp-chip ${p.id === active.id ? 'active' : ''}" data-pick-opp="${esc(p.id)}">${esc((p.title || '').slice(0, 24))}${(p.title || '').length > 24 ? '…' : ''}</button>
                   `).join('')}
                 </div>
@@ -1035,8 +1061,10 @@ async function home() {
 
   // Consumer Home (02-consumer-home.png)
   const renderConsumer = () => {
-    const featured = products.find((p) => p.id === selectedId) || products[0];
-    const vis = getProductVisual(featured);
+    const featured = products.find((p) => p.id === selectedId) || showcaseProducts[0] || products[0];
+    const vis = hasSelectedFeatured
+      ? getProductVisual(featured)
+      : { src: '/assets/genesis-platform-hero.svg', isSvg: true, alt: 'GENESIS Product Creation Platform' };
     const stepMap = { idea: 0, clarifying: 1, demand: 2, tooling: 2, prototype: 3, active: 3, funded: 4 };
     const jStep = stepMap[featured.status] ?? 2;
     const ji = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
@@ -1152,6 +1180,7 @@ async function home() {
           return;
         }
         selectedId = card.dataset.selectCard;
+        hasSelectedFeatured = true;
         renderConsumer();
       };
     });
@@ -1221,7 +1250,9 @@ function help() {
             </div>
           </div>
           <div class="app-hero-graphic-stage">
-            ${renderProductThumb(featured, 'visual-halo')}
+            <div class="visual-halo is-svg">
+              <img src="/assets/genesis-platform-hero.svg" alt="GENESIS Platform Architecture">
+            </div>
           </div>
         </div>
 
@@ -1366,7 +1397,7 @@ async function explore() {
   const data = await api('/products');
   const products = data.products || [];
   const totalBackers = products.reduce((acc, p) => acc + (p.supporters || 0), 0);
-  const featured = products[0] || { title: 'Eight-input portable audio interface', category: 'Creator Tools', status: 'prototype', supporters: 2 };
+  const featured = products[0] || { id: 'genesis-neutral', title: 'Select a product idea below', category: 'GENESIS Platform', status: 'idea', supporters: 0 };
 
   $('#view').innerHTML = `
     <div class="app-workspace-layout view-enter">
@@ -1437,7 +1468,9 @@ async function explore() {
             </div>
           </div>
           <div class="app-hero-graphic-stage">
-            ${renderProductThumb(featured, 'visual-halo')}
+            <div class="visual-halo is-svg">
+              <img src="/assets/genesis-platform-hero.svg" alt="GENESIS Platform Architecture">
+            </div>
           </div>
         </div>
 
@@ -1744,7 +1777,10 @@ function requestWizard(step = 1, publishedId = null) {
 
   const steps = ['Idea', 'Requirements', 'Review', 'Publish'];
   const previewIdea = draft.title || draft.idea || 'Describe a portable hardware tool, smart home device, or creator product';
-  const initVis = getProductVisual({ title: draft.title || draft.idea || '', category: draft.category || '' });
+  const hasDraftInput = Boolean((draft.title || draft.idea || draft.category || '').trim());
+  const initVis = hasDraftInput
+    ? getProductVisual({ title: draft.title || draft.idea || '', category: draft.category || '' })
+    : { src: '/assets/genesis-platform-hero.svg', isSvg: true, alt: 'GENESIS Concept Preview' };
 
   $('#view').innerHTML = `
     <div class="create-stage-wrap view-enter">
@@ -1851,7 +1887,10 @@ function requestWizard(step = 1, publishedId = null) {
       const useVal = ($('#useTextarea')?.value || '').trim();
       if ($('#ideaCounter')) $('#ideaCounter').textContent = `${($('#ideaTextarea')?.value || '').length} / 3000`;
       if ($('#useCounter')) $('#useCounter').textContent = `${($('#useTextarea')?.value || '').length} / 1000`;
-      const vis = getProductVisual({ title: ideaVal || draft.title || '', category: catVal });
+      const hasInput = Boolean(ideaVal || draft.title || catVal);
+      const vis = hasInput
+        ? getProductVisual({ title: ideaVal || draft.title || '', category: catVal })
+        : { src: '/assets/genesis-platform-hero.svg', isSvg: true, alt: 'GENESIS Concept Preview' };
       if ($('#createPreviewImg')) {
         $('#createPreviewImg').src = vis.src;
         $('#createPreviewImg').alt = vis.alt;
@@ -2393,13 +2432,18 @@ async function detail(id, autoAnalyze = false) {
     <div class="product-layout">
       <div class="stack">
         <div class="panel">
-          <div class="row" style="margin-bottom:10px">
-            <span class="badge">${esc(stageName[p.status] || p.status)}</span>
-            ${p.demo ? '<span class="badge demo">DEMO EXAMPLE</span>' : ''}
-            <span class="badge muted-badge">${esc(p.category || 'Other')}</span>
+          <div class="mfg-hero-split">
+            <div>
+              <div class="row" style="margin-bottom:10px">
+                <span class="badge">${esc(stageName[p.status] || p.status)}</span>
+                ${p.demo ? '<span class="badge demo">DEMO EXAMPLE</span>' : ''}
+                <span class="badge muted-badge">${esc(p.category || 'Other')}</span>
+              </div>
+              <h2>${esc(p.title)}</h2>
+              <p style="white-space:pre-line">${esc(p.description)}</p>
+            </div>
+            ${renderProductThumb(p, 'visual-halo')}
           </div>
-          <h2>${esc(p.title)}</h2>
-          <p style="white-space:pre-line">${esc(p.description)}</p>
         </div>
 
         <div class="panel">
@@ -2913,12 +2957,15 @@ async function ordersPage() {
   const res = isMaker ? await api('/manufacturer/orders') : await api('/orders');
   const orders = res.orders || [];
   let statusFilter = '';
+  let selectedOrderId = orders[0]?.id || null;
 
   const renderOrders = () => {
     const filtered = statusFilter ? orders.filter((o) => o.status === statusFilter) : orders;
-    const featuredOrder = orders[0] || null;
-    const fTitle = featuredOrder ? (featuredOrder.product_title || featuredOrder.title || 'Hardware Order') : 'Eight-input portable audio interface';
-    const fVis = getProductVisual(featuredOrder ? { id: featuredOrder.product_id, title: fTitle, category: featuredOrder.category } : { id: 'demo-a1', title: fTitle, category: 'Audio Hardware' });
+    const featuredOrder = orders.find((o) => o.id === selectedOrderId) || filtered[0] || orders[0] || null;
+    const fTitle = featuredOrder ? (featuredOrder.product_title || featuredOrder.title || 'Hardware Order') : 'No PayPal Sandbox Orders Recorded Yet';
+    const fVis = featuredOrder
+      ? getProductVisual({ id: featuredOrder.product_id, title: fTitle, category: featuredOrder.category })
+      : { src: '/assets/genesis-platform-hero.svg', isSvg: true, alt: 'GENESIS PayPal Sandbox Ledger' };
     const fAmount = featuredOrder ? Number(featuredOrder.amount || 0).toFixed(2) : '—';
     const fCurr = featuredOrder ? (featuredOrder.currency || 'USD') : 'USD';
     const isCompleted = featuredOrder ? featuredOrder.status === 'COMPLETED' : false;
@@ -3000,7 +3047,7 @@ async function ordersPage() {
           </div>
 
           <div class="row" style="justify-content:center">
-            <button type="button" class="btn-luminous-primary" onclick="go('#/product/${esc(featuredOrder.product_id || 'demo-a1')}')">
+            <button type="button" class="btn-luminous-primary" onclick="go('#/product/${esc(featuredOrder.product_id)}')">
               <span>View details</span>${icon('arrowRight')}
             </button>
           </div>
@@ -3013,7 +3060,7 @@ async function ordersPage() {
             </div>
 
             <div>
-              <span class="sandbox-pill">Sample Workflow Preview · Not a Ledger Record</span>
+              <span class="sandbox-pill">PayPal Sandbox Ledger · 0 Transactions</span>
               <h3 style="margin:10px 0 6px;font-size:24px;font-weight:800;color:#fff">No PayPal Sandbox Orders Recorded Yet</h3>
               <p style="margin:0;font-size:13px;color:var(--text-secondary)">
                 This account currently has <strong>0</strong> PayPal Sandbox transactions stored in Cloudflare D1. Explore an eligible non-DEMO manufacturing offer to test real PayPal Orders v2 checkout.
@@ -3074,11 +3121,12 @@ async function ordersPage() {
         <div class="list">
           ${filtered.map((o) => {
             const title = o.product_title || o.title || 'Hardware Order';
+            const isSel = featuredOrder && featuredOrder.id === o.id;
             return `
-              <div class="order-row-card">
-                <div class="row" style="gap:14px">
-                  ${renderProductThumb({ id: o.product_id, title })}
-                  <div>
+              <div class="order-row-card ${isSel ? 'is-selected' : ''}" data-select-order="${esc(o.id)}">
+                <div class="row" style="gap:14px;flex-wrap:nowrap;min-width:0">
+                  ${renderProductThumb({ id: o.product_id, title, category: o.category })}
+                  <div style="min-width:0">
                     <strong style="display:block;color:#fff;font-size:14.5px">${esc(title)}</strong>
                     <small style="color:var(--text-muted)">Ref: ${esc(o.paypal_order_id || o.id)} · ${esc((o.created_at || '').slice(0, 10))}</small>
                   </div>
@@ -3089,14 +3137,14 @@ async function ordersPage() {
                   ${!['COMPLETED', 'CANCELLED', 'FAILED'].includes(o.status) ? `
                     ${o.status === 'APPROVED' ? `<button type="button" class="btn-luminous-primary sm" data-capture="${esc(o.id)}">Capture</button>` : ''}
                     <button type="button" class="btn-luminous-secondary sm" data-reconcile="${esc(o.id)}">Check</button>
-                  ` : `<button type="button" class="circle-arrow-btn" onclick="go('#/product/${esc(o.product_id || 'demo-a1')}')" aria-label="View order">${icon('arrowRight')}</button>`}
+                  ` : `<button type="button" class="circle-arrow-btn" onclick="event.stopPropagation();go('#/product/${esc(o.product_id)}')" aria-label="View order">${icon('arrowRight')}</button>`}
                 </div>
               </div>
             `;
           }).join('') || `
-            <div class="order-row-card">
+            <div class="order-row-card" style="cursor:default">
               <div class="row" style="gap:14px">
-                ${renderProductThumb({ id: 'demo-a1', title: 'Eight-input portable audio interface' })}
+                ${renderProductThumb({ id: 'genesis-orders-empty', title: 'GENESIS PayPal Sandbox Ledger' })}
                 <div>
                   <strong style="display:block;color:#fff;font-size:14.5px">Empty PayPal Sandbox Ledger</strong>
                   <small style="color:var(--text-muted)">Real Orders v2 transactions completed via an eligible product offer will appear here with captured amounts and refs.</small>
@@ -3110,6 +3158,13 @@ async function ordersPage() {
         </div>
       </div>
     `;
+
+    $('#view').querySelectorAll('[data-select-order]').forEach((card) => {
+      card.onclick = () => {
+        selectedOrderId = card.dataset.selectOrder;
+        renderOrders();
+      };
+    });
 
     if ($('#ordProductsBtn')) $('#ordProductsBtn').onclick = () => go('#/manufacturer/products');
     if ($('#backMyProductsBtn')) $('#backMyProductsBtn').onclick = () => go('#/explore');
@@ -3142,6 +3197,457 @@ async function ordersPage() {
   renderOrders();
 }
 
+async function manufacturerDemand(mode = 'demand') {
+  if (!maker()) return go('#/home');
+  $('#heading').textContent = mode === 'offer' ? 'Offer to manufacture' : 'Customer demand';
+  const x = await api('/manufacturer/dashboard');
+  const list = mode === 'offer' ? x.opportunities.filter((o) => o.status !== 'retirement') : x.opportunities;
+
+  $('#view').innerHTML = `
+    <div class="mfg-hero-panel view-enter" style="margin-bottom:18px">
+      <div class="app-context-header">
+        <div class="app-title-area">
+          <span class="stage-kicker">GENESIS MANUFACTURING DEMAND</span>
+          <h2>${mode === 'offer' ? 'Choose a product to propose an offer' : 'Customer demand & product requests'}</h2>
+          <p>${mode === 'offer'
+            ? 'Select a non-discontinued product below to submit pricing, minimum quantity, and fulfillment terms.'
+            : 'Ideas sorted by customer interest. Review consumer specifications and decide where to commit manufacturing capacity.'}</p>
+        </div>
+        <div class="app-context-actions">
+          <button type="button" class="btn-luminous-secondary sm" onclick="go('#/manufacturer/intelligence')">${icon('sparkles')}<span>AG Studio Intelligence</span></button>
+          <button type="button" class="btn-luminous-primary sm" onclick="go('#/manufacturer/products')">My Offered Products</button>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-bottom:0">
+        <label class="sr-only" for="mfgSearch">Search requests</label>
+        <input id="mfgSearch" placeholder="Search requests…">
+        <label class="sr-only" for="mfgStage">Stage</label>
+        <select id="mfgStage">
+          <option value="">All stages</option>
+          ${stages.map((s) => `<option value="${s}">${esc(stageName[s])}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div id="mfgGrid" class="grid view-enter"></div>
+  `;
+
+  const renderGrid = () => {
+    const q = $('#mfgSearch').value.trim().toLowerCase();
+    const st = $('#mfgStage').value;
+    const filtered = list.filter(
+      (o) => (!st || o.status === st) && (!q || o.title.toLowerCase().includes(q) || (o.description || '').toLowerCase().includes(q))
+    );
+    $('#mfgGrid').innerHTML = filtered.map((o) => `
+      <article class="card">
+        <div class="row" style="gap:12px;flex-wrap:nowrap;align-items:center">
+          ${renderProductThumb(o)}
+          <div style="min-width:0">
+            <div class="row" style="gap:6px;margin-bottom:6px">
+              <span class="badge">${esc(stageName[o.status] || o.status)}</span>
+              ${o.demo ? '<span class="badge demo">DEMO</span>' : ''}
+              ${o.has_my_offer ? '<span class="badge success">Your offer active</span>' : ''}
+            </div>
+            <h3 style="margin:0;font-size:15.5px;color:#fff">${esc(o.title)}</h3>
+          </div>
+        </div>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--text-secondary)">${esc((o.description || '').slice(0, 140))}${(o.description || '').length > 140 ? '…' : ''}</p>
+        <div class="card-foot">
+          <span class="muted">${o.interest} interested · ${o.reports} reports</span>
+          <button type="button" class="btn-luminous-secondary sm" data-mpid="${esc(o.id)}">${mode === 'offer' ? 'Offer to build' : 'Manage →'}</button>
+        </div>
+      </article>
+    `).join('') || '<div class="empty">No matching requests found.</div>';
+
+    $('#mfgGrid').querySelectorAll('[data-mpid]').forEach((b) => (b.onclick = () => go('#/manufacturer/product/' + b.dataset.mpid)));
+  };
+  renderGrid();
+  $('#mfgSearch').oninput = renderGrid;
+  $('#mfgStage').onchange = renderGrid;
+}
+
+function decisionModal(recId) {
+  modal(`
+    <h2 id="modalTitle">Record improvement decision</h2>
+    <p>A human reviewer must evaluate the evidence and explain the chosen action.</p>
+    <form class="stack" id="decisionForm" novalidate>
+      <label>Decision <span class="req">(Required)</span>
+        <select name="status">
+          <option value="investigating">Investigate further</option>
+          <option value="accepted">Accept and revise design</option>
+          <option value="paused">Pause product availability</option>
+          <option value="retired">Consider discontinuing</option>
+          <option value="rejected">Dismiss with explanation</option>
+        </select>
+      </label>
+      <label>Reason and next steps <span class="req">(Required)</span>
+        <textarea name="note" maxlength="1000" placeholder="Example: Confirmed standby power draw issue on batch 1.0; revising power IC firmware."></textarea>
+        <span class="field-error" data-err="note"></span>
+      </label>
+      <button type="submit" class="primary">Save decision</button>
+    </form>
+  `);
+
+  $('#decisionForm').onsubmit = (e) => {
+    e.preventDefault();
+    const f = e.target;
+    f.querySelector('[data-err="note"]').textContent = '';
+    if (!f.note.value.trim()) {
+      f.querySelector('[data-err="note"]').textContent = 'Enter a reason for this decision.';
+      return;
+    }
+    loading(e.submitter, async () => {
+      try {
+        await api('/recommendations/' + recId + '/decision', 'POST', { status: f.status.value, note: f.note.value.trim() });
+        closeModal();
+        notice('Quality decision recorded.', 'success');
+        await manufacturerQuality();
+      } catch (err) {
+        modalNotice(err.message, 'error');
+      }
+    }, 'Saving…');
+  };
+}
+
+async function manufacturerQuality() {
+  if (!maker()) return go('#/home');
+  $('#heading').textContent = 'Quality & Reports';
+  const q = await api('/intelligence/quality');
+
+  $('#view').innerHTML = `
+    <div class="mfg-hero-panel view-enter" style="margin-bottom:18px">
+      <div class="app-context-header">
+        <div class="app-title-area">
+          <span class="stage-kicker">QUALITY GOVERNANCE</span>
+          <h2>Problems customers are reporting</h2>
+          <p>Submitted reports are customer signals requiring human engineering review — not verified defect rates.</p>
+        </div>
+        <button type="button" class="btn-luminous-secondary sm" onclick="go('#/manufacturer/demand')">← Back to Demand</button>
+      </div>
+    </div>
+    <div class="account-grid-layout view-enter">
+      <div class="panel">
+        <h2>Quality findings requiring decision (${q.recommendations.length})</h2>
+        <div class="stack" style="margin-top:12px">
+          ${q.recommendations.map((r) => `
+            <div class="list-item">
+              <div class="row" style="justify-content:space-between">
+                <div class="row" style="gap:10px">
+                  ${renderProductThumb({ id: r.product_id, title: r.title })}
+                  <div>
+                    <span class="badge ${r.severity === 'high' ? 'danger' : 'demo'}">${esc(r.kind)}</span>
+                    ${r.demo ? '<span class="badge demo">DEMO</span>' : ''}
+                    <strong style="display:block;margin-top:4px;color:#fff">${esc(r.title)}</strong>
+                  </div>
+                </div>
+                <span class="badge muted-badge">${esc(r.status)}</span>
+              </div>
+              <p style="margin-top:8px">${esc(r.evidence)}</p>
+              <p class="field-hint">${esc(r.action)} · ${esc(r.uncertainty)}</p>
+              ${r.decision_note ? `<p><strong>Recorded decision note:</strong> ${esc(r.decision_note)}</p>` : ''}
+              <div class="row" style="margin-top:10px">
+                <button type="button" class="primary sm" data-rec="${esc(r.id)}">Record improvement decision</button>
+                <button type="button" class="secondary sm" data-mpid="${esc(r.product_id)}">Open product</button>
+              </div>
+            </div>
+          `).join('') || '<div class="empty">No quality recommendations yet for products you offered to manufacture.</div>'}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Recent customer feedback reports (${q.reports.length})</h2>
+        <div class="stack" style="margin-top:12px">
+          ${q.reports.map((f) => `
+            <div class="list-item">
+              <div class="row" style="justify-content:space-between">
+                <div class="row" style="gap:10px">
+                  ${renderProductThumb({ id: f.product_id, title: f.title })}
+                  <strong>${esc(f.title)} ${f.demo ? '(DEMO)' : ''}</strong>
+                </div>
+                <span class="badge muted-badge">${esc(f.kind)} · v${esc(f.version)} · ${f.rating}/5</span>
+              </div>
+              <p style="margin-top:8px">${esc(f.details)}</p>
+            </div>
+          `).join('') || '<p class="muted">No customer feedback reports on your products yet.</p>'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  $('#view').querySelectorAll('[data-rec]').forEach((b) => (b.onclick = () => decisionModal(b.dataset.rec)));
+  $('#view').querySelectorAll('[data-mpid]').forEach((b) => (b.onclick = () => go('#/manufacturer/product/' + b.dataset.mpid)));
+}
+
+async function manufacturerProducts() {
+  if (!maker()) return go('#/home');
+  $('#heading').textContent = 'My Offered Products';
+  const x = await api('/manufacturer/my-products');
+  $('#view').innerHTML = `
+    <div class="row page-actions view-enter">
+      <button type="button" class="btn-luminous-primary sm" id="mpOfferNewBtn">Offer to manufacture a product</button>
+      <button type="button" class="btn-luminous-secondary sm" id="mpViewOrdersBtn">View orders</button>
+    </div>
+    <div class="grid view-enter">
+      ${x.products.map((p) => `
+        <article class="card">
+          <div class="row" style="gap:12px;flex-wrap:nowrap;align-items:center">
+            ${renderProductThumb(p)}
+            <div style="min-width:0">
+              <div class="row" style="gap:6px;margin-bottom:6px">
+                <span class="badge">${esc(stageName[p.status] || p.status)}</span>
+                ${p.demo ? '<span class="badge demo">DEMO</span>' : ''}
+                <span class="badge ${p.eligible && !p.demo && p.status !== 'retirement' ? 'success' : 'muted-badge'}">${p.eligible && !p.demo && p.status !== 'retirement' ? 'Checkout enabled' : 'Proposal only'}</span>
+              </div>
+              <h3 style="margin:0;font-size:15.5px;color:#fff">${esc(p.title)}</h3>
+            </div>
+          </div>
+          <p style="margin:4px 0 0;font-size:13px;color:var(--text-secondary)"><strong>${esc(p.currency)} ${Number(p.price).toFixed(2)}</strong> · Min qty ${p.minimum_quantity}<br>${esc((p.terms || '').slice(0, 100))}</p>
+          <div class="card-foot">
+            <button type="button" class="btn-luminous-secondary sm" data-mpid="${esc(p.id)}">Manage offer &amp; stages</button>
+          </div>
+        </article>
+      `).join('') || '<div class="empty" style="grid-column:1/-1">You have not published any offers yet. Browse customer demand to propose your first build.</div>'}
+    </div>
+  `;
+  $('#mpOfferNewBtn').onclick = () => go('#/manufacturer/offer');
+  $('#mpViewOrdersBtn').onclick = () => go('#/orders');
+  $('#view').querySelectorAll('[data-mpid]').forEach((b) => (b.onclick = () => go('#/manufacturer/product/' + b.dataset.mpid)));
+}
+
+async function manufacturerProduct(id) {
+  if (!maker()) return go('#/home');
+  const x = await api('/products/' + id);
+  const p = x.product;
+  $('#heading').textContent = p.title;
+  const spec = safeParseJson(p.intelligence);
+  const myOffers = x.offers.filter((o) => o.manufacturer_id === user.id);
+  const canTransition = user.role === 'administrator' || myOffers.length > 0;
+  const availableNext = nextStages[p.status] || [];
+  let offerStep = 1;
+  const offerDraft = { price: '', currency: 'USD', minimum_quantity: 1, terms: '', eligible: false };
+
+  $('#view').innerHTML = `
+    <div class="row page-actions view-enter">
+      <button type="button" class="btn-luminous-secondary sm" id="backDemandBtn">← Customer Demand</button>
+      <button type="button" class="btn-luminous-secondary sm" id="backMyMfgBtn">My Products</button>
+    </div>
+
+    <div class="product-layout view-enter">
+      <div class="stack">
+        <div class="panel">
+          <div class="mfg-hero-split">
+            <div>
+              <span class="stage-kicker">SELECTED OPPORTUNITY</span>
+              <div class="row" style="margin-bottom:10px">
+                <span class="badge">${esc(stageName[p.status] || p.status)}</span>
+                ${p.demo ? '<span class="badge demo">DEMO</span>' : ''}
+                ${p.category ? `<span class="badge muted-badge">${esc(p.category)}</span>` : ''}
+              </div>
+              <h2 style="margin:0 0 8px;color:#fff">${esc(p.title)}</h2>
+              <p style="white-space:pre-line;color:var(--text-secondary)">${esc(p.description)}</p>
+              <p class="muted" style="margin-top:8px">${x.support.reduce((n, v) => n + v.count, 0)} people interested · ${x.feedback.length} customer reports</p>
+            </div>
+            ${renderProductThumb(p, 'visual-halo')}
+          </div>
+          ${spec ? specEditorHtml(spec, false) : ''}
+        </div>
+
+        <div class="panel">
+          <h2>Offer to manufacture</h2>
+          <p class="field-hint" style="margin-bottom:12px">A proposal shares your estimated pricing and terms. Enabling Sandbox checkout makes an eligible non-DEMO offer purchasable by verified consumers.</p>
+          ${p.status === 'retirement'
+            ? '<div class="callout warn">This product is discontinued. New offers cannot be published.</div>'
+            : '<div id="offerWizardBox"></div>'}
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="panel">
+          <h2>Update production stage</h2>
+          <p class="field-hint" style="margin-bottom:12px">Current stage: <strong>${esc(stageName[p.status] || p.status)}</strong></p>
+          ${!canTransition
+            ? '<div class="callout info">Publish a manufacturer offer for this product first before recording production stage milestones.</div>'
+            : !availableNext.length
+              ? '<p class="muted">No further stage transitions are available from Discontinued.</p>'
+              : `<form class="stack" id="transitionForm" novalidate>
+                  <label>Next valid stage <span class="req">(Required)</span>
+                    <select name="status">${availableNext.map((s) => `<option value="${s}">${esc(stageName[s])}</option>`).join('')}</select>
+                  </label>
+                  <label>Milestone note <span class="req">(Required)</span>
+                    <textarea name="note" maxlength="1000" placeholder="Example: Completed initial PCB prototype and bench testing."></textarea>
+                    <span class="field-error" data-err="note"></span>
+                  </label>
+                  <button type="submit" class="primary">Save stage update</button>
+                </form>`}
+        </div>
+
+        <div class="panel">
+          <h2>Published offers (${x.offers.length})</h2>
+          ${x.offers.map((o) => {
+            const mine = o.manufacturer_id === user.id || user.role === 'administrator';
+            const canEnable = !p.demo && !p.id.startsWith('demo-') && p.status !== 'retirement';
+            return `<div class="list-item">
+              <div class="row" style="justify-content:space-between">
+                <strong>${esc(o.manufacturer)}</strong>
+                <span class="badge ${o.eligible && canEnable ? 'success' : 'muted-badge'}">${o.eligible && canEnable ? 'Checkout enabled' : 'Proposal only'}</span>
+              </div>
+              <p style="margin-top:6px"><strong>${esc(o.currency)} ${Number(o.price).toFixed(2)}</strong> · Min qty ${o.minimum_quantity}</p>
+              <p>${esc(o.terms)}</p>
+              ${mine && canEnable
+                ? `<button type="button" class="secondary sm" data-toggle-offer="${esc(o.id)}" data-next-eligible="${o.eligible ? '0' : '1'}">${o.eligible ? 'Set to proposal only' : 'Enable Sandbox checkout'}</button>`
+                : !canEnable
+                  ? '<span class="field-hint">Checkout cannot be enabled on DEMO or discontinued products.</span>'
+                  : ''}
+            </div>`;
+          }).join('') || '<p class="muted">No offers published yet.</p>'}
+        </div>
+
+        <div class="panel">
+          <h2>Customer reports (${x.feedback.length})</h2>
+          ${x.feedback.slice(0, 6).map((f) => `<div class="list-item"><strong>${esc(f.kind)} · v${esc(f.version)} · ${f.rating}/5</strong><p style="margin-top:4px">${esc(f.details)}</p></div>`).join('') || '<p class="muted">No customer reports yet.</p>'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  $('#backDemandBtn').onclick = () => go('#/manufacturer/demand');
+  $('#backMyMfgBtn').onclick = () => go('#/manufacturer/products');
+
+  const renderOfferStep = () => {
+    const box = $('#offerWizardBox');
+    if (!box) return;
+    if (offerStep === 1) {
+      box.innerHTML = `
+        <form class="stack" id="offerStepForm" novalidate>
+          <p class="muted">Step 1 of 3 · Pricing and order minimum</p>
+          <label>Unit price <span class="req">(Required)</span>
+            <input name="price" type="number" min="0.01" step="0.01" value="${esc(offerDraft.price)}" placeholder="Example: 199.00">
+            <span class="field-error" data-err="price"></span>
+          </label>
+          <label>Currency <span class="req">(Required)</span>
+            <select name="currency">${['USD', 'EUR', 'GBP', 'INR'].map((c) => `<option value="${c}" ${offerDraft.currency === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
+          </label>
+          <label>Minimum order quantity <span class="req">(Required)</span>
+            <input name="minimum_quantity" type="number" min="1" value="${esc(offerDraft.minimum_quantity)}">
+            <span class="field-error" data-err="minimum_quantity"></span>
+          </label>
+          <button type="submit" class="primary">Continue</button>
+        </form>`;
+      $('#offerStepForm').onsubmit = (e) => {
+        e.preventDefault();
+        const f = e.target;
+        f.querySelectorAll('.field-error').forEach((n) => (n.textContent = ''));
+        const price = Number(f.price.value);
+        const minQty = Number(f.minimum_quantity.value);
+        if (!Number.isFinite(price) || price <= 0) {
+          f.querySelector('[data-err="price"]').textContent = 'Enter a valid positive price.';
+          return;
+        }
+        if (!Number.isInteger(minQty) || minQty < 1) {
+          f.querySelector('[data-err="minimum_quantity"]').textContent = 'Minimum quantity must be at least 1.';
+          return;
+        }
+        offerDraft.price = price;
+        offerDraft.currency = f.currency.value;
+        offerDraft.minimum_quantity = minQty;
+        offerStep = 2;
+        renderOfferStep();
+      };
+    } else if (offerStep === 2) {
+      box.innerHTML = `
+        <form class="stack" id="offerStepForm" novalidate>
+          <p class="muted">Step 2 of 3 · Fulfillment terms and checkout eligibility</p>
+          <label>What will you deliver and when? <span class="req">(Required)</span>
+            <textarea name="terms" maxlength="2000" placeholder="Example: Ships in 4 weeks with 1-year warranty and USB-C cable included.">${esc(offerDraft.terms)}</textarea>
+            <span class="field-error" data-err="terms"></span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="eligible" ${offerDraft.eligible ? 'checked' : ''} ${p.demo ? 'disabled' : ''}>
+            <span>Allow verified consumers to start PayPal Sandbox checkout now${p.demo ? ' (disabled for DEMO products)' : ''}</span>
+          </label>
+          <div class="row">
+            <button type="button" class="secondary" id="offerBack1">Back</button>
+            <button type="submit" class="primary">Review offer</button>
+          </div>
+        </form>`;
+      $('#offerBack1').onclick = () => {
+        offerDraft.terms = $('#offerStepForm').terms.value.trim();
+        offerDraft.eligible = $('#offerStepForm').eligible.checked;
+        offerStep = 1;
+        renderOfferStep();
+      };
+      $('#offerStepForm').onsubmit = (e) => {
+        e.preventDefault();
+        const f = e.target;
+        f.querySelector('[data-err="terms"]').textContent = '';
+        if (!f.terms.value.trim()) {
+          f.querySelector('[data-err="terms"]').textContent = 'Describe your fulfillment terms.';
+          return;
+        }
+        offerDraft.terms = f.terms.value.trim();
+        offerDraft.eligible = !p.demo && f.eligible.checked;
+        offerStep = 3;
+        renderOfferStep();
+      };
+    } else {
+      box.innerHTML = `
+        <p class="muted">Step 3 of 3 · Review and publish offer</p>
+        <div class="review">
+          <strong>${esc(offerDraft.currency)} ${Number(offerDraft.price).toFixed(2)}</strong> · Min qty ${offerDraft.minimum_quantity}
+          <p style="margin-top:8px">${esc(offerDraft.terms)}</p>
+          <span class="badge ${offerDraft.eligible ? 'success' : 'muted-badge'}">${offerDraft.eligible ? 'PayPal Sandbox checkout enabled' : 'Preliminary proposal only'}</span>
+        </div>
+        <div class="row">
+          <button type="button" class="secondary" id="offerBack2">Back</button>
+          <button type="button" class="primary" id="publishOfferBtn">Publish offer</button>
+        </div>`;
+      $('#offerBack2').onclick = () => { offerStep = 2; renderOfferStep(); };
+      $('#publishOfferBtn').onclick = (e) => loading(e.currentTarget, async () => {
+        try {
+          await api('/products/' + id + '/offers', 'POST', offerDraft);
+          notice('Manufacturer offer published.', 'success');
+          await manufacturerProduct(id);
+        } catch (err) {
+          notice(err.message, 'error');
+        }
+      }, 'Publishing…');
+    }
+  };
+  renderOfferStep();
+
+  if ($('#transitionForm')) {
+    $('#transitionForm').onsubmit = (e) => {
+      e.preventDefault();
+      const f = e.target;
+      f.querySelector('[data-err="note"]').textContent = '';
+      if (!f.note.value.trim()) {
+        f.querySelector('[data-err="note"]').textContent = 'Explain what changed at this milestone.';
+        return;
+      }
+      loading(e.submitter, async () => {
+        try {
+          await api('/products/' + id + '/transition', 'POST', { status: f.status.value, note: f.note.value.trim() });
+          notice('Production stage updated.', 'success');
+          await manufacturerProduct(id);
+        } catch (err) {
+          notice(err.message, 'error');
+        }
+      }, 'Saving…');
+    };
+  }
+
+  $('#view').querySelectorAll('[data-toggle-offer]').forEach((b) => {
+    b.onclick = (e) => loading(e.currentTarget, async () => {
+      try {
+        await api('/offers/' + b.dataset.toggleOffer, 'PATCH', { eligible: b.dataset.nextEligible === '1' });
+        notice('Offer availability updated.', 'success');
+        await manufacturerProduct(id);
+      } catch (err) {
+        notice(err.message, 'error');
+      }
+    }, 'Updating…');
+  });
+}
+
 async function accountPage() {
   $('#heading').textContent = 'Account & Role';
   if (!user) {
@@ -3157,7 +3663,7 @@ async function accountPage() {
   application = mfgState.application;
 
   $('#view').innerHTML = `
-    <div class="stack" style="max-width:760px">
+    <div class="account-grid-layout view-enter">
       <div class="panel">
         <h2>Account details</h2>
         <p><strong>Name:</strong> ${esc(user.name)}</p>
@@ -3373,7 +3879,7 @@ async function manufacturerIntelligence() {
     products = (pub.products || []).map((p) => ({ ...p, interest: Number(p.supporters || 0) }));
   }
 
-  let activeProduct = products[0] || { id: 'demo-a1', title: 'Eight-input portable audio interface', category: 'Creator Tools', interest: 2, status: 'prototype' };
+  let activeProduct = products[0] || { id: 'genesis-neutral', title: 'No product opportunities yet', category: 'GENESIS Platform', interest: 0, status: 'idea' };
   let chartMode = 'interest';
   let catFilter = '';
   let stageFilter = '';
@@ -3472,7 +3978,18 @@ async function manufacturerIntelligence() {
     `;
   };
 
+  let studioResizeObs = null;
+  let studioRaf = 0;
+
   const draw = () => {
+    if (studioResizeObs) {
+      studioResizeObs.disconnect();
+      studioResizeObs = null;
+    }
+    if (studioRaf) {
+      cancelAnimationFrame(studioRaf);
+      studioRaf = 0;
+    }
     if (studioApi && typeof studioApi.destroy === 'function') {
       try { studioApi.destroy(); } catch {}
       studioApi = null;
@@ -3500,8 +4017,11 @@ async function manufacturerIntelligence() {
               `}
             </div>
           </div>
-          <div class="visual-halo ${vis.isSvg ? 'is-svg' : ''}" style="max-width:250px;min-height:150px">
-            <img src="${vis.src}" alt="${esc(vis.alt)}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:220px">
+            <div class="visual-halo ${vis.isSvg ? 'is-svg' : ''}" style="max-width:260px;min-height:150px">
+              <img src="${vis.src}" alt="${esc(vis.alt)}">
+            </div>
+            <span class="pill" style="font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Selected: ${esc(activeProduct.title)}</span>
           </div>
         </div>
 
@@ -4131,6 +4651,18 @@ async function manufacturerIntelligence() {
             }
           }
         });
+        if (typeof ResizeObserver === 'function') {
+          let lastW = mountEl.clientWidth;
+          studioResizeObs = new ResizeObserver(() => {
+            const w = mountEl.clientWidth;
+            if (w && w !== lastW) {
+              lastW = w;
+              cancelAnimationFrame(studioRaf);
+              studioRaf = requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+            }
+          });
+          studioResizeObs.observe(mountEl);
+        }
       } catch (err) {
         renderStudioError(mountEl, err?.message || 'Unexpected error initializing AG Studio.');
       }
@@ -4177,16 +4709,15 @@ async function manufacturerIntelligence() {
 
 
 async function renderRoute() {
-  const defaultRoute = user ? '#/home' : '#/intro';
+  const defaultRoute = '#/intro';
   const rawHash = (location.hash || defaultRoute).slice(1);
   const [pathPart, queryPart] = rawHash.split('?');
-  const path = pathPart || (user ? '/home' : '/intro');
+  const path = pathPart || '/intro';
   const query = new URLSearchParams(queryPart || '');
 
   ($('#desktopApp') || $('#app'))?.classList.remove('intro-mode');
-  const brandTarget = user ? '#/home' : '#/intro';
-  if ($('#brandHomeLink')) $('#brandHomeLink').setAttribute('href', brandTarget);
-  if ($('#mobileBrandLink')) $('#mobileBrandLink').setAttribute('href', brandTarget);
+  if ($('#brandHomeLink')) $('#brandHomeLink').setAttribute('href', '#/intro');
+  if ($('#mobileBrandLink')) $('#mobileBrandLink').setAttribute('href', '#/intro');
 
   const kickerMap = {
     "/intro": "LUMINA OS",
@@ -4212,8 +4743,8 @@ async function renderRoute() {
   };
 
   try {
-    if (path === '/intro' || (!user && path === '/')) { introPage(); finishRender(); return; }
-    if (path === '/' || path === '/home') { await home(); finishRender(); return; }
+    if (path === '/intro' || path === '/') { introPage(); finishRender(); return; }
+    if (path === '/home') { await home(); finishRender(); return; }
     if (path === '/explore') { await explore(); finishRender(); return; }
     if (path === '/request') { requestWizard(1); finishRender(); return; }
     if (path === '/report') { await reportWizard(1); finishRender(); return; }
@@ -4317,8 +4848,8 @@ async function init() {
       }
     }
 
-    if (!location.hash) {
-      history.replaceState({}, '', location.pathname + (user ? '#/home' : '#/intro'));
+    if (!location.hash || location.hash === '#' || location.hash === '#/') {
+      history.replaceState({}, '', location.pathname + '#/intro');
     }
     await renderRoute();
   } catch (e) {
