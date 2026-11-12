@@ -1175,7 +1175,8 @@ async function route(req, env) {
     }
     const [productsRes, ordersRes, feedbackRes, kpiReqs, kpiInterest, kpiOpen, kpiOffers] = await Promise.all([
       db.prepare(`
-        SELECT p.id, p.title, p.description, p.category, p.status, p.demo, p.created_at, p.spec,
+        SELECT p.id, p.title, p.description, p.category, p.status, p.demo, p.created_at,
+               COALESCE(p.intelligence, p.spec) AS spec, p.intelligence,
                COUNT(DISTINCT s.user_id) AS interest,
                COUNT(DISTINCT f.id) AS reports,
                ROUND(AVG(f.rating), 1) AS rating,

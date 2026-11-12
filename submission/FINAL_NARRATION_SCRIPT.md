@@ -2,50 +2,50 @@
 
 Voice: English AI voice (Leda). No background music.
 
-## Chapter 1: WHAT IS GENESIS?
+## Chapter 1: THE PROBLEM & GENESIS
 
-Have you ever wished a product existed, but couldn't find anyone making it? Or bought something that could have been designed better? GENESIS connects people with product ideas to manufacturers who can bring those ideas closer to reality. Anyone can share an idea, and approved manufacturers can respond with offers.
+What if the products we need didn't have to wait for corporate committees? Introducing PayPal GENESIS, where consumer demand directly sparks manufactured products.
 
-_Measured narration: 18.97s · chapter: 20.80s (frames 0–624)_
+_Measured narration: 11.18s · chapter: 15.00s (frames 0–450)_
 
-## Chapter 2: HOW CONSUMERS USE IT
+## Chapter 2: CONSUMER PRODUCT IDEA
 
-Imagine you need a portable audio interface that records eight microphones at once. You open GENESIS, describe what you need, choose the features that matter, and publish your idea. That's it. Other people can now discover your request.
+A creator requests an affordable portable audio interface with eight microphone inputs, onboard DSP, and USB-C connectivity for live field recording.
 
-_Measured narration: 13.32s · chapter: 15.13s (frames 624–1078)_
+_Measured narration: 10.17s · chapter: 17.00s (frames 450–960)_
 
-## Chapter 3: WHAT THE AI DOES
+## Chapter 3: GENESIS INTELLIGENCE SPECIFICATION
 
-GENESIS Intelligence helps turn your idea into clearer product requirements. It organizes the important features, identifies questions that still need answers, and gives you a specification you can review, edit, and save. You stay in control of your idea.
+Google Gemini AI instantly transforms this description into a verifiable engineering specification, with bill of materials, key technical questions, and editable requirements.
 
-_Measured narration: 17.09s · chapter: 18.90s (frames 1078–1645)_
+_Measured narration: 11.01s · chapter: 20.00s (frames 960–1560)_
 
-## Chapter 4: COMMUNITY SUPPORT AND FEEDBACK
+## Chapter 4: COMMUNITY DEMAND DISCOVERY
 
-Other consumers can explore ideas and show they're interested. They can also report problems with products they already use. This gives manufacturers a clearer view of what people want and what needs improvement.
+The community discovers the idea in the public catalog, pledging nonbinding support to prove real market demand before a single unit is built.
 
-_Measured narration: 12.18s · chapter: 14.00s (frames 1645–2065)_
+_Measured narration: 9.05s · chapter: 13.00s (frames 1560–1950)_
 
-## Chapter 5: HOW MANUFACTURERS USE IT
+## Chapter 5: AG STUDIO COMMAND CENTER
 
-For manufacturers, GENESIS provides a place to discover real customer requests. They can review an idea, propose to build it, share pricing, and update progress. Every offer stays linked to the original request. Customer feedback also helps them decide what to improve before or after a product reaches the market.
+Approved manufacturers enter the GENESIS Intelligence Command Center, built with AG Grid and AG Studio. They explore live demand velocity, filter by stage, and examine the AI specification in an interactive workspace.
 
-_Measured narration: 19.74s · chapter: 21.57s (frames 2065–2712)_
+_Measured narration: 15.05s · chapter: 30.00s (frames 1950–2850)_
 
-## Chapter 6: HOW PAYPAL WORKS
+## Chapter 6: FROM INSIGHT TO PRODUCTION
 
-When a manufacturer has an eligible offer, a verified consumer can continue to PayPal checkout. GENESIS checks the Sandbox payment result before recording the order as confirmed. Both the purchase and its progress can then be followed inside the platform.
+Confident in customer demand, the manufacturer publishes a production offer with unit pricing, minimum batch quantity, and transparent lifecycle milestones.
 
-_Measured narration: 14.55s · chapter: 16.37s (frames 2712–3203)_
+_Measured narration: 9.80s · chapter: 17.00s (frames 2850–3360)_
 
-## Chapter 7: WHY IT MATTERS
+## Chapter 7: PAYPAL SANDBOX CHECKOUT
 
-For consumers, GENESIS means a voice in what gets created, better visibility, and a way to support useful ideas. For manufacturers, it means clearer demand, practical feedback, and a direct path from customer interest to a purchase.
+Consumers complete the purchase through PayPal Sandbox using Orders API v2, with instant escrowed payment verification and confirmed order reconciliation.
 
-_Measured narration: 15.20s · chapter: 17.23s (frames 3203–3720)_
+_Measured narration: 9.99s · chapter: 18.00s (frames 3360–3900)_
 
-## Chapter 8: CLOSING
+## Chapter 8: CLOSING IDENTITY
 
-PayPal GENESIS. Products should begin with people.
+From the first idea to intelligent planning, manufacturing, and PayPal checkout. PayPal GENESIS. Products should begin with people.
 
-_Measured narration: 3.67s · chapter: 9.20s (frames 3720–3996)_
+_Measured narration: 8.74s · chapter: 12.00s (frames 3900–4260)_
